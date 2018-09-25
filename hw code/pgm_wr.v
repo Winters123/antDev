@@ -60,7 +60,7 @@ module pgm_wr #(
 
 
 //signals to PRM_RD
-	output pgm_bypass_flag,
+	output reg pgm_bypass_flag,
 	output pgm_sent_start_flag,
 	output pgm_sent_finish_flag,
 
@@ -128,6 +128,8 @@ always @(posedge clk or negedge rst_n) begin
 		sent_time_cnt <= 64'b0;
 		sent_time_reg <= 64'b0;
 		soft_rst <= 1'b0;
+
+		pgm_bypass_flag <= 1'b0;
 		
 	end
 	else begin
@@ -167,8 +169,9 @@ always @(posedge clk or negedge rst_n) begin
 
 					out_wr_phv <= 1024'b0;
 					out_wr_phv_wr <= 1'b0;
+					pgm_bypass_flag <= 1'b0;
 
-					pgm_wr_state <= DISCARD_S;
+					pgm_wr_state <= IDLE_S;
 				end
 			end
 

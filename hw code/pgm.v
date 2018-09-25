@@ -217,6 +217,7 @@ ram_144_128 pmg_ram
 	.doutb()
 );
 
-pgm_wr #()
+pgm_wr #()();
 
 pgm_rd #()
+
