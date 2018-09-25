@@ -83,10 +83,25 @@ module pgm #(
 //all wire/reg/parameter variable 
 //should be declare below here 
 
+//PGM to WR
+
+reg [133:0]in_wr_data;
+wire in_wr_data_wr;
+wire in_wr_valid_wr;
+wire in_wr_valid;
+wire out_wr_data_alf;
+
+
+reg [1023:0] in_wr_phv;
+wire in_wr_phv_wr;
+wire out_wr_phv_alf;
+
+
 //WR to RD
-wire [1023:0] wr2_rd_phv;
-wire wr2_rd_phv_wr;
-wire wr2_rd_phv_alf;
+
+wire [1023:0] wr2rd_phv;
+wire wr2rd_phv_wr;
+wire wr2rd_phv_alf;
 
 reg [133:0]wr2rd_data;
 reg wr2rd_data_wr;
@@ -111,24 +126,75 @@ wire [6:0]rd2ram_raddr;
 reg [2:0]pgm_state;
 
 assign out_pgm_phv_alf = 1'b0;
-assign out_pgm_data_alf = 
+assign out_pgm_data_alf = in_pgm_alf;
+
+assign   cout_pgm_data_wr = cin_pgm_data_wr;
+assign   cout_pgm_data = cin_pgm_data;
+assign   cout_pgm_ready = cin_pgm_ready;
+
 
 //***************************************************
 //                  PGM Bypass
 //***************************************************
 localparam IDLE_S = 3'd0,
-		   BYPASS = 3'd1,
+		   BYPASS_S = 3'd1,
 		   PGM_S = 3'd2;
 
 always @(posedge clk or negedge rst_n) begin
 	if(rst_n == 1'b0) begin
-		
+		out_pgm_data <= 134'b0;
+		out_pgm_data_wr <= 1'b0;
+		out_pgm_valid_wr <= 1'b0;
+		out_pgm_valid <= 1'b0;
+		out_pgm_phv <= 1024'b0;
+		out_pgm_phv_wr <= 1'b0;
+		pgm_state <= IDLE_S;
+	end
+
+	else begin
+		case(pgm_state)
+			IDLE_S: begin
+				out_pgm_data <= 134'b0;
+				out_pgm_data_wr <= 1'b0;
+				out_pgm_valid_wr <= 1'b0;
+				out_pgm_valid <= 1'b0;
+				out_pgm_phv <= 1024'b0;
+				out_pgm_phv_wr <= 1'b0;
+				//rewrite Priority of flag of PGM works
+				if((in_pgm_data_wr == 1'b1)&&(in_pgm_valid == 1'b1)&&(in_pgm_data[127]==1'b1)&&(in_pgm_data[111:109]==3'b111)) begin
+					pgm_state <= PGM_S;
+				end
+				else if((in_pgm_data_wr == 1'b1)&&(in_pgm_valid == 1'b1)&&(in_pgm_data[111:109]!=3'b111)) begin
+					pgm_state <= BYPASS_S;
+				end
+
+				else begin
+					pgm_state <= IDLE_S;
+				end
+			end
+
+			BYPASS_S: begin
+				//give input values to outputs
+				out_pgm_data <= in_pgm_data;
+				out_pgm_data_wr <= in_pgm_data_wr;
+				out_pgm_valid_wr <= in_pgm_valid_wr;
+				out_pgm_valid <= out_pgm_valid;
+				out_pgm_phv <= in_pgm_phv;
+				out_pgm_phv_wr <= in_pgm_phv_wr;
+			end
+
+			PGM_S: begin
+				//wire inputs into WR
+				
+			end
 	end
 end
 
 
 
-
+//***************************************************
+//                  sub-module Cfg
+//***************************************************
 
 
 //***************************************************
