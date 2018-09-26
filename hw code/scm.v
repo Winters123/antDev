@@ -27,7 +27,8 @@ module scm #(
     //start or end signal
     input gac2scm_sent_start,
     input gac2scm_sent_end,
-
+    
+    /*
     //localbus to scm
     input cfg2scm_cs_n, //low active
     output reg scm2cfg_ack_n, //low active
@@ -35,7 +36,7 @@ module scm #(
     input [31:0] cfg2scm_addr,
     input [31:0] cfg2scm_wdata,
     output reg [31:0] gme2cfg_rdata,
-
+    */
     //input configure pkt from DMA
     input [133:0] cin_scm_data,
     input cin_scm_data_wr,
@@ -84,9 +85,11 @@ reg [31:0] n_RTT;
 
 assign out_scm_md_alf = in_scm_md_alf || (MD_fifo_usedw > 8'd250);
 assign out_scm_phv_alf = in_scm_phv_alf || (MD_fifo_usedw > 8'd250);
+/*
 assign cout_scm_data_wr = cin_scm_data_wr;
 assign cout_scm_data = cin_scm_data;
 assign cout_scm_ready = cin_scm_ready;
+*/
 
 //**************************************************
 //                Transport MD & PHV
@@ -113,6 +116,41 @@ localparam IPv4_TCP     = 3'b000;
 
 always @(posedge clk or negedge rst_n) begin
     if (rst_n == 1'b0) begin
+        protocol_type <= 8'b0;
+        statistic_reset <= 1'b0;
+        n_RTT <= 32'b0;
+    end
+    else begin
+        cout_scm_ready <= 1'b1;
+        if (cin_scm_data_wr == 1'b1) begin
+            if (cin_scm_ready == 1'b1) begin
+                cout_scm_data_wr <= 1'b1;
+                case (cin_scm_data[95:64])
+                    32'h70000000: begin
+                        protocol_type <= cin_scm_data[7:0];
+                    end
+
+                    32'h70000001: begin
+                        statistic_reset <= cin_scm_data[0];
+                    end
+
+                    32'h70000002: begin
+                        n_RTT <= cin_scm_data[31:0];
+                    end
+
+                endcase
+            end
+        end
+        else begin
+            protocol_type <= 8'b0;
+            statistic_reset <= 1'b0;
+            n_RTT <= 32'b0;
+        end
+    end
+end
+
+always @(posedge clk or negedge rst_n) begin
+    if (rst_n == 1'b0) begin
         out_scm_md <= 256'b0;
         out_scm_md_wr <= 1'b0;
         out_scm_phv <= 1024'b0;
@@ -122,9 +160,9 @@ always @(posedge clk or negedge rst_n) begin
         scm_time_cnt <= 64'b0;
         last_timestamp <= 32'b0;
         end_time <= 32'b0;
-        protocol_type <= 8'b0;
-        statistic_reset <= 1'b0;
-        nRTT <= 32'b0;
+        //protocol_type <= 8'b0;
+        //statistic_reset <= 1'b0;
+        //nRTT <= 32'b0;
         md_flag <= 1'b0;
         record_endtime_tag <= 1'b0;
         out_scm_md_reg <= 256'b0;
@@ -254,6 +292,45 @@ always @(posedge clk or negedge rst_n) begin
                 end
                 else begin
                     //fetch the data and information to software
+                    cout_scm_ready <= 1'b1;
+                    if (cin_scm_data_wr == 1'b1) begin
+                        if (cin_scm_ready == 1'b1) begin
+                            cout_scm_data_wr <= 1'b1;
+                            case (cin_scm_data[95:64])
+                                32'h70000008: begin
+                                    cout_scm_data <= {cin_scm_data[133:32], scm_bit_num_cnt[31:0]};
+                                end
+
+                                32'h70000009: begin
+                                    cout_scm_data <= {cin_scm_data[133:32], scm_bit_num_cnt[63:32]};
+                                end
+
+                                32'h7000000A: begin
+                                    cout_scm_data <= {cin_scm_data[133:32], scm_pkt_num_cnt[31:0]};
+                                end
+
+                                32'h7000000B: begin
+                                    cout_scm_data <= {cin_scm_data[133:32], scm_pkt_num_cnt[63:32]};
+                                end
+
+                                32'h7000000C: begin
+                                    cout_scm_data <= {cin_scm_data[133:32], scm_time_cnt[31:0]};
+                                end
+
+                                32'h7000000D: begin
+                                    cout_scm_data <= {cin_scm_data[133:32], scm_time_cnt[63:32]};
+                                end
+
+                                default: begin
+                                    cout_scm_data <= cin_scm_data;
+                                end
+                        end
+                        
+                        scm_state <= FETCH_S;
+                    end
+                    else begin
+                        scm_state <= FETCH_S;
+                    end
                 end
             end
 

@@ -26,6 +26,8 @@
 
 module pgm_rd #(
 	parameter PLATFORM = "Xilinx"
+	LMID = 8'd61, //self MID
+	NMID = 8'd62  //next MID
 )(
 	input clk,
 	input rst_n,
@@ -69,8 +71,8 @@ module pgm_rd #(
 	output cout_rd_ready,
 
 //output configure pkt to next module
-    output [133:0] cout_rd_data,
-	output cout_rd_data_wr,
+    output reg [133:0] cout_rd_data,
+	output reg cout_rd_data_wr,
 	input cin_rd_ready,
 
 );
@@ -95,8 +97,6 @@ reg lat_flag;
 assign out_rd_alf = in_rd_alf;
 assign out_rd_phv_alf = in_rd_phv_alf;
 assign cout_rd_ready = cin_rd_ready;
-assign cout_rd_data = cin_rd_data;
-assign cout_rd_data_wr = cin_rd_data_wr;
 
 reg [5:0] pgm_rd_state;
 
@@ -226,6 +226,8 @@ always @(posedge clk or negedge rst_n) begin
 					rd2ram_addr <= rd2ram_addr + 1'b1;
 
 					sent_bit_cnt <= sent_bit_cnt + 64'd16;
+
+					pgm_rd_state <= READ_S;
 				end
 
 				else if(ram2rd_rdata[133:132] == 2'b10) begin
@@ -297,10 +299,155 @@ always @(posedge clk or negedge rst_n) begin
 
 			PROBE_S: begin
 				//TODO: add timestamp in this part
-				//
+				//but I still think that the timestamp should be added in UDO
+				if(out_rd_data[133:132] != 2'b10) begin
+					out_rd_data <= ram2rd_rdata[133:0];
+					rd2ram_rd <= 1'b1;
+					rd2ram_addr <= rd2ram_addr + 7'b1;
+					out_rd_data_wr <= 1'b1;
+					out_rd_valid <= 1'b1;
+					out_rd_phv_wr <= 1'b0;
+					out_rd_phv <= 1028'b0;
+					
+					pgm_rd_state <= PROBE_S;
+				end
+
+				else begin
+					lat_pkt_cnt <= 32'b0;
+					sent_rate_cnt <= 32'b0;
+
+					rd2ram_rd <= 1'b0;
+					rd2ram_addr <= 7'b0;
+
+					out_rd_data <= 134'b0;
+					out_rd_data_wr <= 1'b0;
+					out_rd_valid <= 1'b0;
+					out_rd_phv_wr <= 1'b0;
+					out_rd_phv <= 1028'b0;
+
+					if(pgm_sent_finish_flag == 1'b1) begin
+						pgm_rd_state <= FIN_S;
+					end
+
+					else begin
+						pgm_rd_state <= WAIT_S;
+					end
+
+				end
 			end
 		
 	end
 end
+
+
+//***************************************************
+//          Operation of User Defined Regs
+//***************************************************
+
+
+always @(posedge clk) begin
+	//1st cycle of control packet 
+	if(cin_rd_data[133:132] == 2'b01 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
+		if (cin_rd_data[103:96]== 8'd61 cin_rd_data[126:124] == 3'b010) begin
+			//write signal from SW
+			case(cin_rd_data[95:64])
+				32'h00000000: begin
+					soft_rst <= cin_rd_data[0];
+				end
+				32'h00000001: begin
+					 sent_rate_cnt <= cin_rd_data[31:0];
+				end
+				32'h00010001: begin
+					 sent_rate_reg <= cin_rd_data[31:0];
+				end
+				32'h00000002: begin
+					 lat_pkt_cnt <= cin_rd_data[31:0];
+				end
+				32'h00010002: begin
+					 lat_pkt_reg <= cin_rd_data[31:0];
+				end
+				32'h00000003: begin
+					 sent_bit_cnt[31:0] <= cin_rd_data[31:0];
+				end
+				32'h00000004: begin
+					 sent_bit_cnt[63:32] <= cin_rd_data[31:0];
+				end
+				32'h00000005: begin
+					 sent_pkt_cnt[31:0] <= cin_rd_data[31:0];
+				end
+				32'h00000006: begin
+					 sent_pkt_cnt[63:32] <= cin_rd_data[31:0];
+				end
+
+			//match input to output
+			cout_rd_data_wr <= cin_rd_data_wr;
+			cout_rd_data <= cin_rd_data;
+		end
+
+		else if(cin_rd_data[103:96]== 8'd61 cin_rd_data[126:124] == 3'b001) begin
+			//read signal from SW
+			
+			case(cin_rd_data[95:64])
+				32'h00000000: begin
+					//cin_rd_data[0] <= soft_rst;
+					cout_rd_data <= {cin_rd_data[133:128], 1'b1, 3'b011, cin_rd_data[123:1], soft_rst};
+				end
+				32'h00000001: begin
+					//cin_rd_data[31:0] <= sent_rate_cnt;
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_rate_cnt};
+				end
+				32'h00010001: begin
+					//cin_rd_data[31:0] <= sent_rate_reg;
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_rate_reg};
+				end
+				32'h00000002: begin
+					//cin_rd_data[31:0] <= lat_pkt_cnt;
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], lat_pkt_cnt};
+				end
+				32'h00010002: begin
+					//cin_rd_data[31:0] <= lat_pkt_reg;
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], lat_pkt_reg};
+				end
+				32'h00000003: begin
+					//cin_rd_data[31:0] <= sent_bit_cnt[31:0];
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_bit_cnt[31:0]};
+				end
+				32'h00000004: begin
+					//cin_rd_data[31:0] <= sent_bit_cnt[63:32];
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_bit_cnt[63:32]};
+				end
+				32'h00000005: begin
+					//cin_rd_data[31:0] <= sent_pkt_cnt[31:0];
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_pkt_cnt[31:0]};
+				end
+				32'h00000006: begin
+					//cin_rd_data[31:0] <= sent_pkt_cnt[63:32];
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_pkt_cnt[63:32]};
+				end
+
+				default: begin
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], 32'hffffffff};
+				end
+
+			cout_rd_data_wr <= cin_rd_data_wr;
+
+
+		end
+	end
+	//2nd cycle of control packet
+	else if(cin_rd_data[133:132] == 2'b10 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
+		cout_rd_data_wr <= cin_rd_data_wr;
+		cout_rd_data <= cin_rd_data;
+	end
+
+	else begin
+		cout_rd_data_wr <= cin_rd_data_wr;
+		cout_rd_data <= cin_rd_data;
+	end
+
+
+end
+
+
 
 endmodule
