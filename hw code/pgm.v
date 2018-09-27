@@ -135,7 +135,7 @@ reg [2:0]pgm_state;
 //likely fifo/ram/async block.... 
 //should be instantiated below here 
 
-ram_144_128 pmg_ram
+ram_144_128 pgm_ram
 (
 	.clka(clk),
 	.dina(wr2ram_wdata),
