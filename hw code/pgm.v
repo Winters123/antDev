@@ -30,7 +30,7 @@ module pgm #(
 		NMID = 8'd5 //next MID
 )(
 	input clk,
-	input rst_n;
+	input rst_n,
 
 //waiting for pkt
 	input in_pgm_data_wr,
@@ -200,7 +200,7 @@ pgm_rd #(
 	.PLATFORM(PLATFORM),
 	.LMID(62),
 	.DMID(5)
-	)(
+	)pgm_rd(
 	.clk(clk),
 	.rst_n(rst_n),
 

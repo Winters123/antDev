@@ -58,7 +58,7 @@ module pgm_wr #(
 //output to PGM_RAM
 	output reg wr2ram_wr_en,
 	output reg [143:0] wr2ram_wdata,
-	output reg [6:0] wr2ram_addr
+	output reg [6:0] wr2ram_addr,
 
 
 //signals to PRM_RD
@@ -264,6 +264,7 @@ always @(posedge clk or negedge rst_n) begin
 					pgm_wr_state <= IDLE_S;
 				end
 			end
+		endcase
 	end
 end
 
@@ -273,69 +274,69 @@ end
 
 always @(posedge clk) begin
 	//1st cycle of control packet 
-	if(cin_rd_data[133:132] == 2'b01 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
-		if (cin_rd_data[103:96]== 8'd62 cin_rd_data[126:124] == 3'b010) begin
+	if(cin_wr_data[133:132] == 2'b01 && cin_wr_data_wr == 1'b1 && cin_wr_ready == 1'b1) begin
+		if (cin_wr_data[103:96]== 8'd62 && cin_wr_data[126:124] == 3'b010) begin
 			//write signal from SW
-			case(cin_rd_data[95:64])
+			case(cin_wr_data[95:64])
 				32'h00000000: begin
-					soft_rst <= cin_rd_data[0];
+					soft_rst <= cin_wr_data[0];
 				end
 				32'h00000001: begin
-					 sent_time_cnt <= cin_rd_data[31:0];
+					 sent_time_cnt <= cin_wr_data[31:0];
 				end
 				32'h00010001: begin
-					 sent_time_reg <= cin_rd_data[31:0];
+					 sent_time_reg <= cin_wr_data[31:0];
 				end
-				
+			endcase
 			//match input to output
-			cout_rd_data_wr <= cin_rd_data_wr;
-			cout_rd_data <= cin_rd_data;
+			cout_wr_data_wr <= cin_wr_data_wr;
+			cout_wr_data <= cin_wr_data;
 		end
 
-		else if(cin_rd_data[103:96]== 8'd62 cin_rd_data[126:124] == 3'b001) begin
+		else if(cin_wr_data[103:96]== 8'd62 && cin_wr_data[126:124] == 3'b001) begin
 			//read signal from SW
 			
-			case(cin_rd_data[95:64])
+			case(cin_wr_data[95:64])
 				32'h00000000: begin
 					//cin_rd_data[0] <= soft_rst;
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:1], soft_rst};
+					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:1], soft_rst};
 				end
 				32'h00000001: begin
 					//cin_rd_data[31:0] <= sent_rate_cnt;
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_time_cnt[31:0]};
+					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:32], sent_time_cnt[31:0]};
 				end
 				32'h00000002: begin
 					//cin_rd_data[31:0] <= sent_rate_cnt;
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_time_cnt[63:32]};
+					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:32], sent_time_cnt[63:32]};
 				end
 				32'h00010001: begin
 					//cin_rd_data[31:0] <= sent_rate_reg;
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_time_reg[31:0]};
+					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:32], sent_time_reg[31:0]};
 				end
 				32'h00010002: begin
 					//cin_rd_data[31:0] <= sent_rate_reg;
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_time_reg[63:32]};
+					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:32], sent_time_reg[63:32]};
 				end
 
 				default: begin
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], 32'hffffffff};
+					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:32], 32'hffffffff};
 				end
-
-			cout_rd_data_wr <= cin_rd_data_wr;
+			endcase
+			cout_wr_data_wr <= cin_wr_data_wr;
 
 
 		end
 	end
 	//2nd cycle of control packet
 	//TODO: the 2nd cycle can be used in the future. 
-	else if(cin_rd_data[133:132] == 2'b10 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
-		cout_rd_data_wr <= cin_rd_data_wr;
-		cout_rd_data <= cin_rd_data;
+	else if(cin_wr_data[133:132] == 2'b10 && cin_wr_data_wr == 1'b1 && cin_wr_ready == 1'b1) begin
+		cout_wr_data_wr <= cin_wr_data_wr;
+		cout_wr_data <= cin_wr_data;
 	end
 
 	else begin
-		cout_rd_data_wr <= cin_rd_data_wr;
-		cout_rd_data <= cin_rd_data;
+		cout_wr_data_wr <= cin_wr_data_wr;
+		cout_wr_data <= cin_wr_data;
 	end
 
 

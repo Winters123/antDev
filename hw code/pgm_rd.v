@@ -25,7 +25,7 @@
 ///////////////////////////////////////////////////////////////// 
 
 module pgm_rd #(
-	parameter PLATFORM = "Xilinx"
+	parameter PLATFORM = "Xilinx",
 	LMID = 8'd61, //self MID
 	NMID = 8'd62  //next MID
 )(
@@ -192,7 +192,7 @@ always @(posedge clk or negedge rst_n) begin
 					out_rd_phv <= in_rd_phv;
 					out_rd_phv_wr <= 1'b1;
 				end
-				else if(in_rd_data[133:132] == 2'b10 && in_rd_data_rd == 1'b1) begin
+				else if(in_rd_data[133:132] == 2'b10 && in_rd_data_wr == 1'b1) begin
 					out_rd_data_wr <= 1'b0;
 					out_rd_valid <= 1'b0;
 					out_rd_phv <= 1028'b0;
@@ -232,7 +232,7 @@ always @(posedge clk or negedge rst_n) begin
 					rd2ram_rd <= 1'b0;
 					rd2ram_addr <= 7'b0;
 
-					out_rd_data <= 134'b0;;
+					out_rd_data <= 134'b0;
 					out_rd_data_wr <= 1'b0;
 					out_rd_valid <= 1'b0;
 					out_rd_phv <= 1028'b0;
@@ -333,7 +333,7 @@ always @(posedge clk or negedge rst_n) begin
 
 				end
 			end
-		
+		endcase
 	end
 end
 
@@ -346,7 +346,7 @@ end
 always @(posedge clk) begin
 	//1st cycle of control packet 
 	if(cin_rd_data[133:132] == 2'b01 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
-		if (cin_rd_data[103:96]== 8'd61 cin_rd_data[126:124] == 3'b010) begin
+		if (cin_rd_data[103:96]== 8'd61 && cin_rd_data[126:124] == 3'b010) begin
 			//write signal from SW
 			case(cin_rd_data[95:64])
 				32'h00000000: begin
@@ -380,12 +380,14 @@ always @(posedge clk) begin
 					lat_flag <= cin_rd_data[0];
 				end
 
+			endcase
+
 			//match input to output
 			cout_rd_data_wr <= cin_rd_data_wr;
 			cout_rd_data <= cin_rd_data;
 		end
 
-		else if(cin_rd_data[103:96]== 8'd61 cin_rd_data[126:124] == 3'b001) begin
+		else if(cin_rd_data[103:96]== 8'd61 && cin_rd_data[126:124] == 3'b001) begin
 			//read signal from SW
 			
 			case(cin_rd_data[95:64])
@@ -432,6 +434,7 @@ always @(posedge clk) begin
 					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], 32'hffffffff};
 				end
 
+			endcase
 			cout_rd_data_wr <= cin_rd_data_wr;
 
 
