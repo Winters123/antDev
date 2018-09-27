@@ -97,6 +97,7 @@ reg [133:0]wr2rd_data;
 reg wr2rd_data_wr;
 reg wr2rd_data_valid;
 reg wr2rd_data_valid_wr;
+wire in_wr_alf;
 
 wire pgm_bypass_flag;
 wire pgm_sent_start_flag;
@@ -122,8 +123,8 @@ wire [6:0]rd2ram_raddr;
 
 reg [2:0]pgm_state;
 
-assign out_pgm_phv_alf = 1'b0;
-assign out_pgm_alf = in_pgm_alf;
+//assign out_pgm_phv_alf = 1'b0;
+//assign out_pgm_alf = in_pgm_alf;
 
 
 
@@ -137,15 +138,15 @@ assign out_pgm_alf = in_pgm_alf;
 ram_144_128 pmg_ram
 (
 	.clka(clk),
-	.dina(),
-	.wea(),
-	.addra(),
+	.dina(wr2ram_wdata),
+	.wea(wr2ram_wr_en),
+	.addra(wr2ram_addr),
 	.douta(),
-	.clkb(),
-	.web(),
-	.addrd(),
+	.clkb(clk),
+	.web(~rd2ram_rd),
+	.addrd(rd2ram_raddr),
 	.dinb(),
-	.doutb()
+	.doutb(rd2ram_rdata)
 );
 
 pgm_wr #(
@@ -153,51 +154,98 @@ pgm_wr #(
 	.LMID(61),
 	.NMID(62)
 	)pgm_wr(
-	.in_wr_phv(in_wr_phv),
-	.in_wr_phv_wr(in_wr_phv_wr), 
-	.out_wr_phv_alf(out_wr_phv_alf),
-	.in_wr_data(in_wr_data),
-	.in_wr_data_wr(in_wr_data_wr),
-	.in_wr_valid_wr(in_wr_valid_wr),
-	.in_wr_valid(in_wr_valid),
-	.out_wr_alf(out_wr_alf),
+	.in_wr_phv(in_pgm_phv),
+	.in_wr_phv_wr(in_pgm_phv_wr), 
+	.out_wr_phv_alf(out_pgm_phv_alf),
+	.in_wr_data(in_pgm_data),
+	.in_wr_data_wr(in_pgm_data_wr),
+	.in_wr_valid_wr(in_pgm_valid_wr),
+	.in_wr_valid(in_pgm_valid),
+	.out_wr_alf(out_pgm_alf),
 
 //transport phv and data to pgm_rd
-    .out_wr_phv,
-	.out_wr_phv_wr,
-	.in_wr_phv_alf,
+    .out_wr_phv(out_pgm_phv),
+	.out_wr_phv_wr(out_pgm_phv_wr),
+	.in_wr_phv_alf(out_pgm_phv_alf),
 
-	.out_wr_data, 
-	.out_wr_data_wr,
-	.out_wr_valid,
-	.out_wr_valid_wr,
-	.in_wr_alf,
+	.out_wr_data(out_pgm_data), 
+	.out_wr_data_wr(out_pgm_data_wr),
+	.out_wr_valid(out_pgm_valid),
+	.out_wr_valid_wr(out_pgm_valid_wr),
+	.in_wr_alf(in_wr_alf),
 
 //output to PGM_RAM
-	.wr2ram_wr_en,
-	.wr2ram_wdata,
-	.wr2ram_addr
+	.wr2ram_wr_en(wr2ram_wr_en),
+	.wr2ram_wdata(wr2ram_wdata),
+	.wr2ram_addr(wr2ram_addr),
 
 
 //signals to PRM_RD
-	.pgm_bypass_flag,
-	.pgm_sent_start_flag,
-	.pgm_sent_finish_flag,
+	.pgm_bypass_flag(pgm_bypass_flag),
+	.pgm_sent_start_flag(pgm_sent_start_flag),
+	.pgm_sent_finish_flag(pgm_sent_finish_flag),
 
 //input cfg packet from DMA
-    .cin_wr_data,
-	.cin_wr_data_wr,
-	.cout_wr_ready,
+    .cin_wr_data(cin_pgm_data),
+	.cin_wr_data_wr(cin_pgm_data_wr),
+	.cout_wr_ready(cout_pgm_ready),
 
 //output configure pkt to next module
-    .cout_wr_data,
-	.cout_wr_data_wr,
-	.cin_wr_ready,
-	);
+    .cout_wr_data(cout_pgm_data),
+	.cout_wr_data_wr(cout_pgm_data_wr),
+	.cin_wr_ready(cin_pgm_ready)
+);
 
-pgm_rd #()
+pgm_rd #(
+	.PLATFORM(PLATFORM),
+	.LMID(62),
+	.DMID(5)
+	)(
+	.clk(clk),
+	.rst_n(rst_n),
 
+//receive data & phv from Previous module
+	
+    .in_rd_phv(wr2rd_phv),
+	.in_rd_phv_wr(wr2rd_phv_wr), 
+	.out_rd_phv_alf(in_wr_alf),
 
+	.in_rd_data(wr2rd_data),
+	.in_rd_data_wr(wr2rd_data_wr),
+	.in_rd_valid_wr(wr2rd_data_valid_wr),
+	.in_rd_valid(wr2rd_data_valid),
+	.out_rd_alf(in_wr_alf),
 
+//transport phv and data to pgm_rd
+    .out_rd_phv(out_pgm_phv),
+	.out_rd_phv_wr(out_pgm_valid_wr),
+	.in_rd_phv_alf(in_pgm_phv_alf),
+
+	.out_rd_data(out_pgm_data), 
+	.out_rd_data_wr(out_rd_data_wr),
+	.out_rd_valid(out_pgm_valid),
+	.out_rd_valid_wr(out_rd_valid_wr),
+	.in_rd_alf(in_pgm_alf),
+
+//signals from PGM_WR
+	.pgm_bypass_flag(pgm_bypass_flag),
+	.pgm_sent_start_flag(pgm_sent_start_flag),
+	.pgm_sent_finish_flag(pgm_sent_finish_flag),
+
+//opration with PGM_RAM
+	.rd2ram_rd(rd2ram_rd),
+	.rd2ram_addr(rd2ram_raddr),
+	.ram2rd_rdata(ram2rd_rdata),
+
+//input cfg packet from DMA
+    .cin_rd_data(cout_wr_data),
+	.cin_rd_data_wr(cout_rd_data_wr),
+	.cout_rd_ready(cin_wr_ready),
+
+//output configure pkt to next module
+    .cout_rd_data(cout_pgm_data),
+	.cout_rd_data_wr(cout_rd_data_wr),
+	.cin_rd_ready(cin_pgm_ready)
+);
 
 endmodule 

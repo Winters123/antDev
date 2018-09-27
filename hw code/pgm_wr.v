@@ -63,8 +63,8 @@ module pgm_wr #(
 
 //signals to PRM_RD
 	output reg pgm_bypass_flag,
-	output pgm_sent_start_flag,
-	output pgm_sent_finish_flag,
+	output reg pgm_sent_start_flag,
+	output reg pgm_sent_finish_flag,
 
 //input cfg packet from DMA
     input [133:0] cin_wr_data,
@@ -74,7 +74,7 @@ module pgm_wr #(
 //output configure pkt to next module
     output reg [133:0] cout_wr_data,
 	output reg cout_wr_data_wr,
-	input cin_wr_ready,
+	input cin_wr_ready
 
 );
 
@@ -103,11 +103,11 @@ reg [4:0] pgm_wr_state;
 //             Pkt Store & Transmit
 //***************************************************
 
-localparam IDLE_S = 5'd0,
-			WAIT_S = 5'd1,
-			STORE_S = 5'd2,
-			SENT_S = 5'd3,
-			DISCARD_S = 5'd4;
+localparam  IDLE_S = 4'd0,
+			WAIT_S = 4'd1,
+			STORE_S = 4'd2,
+			SENT_S = 4'd4,
+			DISCARD_S = 4'd8;
 
 always @(posedge clk or negedge rst_n) begin
 
@@ -132,6 +132,9 @@ always @(posedge clk or negedge rst_n) begin
 		soft_rst <= 1'b0;
 
 		pgm_bypass_flag <= 1'b0;
+
+		pgm_sent_start_flag <= 1'b0;
+		pgm_sent_finish_flag <= 1'b0;
 		
 	end
 	else begin
@@ -150,6 +153,7 @@ always @(posedge clk or negedge rst_n) begin
 					pgm_wr_state <= SENT_S;
 				end
 
+				//PGM start to store packet.
 				else if(in_wr_valid == 1'b1 && in_wr_data[133:132]==2'b01 && in_wr_data[111:109]==3'b111) begin
 					wr2ram_wr_en <= 1'b1;
 					wr2ram_addr <= 7'b0;
@@ -171,6 +175,7 @@ always @(posedge clk or negedge rst_n) begin
 
 					out_wr_phv <= 1024'b0;
 					out_wr_phv_wr <= 1'b0;
+					
 					pgm_bypass_flag <= 1'b0;
 
 					pgm_wr_state <= IDLE_S;
