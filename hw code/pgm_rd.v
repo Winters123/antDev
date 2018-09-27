@@ -73,7 +73,7 @@ module pgm_rd #(
 //output configure pkt to next module
     output reg [133:0] cout_rd_data,
 	output reg cout_rd_data_wr,
-	input cin_rd_ready,
+	input cin_rd_ready
 
 );
 
