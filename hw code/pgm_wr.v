@@ -175,8 +175,10 @@ always @(posedge clk or negedge rst_n) begin
 
 					out_wr_phv <= 1024'b0;
 					out_wr_phv_wr <= 1'b0;
-					
+
 					pgm_bypass_flag <= 1'b0;
+					pgm_sent_start_flag <= 1'b0;
+					//pgm_sent_finish_flag <= 1'b0;
 
 					pgm_wr_state <= IDLE_S;
 				end
@@ -223,7 +225,7 @@ always @(posedge clk or negedge rst_n) begin
 				end
 				else if(in_wr_data[133:132] == 2'b10) begin
 					wr2ram_wr_en = 1'b0;
-
+					wr2ram_wdata <= {10'b0, in_wr_data};
 					pgm_sent_start_flag <= 1'b1;
 					pgm_wr_state <= WAIT_S;
 				end
