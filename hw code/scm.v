@@ -43,8 +43,8 @@ module scm #(
     output cout_scm_ready,
 
     //output configure pkt to next module
-    output [133:0] cout_scm_data,
-    output cout_scm_data_wr,
+    output reg [133:0] cout_scm_data,
+    output reg cout_scm_data_wr,
     input cin_scm_ready
 );
 
@@ -88,8 +88,8 @@ assign out_scm_phv_alf = in_scm_phv_alf || (MD_fifo_usedw > 8'd250);
 /*
 assign cout_scm_data_wr = cin_scm_data_wr;
 assign cout_scm_data = cin_scm_data;
-assign cout_scm_ready = cin_scm_ready;
 */
+assign cout_scm_ready = cin_scm_ready;
 
 //**************************************************
 //                Transport MD & PHV
@@ -121,9 +121,8 @@ always @(posedge clk or negedge rst_n) begin
         n_RTT <= 32'b0;
     end
     else begin
-        cout_scm_ready <= 1'b1;
         if (cin_scm_data_wr == 1'b1) begin
-            if (cin_scm_ready == 1'b1) begin
+            if ((cin_scm_ready == 1'b1) && (cin_scm_data[126:124] == 3'b010)) begin
                 cout_scm_data_wr <= 1'b1;
                 case (cin_scm_data[95:64])
                     32'h70000000: begin
@@ -292,33 +291,32 @@ always @(posedge clk or negedge rst_n) begin
                 end
                 else begin
                     //fetch the data and information to software
-                    cout_scm_ready <= 1'b1;
                     if (cin_scm_data_wr == 1'b1) begin
-                        if (cin_scm_ready == 1'b1) begin
+                        if ((cin_scm_ready == 1'b1) && (cin_scm_data[126:124] == 3'b001)) begin
                             cout_scm_data_wr <= 1'b1;
                             case (cin_scm_data[95:64])
                                 32'h70000008: begin
-                                    cout_scm_data <= {cin_scm_data[133:32], scm_bit_num_cnt[31:0]};
+                                    cout_scm_data <= {cin_scm_data[133:128], 4'b1011, scm_bit_num_cnt[31:0]};
                                 end
 
                                 32'h70000009: begin
-                                    cout_scm_data <= {cin_scm_data[133:32], scm_bit_num_cnt[63:32]};
+                                    cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_bit_num_cnt[63:32]};
                                 end
 
                                 32'h7000000A: begin
-                                    cout_scm_data <= {cin_scm_data[133:32], scm_pkt_num_cnt[31:0]};
+                                    cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_pkt_num_cnt[31:0]};
                                 end
 
                                 32'h7000000B: begin
-                                    cout_scm_data <= {cin_scm_data[133:32], scm_pkt_num_cnt[63:32]};
+                                    cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_pkt_num_cnt[63:32]};
                                 end
 
                                 32'h7000000C: begin
-                                    cout_scm_data <= {cin_scm_data[133:32], scm_time_cnt[31:0]};
+                                    cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_time_cnt[31:0]};
                                 end
 
                                 32'h7000000D: begin
-                                    cout_scm_data <= {cin_scm_data[133:32], scm_time_cnt[63:32]};
+                                    cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_time_cnt[63:32]};
                                 end
 
                                 default: begin
