@@ -135,6 +135,17 @@ always @(posedge clk or negedge rst_n) begin
 
 		pgm_sent_start_flag <= 1'b0;
 		pgm_sent_finish_flag <= 1'b0;
+
+		pgm_wr_state <= IDLE_S;
+
+
+		/*****used for tb, shall be delete later*****/
+
+
+		sent_time_reg <= 64'hfffffffffffffffa;
+
+
+		/*****used for tb, shall be delete later*****/
 		
 	end
 	else begin
@@ -195,13 +206,13 @@ always @(posedge clk or negedge rst_n) begin
 				end
 
 				else if(in_wr_valid == 1'b1 && in_wr_data[133:132] == 2'b10) begin
-					out_wr_data <= 134'b0;
-					out_wr_data_wr <= 1'b0;
-					out_wr_valid <= 1'b0;
-					out_wr_valid_wr <= 1'b0;
+					out_wr_data <= in_wr_data;
+					out_wr_data_wr <= 1'b1;
+					out_wr_valid <= 1'b1;
+					out_wr_valid_wr <= 1'b1;
 
 					out_wr_phv <= 1024'b0;
-					out_wr_phv_wr <= 1'b0;
+					out_wr_phv_wr <= 1'b1;
 					pgm_wr_state <= IDLE_S;
 				end
 
@@ -224,7 +235,8 @@ always @(posedge clk or negedge rst_n) begin
 					wr2ram_addr <= wr2ram_addr + 1'b1;
 				end
 				else if(in_wr_data[133:132] == 2'b10) begin
-					wr2ram_wr_en = 1'b0;
+					wr2ram_wr_en <= 1'b1;
+					wr2ram_addr <= wr2ram_addr + 1'b1;
 					wr2ram_wdata <= {10'b0, in_wr_data};
 					pgm_sent_start_flag <= 1'b1;
 					pgm_wr_state <= WAIT_S;
@@ -238,9 +250,13 @@ always @(posedge clk or negedge rst_n) begin
 
 			WAIT_S: begin
 				if(sent_time_cnt != sent_time_reg) begin
+					wr2ram_addr <= 7'b0;
+					wr2ram_wdata <= 144'b0;
+					wr2ram_wr_en <= 1'b0;
 					sent_time_cnt <= sent_time_cnt + 1'b1;
 				end
 				else begin
+					wr2ram_wdata <= {10'b0, in_wr_data};
 					pgm_sent_finish_flag <= 1'b1;
 					pgm_wr_state <= IDLE_S;
 				end
@@ -275,17 +291,23 @@ end
 always @(posedge clk) begin
 	//1st cycle of control packet 
 	if(cin_wr_data[133:132] == 2'b01 && cin_wr_data_wr == 1'b1 && cin_wr_ready == 1'b1) begin
-		if (cin_wr_data[103:96]== 8'd62 && cin_wr_data[126:124] == 3'b010) begin
+		if (cin_wr_data[103:96]== 8'd61 && cin_wr_data[126:124] == 3'b010) begin
 			//write signal from SW
 			case(cin_wr_data[95:64])
 				32'h00000000: begin
 					soft_rst <= cin_wr_data[0];
 				end
 				32'h00000001: begin
-					 sent_time_cnt <= cin_wr_data[31:0];
+					sent_time_cnt[31:0] <= cin_wr_data[31:0];
+				end
+				32'h00000002: begin
+					sent_time_cnt[63:32] <= cin_wr_data[31:0];
 				end
 				32'h00010001: begin
-					 sent_time_reg <= cin_wr_data[31:0];
+					sent_time_reg[31:0] <= cin_wr_data[31:0];
+				end
+				32'h00010002: begin
+					sent_time_reg[63:32] <= cin_wr_data[31:0];
 				end
 			endcase
 			//match input to output
@@ -293,7 +315,7 @@ always @(posedge clk) begin
 			cout_wr_data <= cin_wr_data;
 		end
 
-		else if(cin_wr_data[103:96]== 8'd62 && cin_wr_data[126:124] == 3'b001) begin
+		else if(cin_wr_data[103:96]== 8'd61 && cin_wr_data[126:124] == 3'b001) begin
 			//read signal from SW
 			
 			case(cin_wr_data[95:64])
