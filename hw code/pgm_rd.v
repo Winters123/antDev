@@ -25,7 +25,7 @@
 ///////////////////////////////////////////////////////////////// 
 
 module pgm_rd #(
-	parameter PLATFORM = "Xilinx"
+	parameter PLATFORM = "Xilinx",
 	LMID = 8'd61, //self MID
 	NMID = 8'd62  //next MID
 )(
@@ -105,12 +105,12 @@ reg [5:0] pgm_rd_state;
 //             Pkt Rd & Transmit
 //***************************************************
 
-localparam IDLE_S = 6'd0,
+localparam  IDLE_S = 6'd0,
 			SENT_S = 6'd1,
 			READ_S = 6'd2,
-			WAIT_S = 6'd3,
-			PROBE_S = 6'd4,
-			FIN_S = 6'd5;
+			WAIT_S = 6'd4,
+			PROBE_S = 6'd8,
+			FIN_S = 6'd16;
 
 always @(posedge clk or negedge rst_n) begin
 	if (rst_n == 1'b0 || soft_rst) begin
@@ -134,8 +134,6 @@ always @(posedge clk or negedge rst_n) begin
 		lat_pkt_reg <= 32'b0; //num of pkt between Probes
 		sent_bit_cnt <= 64'b0;
 		sent_pkt_cnt <= 64'b0;
-
-
 		
 	end
 	else begin
@@ -150,7 +148,7 @@ always @(posedge clk or negedge rst_n) begin
 
 					pgm_rd_state <= SENT_S;
 				end
-				else if(pgm_sent_start_flag == 1'b1 && in_rd_data[133:132] == 2'b01 && in_rd_valid == 1'b1) begin
+				else if(pgm_sent_start_flag == 1'b1) begin
 					out_rd_data <= ram2rd_rdata[133:0];
 					rd2ram_addr <= 7'b0;
 					rd2ram_rd <= 1'b1;
@@ -194,7 +192,7 @@ always @(posedge clk or negedge rst_n) begin
 					out_rd_phv <= in_rd_phv;
 					out_rd_phv_wr <= 1'b1;
 				end
-				else if(in_rd_data[133:132] == 2'b10 && in_rd_data_rd == 1'b1) begin
+				else if(in_rd_data[133:132] == 2'b10 && in_rd_data_wr == 1'b1) begin
 					out_rd_data_wr <= 1'b0;
 					out_rd_valid <= 1'b0;
 					out_rd_phv <= 1028'b0;
@@ -234,13 +232,13 @@ always @(posedge clk or negedge rst_n) begin
 					rd2ram_rd <= 1'b0;
 					rd2ram_addr <= 7'b0;
 
-					out_rd_data <= 134'b0;;
+					out_rd_data <= 134'b0;
 					out_rd_data_wr <= 1'b0;
 					out_rd_valid <= 1'b0;
 					out_rd_phv <= 1028'b0;
 					out_rd_phv_wr <= 1'b0;
 
-					sent_bit_cnt <= sent_bit_cnt + 64'd16;
+					sent_bit_cnt <= sent_bit_cnt + ram2rd_rdata[131:128];
 					sent_pkt_cnt <= sent_pkt_cnt + 1'b1;
 
 					if(pgm_sent_finish_flag == 1'b1) begin
@@ -264,7 +262,7 @@ always @(posedge clk or negedge rst_n) begin
 			end
 
 			WAIT_S: begin
-				if(sent_rate_cnt==sent_rate_reg && lat_flag == 1'b0) begin
+				if(sent_rate_cnt==sent_rate_reg) begin
 					rd2ram_rd <= 1'b1;
 					rd2ram_addr <= 7'b0;
 					out_rd_data <= ram2rd_rdata[133:0];
@@ -277,7 +275,7 @@ always @(posedge clk or negedge rst_n) begin
 					pgm_rd_state <= READ_S;
 				end
 
-				else if(sent_rate_cnt==sent_rate_reg && lat_flag == 1'b1 && lat_pkt_cnt == lat_pkt_reg) begin
+				else if(sent_rate_cnt != sent_rate_reg && lat_flag == 1'b1 && lat_pkt_cnt == lat_pkt_reg) begin
 					rd2ram_rd <= 1'b1;
 					rd2ram_addr <= 7'b0;
 					out_rd_data <= ram2rd_rdata[133:0];
@@ -335,7 +333,7 @@ always @(posedge clk or negedge rst_n) begin
 
 				end
 			end
-		
+		endcase
 	end
 end
 
@@ -348,7 +346,7 @@ end
 always @(posedge clk) begin
 	//1st cycle of control packet 
 	if(cin_rd_data[133:132] == 2'b01 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
-		if (cin_rd_data[103:96]== 8'd61 cin_rd_data[126:124] == 3'b010) begin
+		if (cin_rd_data[103:96]== 8'd61 && cin_rd_data[126:124] == 3'b010) begin
 			//write signal from SW
 			case(cin_rd_data[95:64])
 				32'h00000000: begin
@@ -378,13 +376,18 @@ always @(posedge clk) begin
 				32'h00000006: begin
 					 sent_pkt_cnt[63:32] <= cin_rd_data[31:0];
 				end
+				32'h00010010: begin
+					lat_flag <= cin_rd_data[0];
+				end
+
+			endcase
 
 			//match input to output
 			cout_rd_data_wr <= cin_rd_data_wr;
 			cout_rd_data <= cin_rd_data;
 		end
 
-		else if(cin_rd_data[103:96]== 8'd61 cin_rd_data[126:124] == 3'b001) begin
+		else if(cin_rd_data[103:96]== 8'd61 && cin_rd_data[126:124] == 3'b001) begin
 			//read signal from SW
 			
 			case(cin_rd_data[95:64])
@@ -424,11 +427,14 @@ always @(posedge clk) begin
 					//cin_rd_data[31:0] <= sent_pkt_cnt[63:32];
 					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_pkt_cnt[63:32]};
 				end
-
+				32'h00010010: begin
+					cout_rd_data <= {cin_rd_data[133:128], 1'b1, 3'b011, cin_rd_data[123:1], lat_flag};
+				end
 				default: begin
 					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], 32'hffffffff};
 				end
 
+			endcase
 			cout_rd_data_wr <= cin_rd_data_wr;
 
 
