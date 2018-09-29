@@ -129,11 +129,13 @@ always @(posedge clk or negedge rst_n) begin
 		//intermidiate set to 0
 		soft_rst <= 1'b0;
 		sent_rate_cnt <= 32'b0;
-		sent_rate_reg <= 32'b0;
+		sent_rate_reg <= 32'hffffffff;
 		lat_pkt_cnt <= 32'b0; //num of pkt between Probes
-		lat_pkt_reg <= 32'b0; //num of pkt between Probes
+		lat_pkt_reg <= 32'hffffffff; //num of pkt between Probes
 		sent_bit_cnt <= 64'b0;
 		sent_pkt_cnt <= 64'b0;
+
+		lat_flag <= 1'b0;
 
 		pgm_rd_state <= IDLE_S;
 		
@@ -195,12 +197,14 @@ always @(posedge clk or negedge rst_n) begin
 					out_rd_phv_wr <= 1'b1;
 				end
 				else if(in_rd_data[133:132] == 2'b10 && in_rd_data_wr == 1'b1) begin
-					out_rd_data_wr <= in_rd_data;
+					out_rd_data <= in_rd_data;
 					out_rd_data_wr <= 1'b1;
 					out_rd_valid <= 1'b1;
 					out_rd_valid_wr <= 1'b1;
 					out_rd_phv <= in_rd_phv;
 					out_rd_phv_wr <= 1'b1;
+
+					pgm_rd_state <= IDLE_S;
 				end
 
 				else begin
@@ -370,7 +374,7 @@ end
 always @(posedge clk) begin
 	//1st cycle of control packet 
 	if(cin_rd_data[133:132] == 2'b01 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
-		if (cin_rd_data[103:96]== 8'd61 && cin_rd_data[126:124] == 3'b010) begin
+		if (cin_rd_data[103:96]== 8'd62 && cin_rd_data[126:124] == 3'b010) begin
 			//write signal from SW
 			case(cin_rd_data[95:64])
 				32'h00000000: begin
@@ -405,13 +409,12 @@ always @(posedge clk) begin
 				end
 
 			endcase
-
-			//match input to output
-			cout_rd_data_wr <= cin_rd_data_wr;
 			cout_rd_data <= cin_rd_data;
+			cout_rd_data_wr <= cin_rd_data_wr;
+			
 		end
 
-		else if(cin_rd_data[103:96]== 8'd61 && cin_rd_data[126:124] == 3'b001) begin
+		else if(cin_rd_data[103:96]== 8'd62 && cin_rd_data[126:124] == 3'b001) begin
 			//read signal from SW
 			
 			case(cin_rd_data[95:64])
@@ -460,8 +463,11 @@ always @(posedge clk) begin
 
 			endcase
 			cout_rd_data_wr <= cin_rd_data_wr;
+		end
 
-
+		else begin
+			cout_rd_data <= cin_rd_data;
+			cout_rd_data_wr <= cin_rd_data_wr;
 		end
 	end
 	//2nd cycle of control packet

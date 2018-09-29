@@ -311,10 +311,7 @@ always @(posedge clk) begin
 				end
 			endcase
 			//match input to output
-			cout_wr_data_wr <= cin_wr_data_wr;
-			cout_wr_data <= cin_wr_data;
 		end
-
 		else if(cin_wr_data[103:96]== 8'd61 && cin_wr_data[126:124] == 3'b001) begin
 			//read signal from SW
 			
@@ -344,10 +341,12 @@ always @(posedge clk) begin
 					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:32], 32'hffffffff};
 				end
 			endcase
-			cout_wr_data_wr <= cin_wr_data_wr;
-
-
+			//cout_wr_data_wr <= cin_wr_data_wr;
 		end
+		else begin
+			cout_wr_data <= cin_wr_data;
+		end
+		cout_wr_data_wr <= cin_wr_data_wr;
 	end
 	//2nd cycle of control packet
 	//TODO: the 2nd cycle can be used in the future. 
