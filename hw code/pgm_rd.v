@@ -101,6 +101,40 @@ assign cout_rd_ready = cin_rd_ready;
 reg [5:0] pgm_rd_state;
 
 
+
+
+
+//**************************************************
+//             Delay check & addition
+//**************************************************
+
+reg [133:0] out_rd_data_dly[1:0];
+reg out_rd_data_wr_dly[1:0];
+reg out_rd_valid_dly[1:0];
+reg out_rd_valid_wr_dly[1:0];
+reg [1023:0] out_rd_phv_dly[1:0];
+reg out_rd_phy_wr_dly[1:0];
+
+always @(posedge clk) begin
+	out_rd_data <= out_rd_data_dly[0];
+	out_rd_data_dly[0] <= out_rd_data_dly[1];
+
+	out_rd_data_wr <= out_rd_data_wr_dly[0];
+	out_rd_data_wr_dly[0] <= out_rd_data_wr_dly[1];
+	
+	out_rd_valid <= out_rd_valid_dly[0];
+	out_rd_valid_dly[0] <= out_rd_valid_dly[1];
+
+	out_rd_valid_wr <= out_rd_valid_wr_dly[0];
+	out_rd_valid_wr_dly[0] <= out_rd_valid_wr_dly[1];
+
+	out_rd_phv <= out_rd_phv_dly[0];
+	out_rd_phv_dly[0] <= out_rd_phv_dly[1];
+
+	out_rd_phv_wr <= out_rd_phv_wr_dly[0];
+	out_rd_phv_wr_dly[0] <= out_rd_phv_wr_dly[1];
+end
+
 //***************************************************
 //             Pkt Rd & Transmit
 //***************************************************
@@ -118,13 +152,13 @@ always @(posedge clk or negedge rst_n) begin
 		rd2ram_rd <= 1'b0;
 		rd2ram_addr <= 7'b0;
 		//outputs set to 0
-		out_rd_data <= 134'b0;
-		out_rd_data_wr <= 1'b0;
-		out_rd_valid <= 1'b0;
-		out_rd_valid_wr <= 1'b0;
+		out_rd_data_dly[1] <= 134'b0;
+		out_rd_data_wr_dly[1] <= 1'b0;
+		out_rd_valid_dly[1] <= 1'b0;
+		out_rd_valid_wr_dly[1] <= 1'b0;
 
-		out_rd_phv <= 1024'b0;
-		out_rd_phv_wr <= 1'b0;
+		out_rd_phv_dly[1] <= 1024'b0;
+		out_rd_phv_wr_dly[1] <= 1'b0;
 
 		//intermidiate set to 0
 		soft_rst <= 1'b0;
@@ -135,7 +169,20 @@ always @(posedge clk or negedge rst_n) begin
 		sent_bit_cnt <= 64'b0;
 		sent_pkt_cnt <= 64'b0;
 
-		lat_flag <= 1'b0;
+		lat_flag <= 1'b0;  //TODO add latency flag here
+
+
+		//**********************set dly to 0****************//
+		/*
+		out_rd_data_dly[1] <= 134'b0;
+		out_rd_data_wr_dly[1] <= 1'b0;
+		out_rd_valid_dly[1] <= 1'b0;
+		out_rd_valid_wr_dly[1] <= 1'b0;
+		out_rd_phv_dly[1] <= 1024'b0;
+		out_rd_phy_wr_dly[1] <= 1'b0;
+		*/
+		//**********************set dly to 0****************//
+
 
 		pgm_rd_state <= IDLE_S;
 		
@@ -144,14 +191,17 @@ always @(posedge clk or negedge rst_n) begin
 		case(pgm_rd_state)
 			IDLE_S: begin
 				if(pgm_bypass_flag == 1'b1 && in_rd_data[133:132] == 2'b01 && in_rd_valid == 1'b1) begin
+					
 					out_rd_data <= in_rd_data;
 					out_rd_data_wr <= 1'b1;
 					out_rd_valid <= 1'b1;
 					out_rd_phv <= in_rd_phv;
 					out_rd_phv_wr <= 1'b1;
+					out_rd_valid_wr <= 1'b0;
 
 					pgm_rd_state <= SENT_S;
 				end
+
 				else if(pgm_sent_start_flag == 1'b1) begin
 					out_rd_data <= ram2rd_rdata[133:0];
 					rd2ram_addr <= 7'b0;
@@ -159,6 +209,7 @@ always @(posedge clk or negedge rst_n) begin
 					out_rd_data_wr <= 1'b1;
 					out_rd_valid <= 1'b1;
 					out_rd_phv <= 1024'b0;
+					out_rd_phv_wr <= 1'b1;
 
 					pgm_rd_state <= READ_S;
 				end
@@ -182,6 +233,10 @@ always @(posedge clk or negedge rst_n) begin
 					sent_bit_cnt <= 64'b0;
 					sent_pkt_cnt <= 64'b0;
 
+					//**********************set dly to 0****************//
+					
+
+					//**********************set dly to 0****************//
 
 
 					pgm_rd_state <= IDLE_S;
@@ -222,11 +277,11 @@ always @(posedge clk or negedge rst_n) begin
 					//clear counters of rate
 					//sent_rate_cnt <= 64'b0;
 
-					out_rd_data <= ram2rd_rdata[133:0];
-					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= 1'b1;
-					out_rd_phv <= 1028'b0;
-					out_rd_phv_wr <= 1'b0;
+					out_rd_data_dly[1] <= ram2rd_rdata[133:0];
+					out_rd_data_wr_dly[1] <= 1'b1;
+					out_rd_valid_dly[1] <= 1'b1;
+					out_rd_phv_dly[1] <= 1028'b0;
+					out_rd_phv_wr_dly[1] <= 1'b0;
 
 					rd2ram_rd <= 1'b1;
 					rd2ram_addr <= rd2ram_addr + 1'b1;
@@ -257,6 +312,21 @@ always @(posedge clk or negedge rst_n) begin
 					else begin
 						pgm_rd_state <= WAIT_S;
 					end
+				end
+
+				else if(ram2rd_rdata[133:132] == 2'b01) begin
+					rd2ram_rd <= 1'b1;
+					rd2ram_addr <= rd2ram_addr + 7'b1;
+
+					out_rd_data <= ram2rd_rdata[133:0];
+					out_rd_data_wr <= 1'b1;
+					out_rd_valid <= 1'b1;
+					out_rd_phv <= 1028'b1;
+					out_rd_phv_wr <= 1'b1;
+					out_rd_valid_wr <= 1'b1;
+
+					pgm_rd_state <= READ_S;
+
 				end
 
 			end

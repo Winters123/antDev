@@ -89,10 +89,10 @@ wire [1023:0] wr2rd_phv;
 wire wr2rd_phv_wr;
 wire wr2rd_phv_alf;
 
-reg [133:0]wr2rd_data;
-reg wr2rd_data_wr;
-reg wr2rd_data_valid;
-reg wr2rd_data_valid_wr;
+wire [133:0]wr2rd_data;
+wire wr2rd_data_wr;
+wire wr2rd_data_valid;
+wire wr2rd_data_valid_wr;
 wire in_wr_alf;
 
 wire pgm_bypass_flag;
@@ -138,14 +138,16 @@ ram_144_128 pgm_ram
 (
 	.clka(clk),
 	.dina(wr2ram_wdata),
-	.wea(wr2ram_wr_en),
+	.wea(wr2ram_wr_en),  
 	.addra(wr2ram_addr),
+	.ena(1'b1),
 	.douta(),
 	.clkb(clk),
-	.web(~rd2ram_rd),
+	.web(1'b0),
 	.addrb(rd2ram_raddr),
 	.dinb(144'b0),
-	.doutb(ram2rd_rdata)
+	.doutb(ram2rd_rdata),
+	.enb(1'b1)
 );
 
 pgm_wr #(
@@ -163,14 +165,14 @@ pgm_wr #(
 	.out_wr_alf(out_pgm_alf),
 
 //transport phv and data to pgm_rd
-    .out_wr_phv(out_pgm_phv),
-	.out_wr_phv_wr(out_pgm_phv_wr),
-	.in_wr_phv_alf(out_pgm_phv_alf),
+    .out_wr_phv(wr2rd_phv),
+	.out_wr_phv_wr(wr2rd_phv_wr),
+	.in_wr_phv_alf(in_wr_phv_alf),
 
-	.out_wr_data(out_pgm_data), 
-	.out_wr_data_wr(out_pgm_data_wr),
-	.out_wr_valid(out_pgm_valid),
-	.out_wr_valid_wr(out_pgm_valid_wr),
+	.out_wr_data(wr2rd_data), 
+	.out_wr_data_wr(wr2rd_data_wr),
+	.out_wr_valid(wr2rd_data_valid),
+	.out_wr_valid_wr(wr2rd_data_valid_wr),
 	.in_wr_alf(in_wr_alf),
 
 //output to PGM_RAM
