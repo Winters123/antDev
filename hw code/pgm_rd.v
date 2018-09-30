@@ -25,7 +25,7 @@
 ///////////////////////////////////////////////////////////////// 
 
 module pgm_rd #(
-	parameter PLATFORM = "Xilinx"
+	parameter PLATFORM = "Xilinx",
 	LMID = 8'd61, //self MID
 	NMID = 8'd62  //next MID
 )(
@@ -101,6 +101,40 @@ assign cout_rd_ready = cin_rd_ready;
 reg [5:0] pgm_rd_state;
 
 
+
+
+
+//**************************************************
+//             Delay check & addition
+//**************************************************
+
+reg [133:0] out_rd_data_dly[1:0];
+reg out_rd_data_wr_dly[1:0];
+reg out_rd_valid_dly[1:0];
+reg out_rd_valid_wr_dly[1:0];
+reg [1023:0] out_rd_phv_dly[1:0];
+reg out_rd_phy_wr_dly[1:0];
+
+always @(posedge clk) begin
+	out_rd_data <= out_rd_data_dly[0];
+	out_rd_data_dly[0] <= out_rd_data_dly[1];
+
+	out_rd_data_wr <= out_rd_data_wr_dly[0];
+	out_rd_data_wr_dly[0] <= out_rd_data_wr_dly[1];
+	
+	out_rd_valid <= out_rd_valid_dly[0];
+	out_rd_valid_dly[0] <= out_rd_valid_dly[1];
+
+	out_rd_valid_wr <= out_rd_valid_wr_dly[0];
+	out_rd_valid_wr_dly[0] <= out_rd_valid_wr_dly[1];
+
+	out_rd_phv <= out_rd_phv_dly[0];
+	out_rd_phv_dly[0] <= out_rd_phv_dly[1];
+
+	out_rd_phv_wr <= out_rd_phv_wr_dly[0];
+	out_rd_phv_wr_dly[0] <= out_rd_phv_wr_dly[1];
+end
+
 //***************************************************
 //             Pkt Rd & Transmit
 //***************************************************
@@ -118,36 +152,56 @@ always @(posedge clk or negedge rst_n) begin
 		rd2ram_rd <= 1'b0;
 		rd2ram_addr <= 7'b0;
 		//outputs set to 0
-		out_rd_data <= 134'b0;
-		out_rd_data_wr <= 1'b0;
-		out_rd_valid <= 1'b0;
-		out_rd_valid_wr <= 1'b0;
+		out_rd_data_dly[1] <= 134'b0;
+		out_rd_data_wr_dly[1] <= 1'b0;
+		out_rd_valid_dly[1] <= 1'b0;
+		out_rd_valid_wr_dly[1] <= 1'b0;
 
-		out_rd_phv <= 1024'b0;
-		out_rd_phv_wr <= 1'b0;
+		out_rd_phv_dly[1] <= 1024'b0;
+		out_rd_phv_wr_dly[1] <= 1'b0;
 
 		//intermidiate set to 0
 		soft_rst <= 1'b0;
 		sent_rate_cnt <= 32'b0;
-		sent_rate_reg <= 32'b0;
+		sent_rate_reg <= 32'hffffffff;
 		lat_pkt_cnt <= 32'b0; //num of pkt between Probes
-		lat_pkt_reg <= 32'b0; //num of pkt between Probes
+		lat_pkt_reg <= 32'hffffffff; //num of pkt between Probes
 		sent_bit_cnt <= 64'b0;
 		sent_pkt_cnt <= 64'b0;
+
+		lat_flag <= 1'b0;  //TODO add latency flag here
+
+
+		//**********************set dly to 0****************//
+		/*
+		out_rd_data_dly[1] <= 134'b0;
+		out_rd_data_wr_dly[1] <= 1'b0;
+		out_rd_valid_dly[1] <= 1'b0;
+		out_rd_valid_wr_dly[1] <= 1'b0;
+		out_rd_phv_dly[1] <= 1024'b0;
+		out_rd_phy_wr_dly[1] <= 1'b0;
+		*/
+		//**********************set dly to 0****************//
+
+
+		pgm_rd_state <= IDLE_S;
 		
 	end
 	else begin
 		case(pgm_rd_state)
 			IDLE_S: begin
 				if(pgm_bypass_flag == 1'b1 && in_rd_data[133:132] == 2'b01 && in_rd_valid == 1'b1) begin
+					
 					out_rd_data <= in_rd_data;
 					out_rd_data_wr <= 1'b1;
 					out_rd_valid <= 1'b1;
 					out_rd_phv <= in_rd_phv;
 					out_rd_phv_wr <= 1'b1;
+					out_rd_valid_wr <= 1'b0;
 
 					pgm_rd_state <= SENT_S;
 				end
+
 				else if(pgm_sent_start_flag == 1'b1) begin
 					out_rd_data <= ram2rd_rdata[133:0];
 					rd2ram_addr <= 7'b0;
@@ -155,6 +209,7 @@ always @(posedge clk or negedge rst_n) begin
 					out_rd_data_wr <= 1'b1;
 					out_rd_valid <= 1'b1;
 					out_rd_phv <= 1024'b0;
+					out_rd_phv_wr <= 1'b1;
 
 					pgm_rd_state <= READ_S;
 				end
@@ -178,6 +233,10 @@ always @(posedge clk or negedge rst_n) begin
 					sent_bit_cnt <= 64'b0;
 					sent_pkt_cnt <= 64'b0;
 
+					//**********************set dly to 0****************//
+					
+
+					//**********************set dly to 0****************//
 
 
 					pgm_rd_state <= IDLE_S;
@@ -192,11 +251,15 @@ always @(posedge clk or negedge rst_n) begin
 					out_rd_phv <= in_rd_phv;
 					out_rd_phv_wr <= 1'b1;
 				end
-				else if(in_rd_data[133:132] == 2'b10 && in_rd_data_rd == 1'b1) begin
-					out_rd_data_wr <= 1'b0;
-					out_rd_valid <= 1'b0;
-					out_rd_phv <= 1028'b0;
-					out_rd_phv_wr <= 1'b0;
+				else if(in_rd_data[133:132] == 2'b10 && in_rd_data_wr == 1'b1) begin
+					out_rd_data <= in_rd_data;
+					out_rd_data_wr <= 1'b1;
+					out_rd_valid <= 1'b1;
+					out_rd_valid_wr <= 1'b1;
+					out_rd_phv <= in_rd_phv;
+					out_rd_phv_wr <= 1'b1;
+
+					pgm_rd_state <= IDLE_S;
 				end
 
 				else begin
@@ -214,11 +277,11 @@ always @(posedge clk or negedge rst_n) begin
 					//clear counters of rate
 					//sent_rate_cnt <= 64'b0;
 
-					out_rd_data <= ram2rd_rdata[133:0];
-					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= 1'b1;
-					out_rd_phv <= 1028'b0;
-					out_rd_phv_wr <= 1'b0;
+					out_rd_data_dly[1] <= ram2rd_rdata[133:0];
+					out_rd_data_wr_dly[1] <= 1'b1;
+					out_rd_valid_dly[1] <= 1'b1;
+					out_rd_phv_dly[1] <= 1028'b0;
+					out_rd_phv_wr_dly[1] <= 1'b0;
 
 					rd2ram_rd <= 1'b1;
 					rd2ram_addr <= rd2ram_addr + 1'b1;
@@ -232,11 +295,12 @@ always @(posedge clk or negedge rst_n) begin
 					rd2ram_rd <= 1'b0;
 					rd2ram_addr <= 7'b0;
 
-					out_rd_data <= 134'b0;;
-					out_rd_data_wr <= 1'b0;
-					out_rd_valid <= 1'b0;
-					out_rd_phv <= 1028'b0;
-					out_rd_phv_wr <= 1'b0;
+					out_rd_data <= ram2rd_rdata[133:0];
+					out_rd_data_wr <= 1'b1;
+					out_rd_valid <= 1'b1;
+					out_rd_phv <= 1028'b1;
+					out_rd_phv_wr <= 1'b1;
+					out_rd_valid_wr <= 1'b1;
 
 					sent_bit_cnt <= sent_bit_cnt + ram2rd_rdata[131:128];
 					sent_pkt_cnt <= sent_pkt_cnt + 1'b1;
@@ -250,6 +314,21 @@ always @(posedge clk or negedge rst_n) begin
 					end
 				end
 
+				else if(ram2rd_rdata[133:132] == 2'b01) begin
+					rd2ram_rd <= 1'b1;
+					rd2ram_addr <= rd2ram_addr + 7'b1;
+
+					out_rd_data <= ram2rd_rdata[133:0];
+					out_rd_data_wr <= 1'b1;
+					out_rd_valid <= 1'b1;
+					out_rd_phv <= 1028'b1;
+					out_rd_phv_wr <= 1'b1;
+					out_rd_valid_wr <= 1'b1;
+
+					pgm_rd_state <= READ_S;
+
+				end
+
 			end
 
 			FIN_S: begin
@@ -257,39 +336,56 @@ always @(posedge clk or negedge rst_n) begin
 					pgm_rd_state <= IDLE_S;
 				end	
 				else begin
+					out_rd_data <= 134'b0;
+					out_rd_data_wr <= 1'b0;
+					out_rd_valid <= 1'b0;
+					out_rd_phv <= 1028'b0;
+					out_rd_phv_wr <= 1'b0;
+					out_rd_valid_wr <= 1'b0;
+
 					pgm_rd_state <= FIN_S;
 				end
 			end
 
 			WAIT_S: begin
-				if(sent_rate_cnt==sent_rate_reg) begin
+				
+				if(sent_rate_cnt == sent_rate_reg && lat_flag == 1'b1 && lat_pkt_cnt == lat_pkt_reg) begin
 					rd2ram_rd <= 1'b1;
-					rd2ram_addr <= 7'b0;
+					rd2ram_addr <= 7'b0000000;
 					out_rd_data <= ram2rd_rdata[133:0];
 					out_rd_data_wr <= 1'b1;
 					out_rd_valid <= 1'b1;
-					out_rd_phv_wr <= 1'b0;
-					out_rd_phv <= 1028'b0;
-
-					sent_rate_cnt <= 32'b0;
-					pgm_rd_state <= READ_S;
-				end
-
-				else if(sent_rate_cnt != sent_rate_reg && lat_flag == 1'b1 && lat_pkt_cnt == lat_pkt_reg) begin
-					rd2ram_rd <= 1'b1;
-					rd2ram_addr <= 7'b0;
-					out_rd_data <= ram2rd_rdata[133:0];
-					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= 1'b1;
-					out_rd_phv_wr <= 1'b0;
-					out_rd_phv <= 1028'b0;
+					out_rd_phv_wr <= 1'b1;
+					out_rd_phv <= 1028'b1;
 
 					sent_rate_cnt <= 32'b0;
 					lat_pkt_cnt <= 32'b0;
 					pgm_rd_state <= PROBE_S;
 				end
 
+				else if(sent_rate_cnt==sent_rate_reg) begin
+					rd2ram_rd <= 1'b1;
+					rd2ram_addr <= 7'b0000000;
+					out_rd_data <= ram2rd_rdata[133:0];
+					out_rd_data_wr <= 1'b1;
+					out_rd_valid <= 1'b1;
+					out_rd_phv_wr <= 1'b1;
+					out_rd_phv <= 1028'b1;
+
+					sent_rate_cnt <= 32'b0;
+					pgm_rd_state <= READ_S;
+				end
+
+				
+
 				else begin
+					out_rd_data <= 134'b0;
+					out_rd_data_wr <= 1'b0;
+					out_rd_valid <= 1'b0;
+					out_rd_phv <= 1028'b0;
+					out_rd_phv_wr <= 1'b0;
+					out_rd_valid_wr <= 1'b0;
+
 					lat_pkt_cnt <= lat_pkt_cnt + 1'b1;
 					sent_rate_cnt <= sent_rate_cnt + 1'b1;
 				end
@@ -306,6 +402,7 @@ always @(posedge clk or negedge rst_n) begin
 					out_rd_valid <= 1'b1;
 					out_rd_phv_wr <= 1'b0;
 					out_rd_phv <= 1028'b0;
+					out_rd_valid_wr <= 1'b0;
 					
 					pgm_rd_state <= PROBE_S;
 				end
@@ -317,11 +414,12 @@ always @(posedge clk or negedge rst_n) begin
 					rd2ram_rd <= 1'b0;
 					rd2ram_addr <= 7'b0;
 
-					out_rd_data <= 134'b0;
-					out_rd_data_wr <= 1'b0;
-					out_rd_valid <= 1'b0;
-					out_rd_phv_wr <= 1'b0;
-					out_rd_phv <= 1028'b0;
+					out_rd_data <= ram2rd_rdata[133:0];
+					out_rd_data_wr <= 1'b1;
+					out_rd_valid <= 1'b1;
+					out_rd_phv_wr <= 1'b1;
+					out_rd_phv <= 1028'b1;
+					out_rd_valid_wr <= 1'b1;
 
 					if(pgm_sent_finish_flag == 1'b1) begin
 						pgm_rd_state <= FIN_S;
@@ -333,7 +431,7 @@ always @(posedge clk or negedge rst_n) begin
 
 				end
 			end
-		
+		endcase
 	end
 end
 
@@ -346,7 +444,7 @@ end
 always @(posedge clk) begin
 	//1st cycle of control packet 
 	if(cin_rd_data[133:132] == 2'b01 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
-		if (cin_rd_data[103:96]== 8'd61 cin_rd_data[126:124] == 3'b010) begin
+		if (cin_rd_data[103:96]== 8'd62 && cin_rd_data[126:124] == 3'b010) begin
 			//write signal from SW
 			case(cin_rd_data[95:64])
 				32'h00000000: begin
@@ -380,12 +478,13 @@ always @(posedge clk) begin
 					lat_flag <= cin_rd_data[0];
 				end
 
-			//match input to output
-			cout_rd_data_wr <= cin_rd_data_wr;
+			endcase
 			cout_rd_data <= cin_rd_data;
+			cout_rd_data_wr <= cin_rd_data_wr;
+			
 		end
 
-		else if(cin_rd_data[103:96]== 8'd61 cin_rd_data[126:124] == 3'b001) begin
+		else if(cin_rd_data[103:96]== 8'd62 && cin_rd_data[126:124] == 3'b001) begin
 			//read signal from SW
 			
 			case(cin_rd_data[95:64])
@@ -432,9 +531,13 @@ always @(posedge clk) begin
 					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], 32'hffffffff};
 				end
 
+			endcase
 			cout_rd_data_wr <= cin_rd_data_wr;
+		end
 
-
+		else begin
+			cout_rd_data <= cin_rd_data;
+			cout_rd_data_wr <= cin_rd_data_wr;
 		end
 	end
 	//2nd cycle of control packet
