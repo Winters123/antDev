@@ -311,10 +311,10 @@ always @(posedge clk or negedge rst_n) begin
 					rd2ram_addr <= 7'b0;
 
 					out_rd_data <= ram2rd_rdata[133:0];
-					out_rd_data_wr <= 1'b0;
-					out_rd_valid <= 1'b0;
+					out_rd_data_wr <= 1'b1;
+					out_rd_valid <= 1'b1;
 					out_rd_phv <= 1024'b0;
-					out_rd_phv_wr <= 1'b0;
+					out_rd_phv_wr <= 1'b1;
 					out_rd_valid_wr <= 1'b1;
 
 					sent_bit_cnt <= sent_bit_cnt + ram2rd_rdata[131:128];
@@ -437,10 +437,10 @@ always @(posedge clk or negedge rst_n) begin
 					rd2ram_rd <= 1'b0;
 					rd2ram_addr <= 7'b0;
 
-					out_rd_data <= 134'b0;
-					out_rd_data_wr <= 1'b0;
-					out_rd_valid <= 1'b0;
-					out_rd_phv_wr <= 1'b0;
+					out_rd_data <= ram2rd_rdata[133:0];
+					out_rd_data_wr <= 1'b1;
+					out_rd_valid <= 1'b1;
+					out_rd_phv_wr <= 1'b1;
 					out_rd_phv <= 1024'b0;
 					out_rd_valid_wr <= 1'b1;
 
