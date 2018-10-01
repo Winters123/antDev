@@ -236,7 +236,7 @@ initial begin
 	cin_pgm_data = {6'b100000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
 
 
-	#(10*CYCLE);
+	#(20*CYCLE);
 	$finish; 
 	
 end
