@@ -43,7 +43,8 @@ module um #(
     output pktout_data_valid,
     output pktout_data_valid_wr,
     input pktout_ready,//pktout_ready = port2um_alf    
-    
+
+//control path
     input [133:0] dma2um_data,
     input dma2um_data_wr,
     output um2dma_ready,
@@ -112,23 +113,66 @@ wire data_cache2gac_valid;
 wire gac2data_cache_alf;
 
 //GAC to GOE 
-wire [133:0] gac2goe_data;
-wire gac2goe_data_wr;
-wire [1023:0] gac2goe_phv;
-wire gac2goe_phv_wr;
-wire gac2goe_valid;
-wire gac2goe_valid_wr;
-wire goe2gac_alf;
-wire goe2gac_phv_alf;
+//wire [133:0] gac2goe_data;
+//wire gac2goe_data_wr;
+//wire [1023:0] gac2goe_phv;
+//wire gac2goe_phv_wr;
+//wire gac2goe_valid;
+//wire gac2goe_valid_wr;
+//wire goe2gac_alf;
+//wire goe2gac_phv_alf;
+
+//GAC to PGM
+wire [133:0] gac2pgm_data;
+wire gac2pgm_data_wr;
+wire [1023:0] gac2pgm_phv;
+wire gac2pgm_phv_wr;
+wire gac2pgm_valid;
+wire gac2pgm_valid_wr;
+wire pgm2gac_alf;
+wire pgm2gac_phv_alf;
+
+//PGM to GOE
+wire [133:0] pgm2goe_data;
+wire pgm2goe_data_wr;
+wire [1023:0] pgm2goe_phv;
+wire pgm2goe_phv_wr;
+wire pgm2goe_valid;
+wire pgm2goe_valid_wr;
+wire goe2pgm_alf;
+wire goe2pgm_phv_alf;
+
+//GME to SCM
+wire [255:0] gme2scm_md;   
+wire gme2scm_md_wr;
+wire [1023:0] gme2scm_phv;
+wire gme2scm_phv_wr;
+wire scm2gme_md_alf;
+wire scm2gme_phv_alf;
+
+//SCM to GAC
+wire [255:0] scm2gac_md;
+wire scm2gac_md_wr;
+wire [1023:0] scm2gac_phv;
+wire scm2gac_phv_wr;
+wire gac2scm_md_alf;
+wire gac2scm_phv_alf;
 
 //GME to GAC
-wire [255:0] gme2gac_md;
-wire gme2gac_md_wr;
-wire [1023:0] gme2gac_phv;
-wire gme2gac_phv_wr;
-wire gac2gme_md_alf;
-wire gac2gme_phv_alf;
+//wire [255:0] gme2gac_md;
+//wire gme2gac_md_wr;
+//wire [1023:0] gme2gac_phv;
+//wire gme2gac_phv_wr;
+//wire gac2gme_md_alf;
+//wire gac2gme_phv_alf;
 
+//PGM to GAC flag
+wire pgm2gac_sent_start_flag;
+wire pgm2gac_sent_finish_flag;
+
+//GAC to SCM flag
+wire gac2scm_sent_start_flag;
+wire gac2scm_sent_finish_flag;
 
 //cmd
 wire [133:0] cout_gpp_data;
@@ -143,9 +187,17 @@ wire [133:0] cout_gme_data;
 wire cout_gme_data_wr;
 wire cin_gme_ready;
 
+wire [133:0] cout_scm_data;
+wire cout_scm_data_wr;
+wire cin_scm_ready;
+
 wire [133:0] cout_gac_data;
 wire cout_gac_data_wr;
 wire cin_gac_ready;
+
+wire [133:0] cout_pgm_data;
+wire cout_pgm_data_wr;
+wire cin_pgm_ready;
 
 //localbus
 //gpp
@@ -571,13 +623,13 @@ gme #(
 	.in_gme_phv_wr(gke2gme_phv_wr),	     
 	.out_gme_phv_alf(gme2gke_phv_alf),
 //********************************
-    .out_gme_md(gme2gac_md),
-	.out_gme_md_wr(gme2gac_md_wr),
-	.in_gme_md_alf(gac2gme_md_alf),
+    .out_gme_md(gme2scm_md),
+	.out_gme_md_wr(gme2scm_md_wr),
+	.in_gme_md_alf(scm2gme_md_alf),
 	
-    .out_gme_phv(gme2gac_phv),
-	.out_gme_phv_wr(gme2gac_phv_wr),
-	.in_gme_phv_alf(gac2gme_phv_alf),
+    .out_gme_phv(gme2scm_phv),
+	.out_gme_phv_wr(gme2scm_phv_wr),
+	.in_gme_phv_alf(scm2gme_phv_alf),
 //transport key to lookup      
     .out_gme_key_wr(um2me_key_wr),  
     .out_gme_key(um2match_key),
@@ -603,6 +655,48 @@ gme #(
 	.cout_gme_data_wr(cout_gme_data_wr),
 	.cin_gme_ready(cin_gme_ready)
 );
+
+scm #(
+    .PLATFORM(PLATFORM),
+    .LMID(7),
+    .NMID(5)
+)scm (
+    .clk(clk),
+    .rst_n(rst_n),
+
+        //receive from gme
+    .in_scm_md(gme2scm_md),
+    .in_scm_md_wr(gme2scm_md_wr),
+    .out_scm_md_alf(scm2gme_md_alf),
+
+    .in_scm_phv(gme2scm_phv),
+    .in_scm_phv_wr(gme2scm_phv_wr),
+    .out_scm_phv_alf(scm2gme_phv_alf),
+
+    //transport to next module
+    .out_scm_md(scm2gac_md),
+    .out_scm_md_wr(scm2gac_md_wr),
+    .in_scm_md_alf(gac2scm_md_alf),
+
+    .out_scm_phv(scm2gac_phv),
+    .out_scm_phv_wr(scm2gac_phv_wr),
+    .in_scm_phv_alf(gac2scm_phv_alf),
+
+    //start or end signal
+    .gac2scm_sent_start(gac2scm_sent_start_flag),
+    .gac2scm_sent_end(gac2scm_sent_finish_flag),
+    
+    //input configure pkt from DMA
+    .cin_scm_data(cout_gme_data),
+    .cin_scm_data_wr(cout_gme_data_wr),
+    .cout_scm_ready(cin_gme_ready),
+
+    //output configure pkt to next module
+    .cout_scm_data(cout_scm_data),
+    .cout_scm_data_wr(cout_scm_data_wr),
+    .cin_scm_ready(cout_scm_ready)
+
+);
     
 gac #(
 	.PLATFORM(PLATFORM),
@@ -614,13 +708,13 @@ gac #(
     
     .sys_max_cpuid(6'd8),
 //************************************	 
-    .in_gac_md(gme2gac_md),
-	.in_gac_md_wr(gme2gac_md_wr),
-	.out_gac_md_alf(gac2gme_md_alf),
+    .in_gac_md(scm2gac_md),
+	.in_gac_md_wr(scm2gac_md_wr),
+	.out_gac_md_alf(scm2gme_md_alf),
 	
-    .in_gac_phv(gme2gac_phv),
-	.in_gac_phv_wr(gme2gac_phv_wr),   
-	.out_gac_phv_alf(gac2gme_phv_alf),	
+    .in_gac_phv(scm2gac_phv),
+	.in_gac_phv_wr(scm2gac_phv_wr),   
+	.out_gac_phv_alf(gac2scm_phv_alf),	
 	 
 //Pkt waiting for rule 
     .in_gac_data_wr(data_cache2gac_data_wr),
@@ -638,24 +732,82 @@ gac #(
     .gac2cfg_rdata(gac2cfg_rdata),	
 	 
 //************************************
-    .out_gac_data(gac2goe_data),
-    .out_gac_data_wr(gac2goe_data_wr),
-    .out_gac_valid(gac2goe_valid),
-	.out_gac_valid_wr(gac2goe_valid_wr),
-	.in_gac_alf(goe2gac_alf),
+    .out_gac_data(gac2pgm_data),
+    .out_gac_data_wr(gac2pgm_data_wr),
+    .out_gac_valid(gac2pgm_valid),
+	.out_gac_valid_wr(gac2pgm_valid_wr),
+	.in_gac_alf(pgm2gac_alf),
 	
-	.out_gac_phv(gac2goe_phv),
-	.out_gac_phv_wr(gac2goe_phv_wr),
-	.in_gac_phv_alf(goe2gac_phv_alf),
+	.out_gac_phv(gac2pgm_phv),
+	.out_gac_phv_wr(gac2pgm_phv_wr),
+	.in_gac_phv_alf(pgm2gac_phv_alf),
 	
-	.cin_gac_data(cout_gme_data),
-	.cin_gac_data_wr(cout_gme_data_wr),
-	.cout_gac_ready(cin_gme_ready),
+	.cin_gac_data(cout_scm_data),
+	.cin_gac_data_wr(cout_scm_data_wr),
+	.cout_gac_ready(cin_scm_ready),
 	
 	.cout_gac_data(cout_gac_data),
 	.cout_gac_data_wr(cout_gac_data_wr),
-	.cin_gac_ready(cin_gac_ready)
+	.cin_gac_ready(cin_gac_ready),
+
+    .in_gac_sent_start_flag(pgm2gac_sent_start_flag),
+    .in_gac_sent_finish_flag(pgm2gac_sent_finish_flag),
+    .out_gac_sent_start_flag(gac2scm_sent_start_flag),
+    .out_gac_sent_finish_flag(gac2scm_sent_finish_flag)
 );
+
+
+pgm #(
+    .PLATFORM(PLATFORM),
+    .LMID(6),
+    .NMID(5)
+)pgm(
+    .clk(clk),
+    .rst_n(rst_n),
+
+//waiting for pkt
+    .in_pgm_data_wr(gac2pgm_data_wr),
+    .in_pgm_data(gac2pgm_data), 
+    .in_pgm_valid_wr(gac2pgm_valid_wr),
+    .in_pgm_valid(gac2pgm_valid),
+    .out_pgm_alf(pgm2gac_alf),
+
+//receive from gac
+
+    .in_pgm_phv(gac2pgm_phv),
+    .in_pgm_phv_wr(gac2pgm_phv_wr),
+    .out_pgm_phv_alf(pgm2gac_phv_alf),
+
+//transmit to next module (goe)
+    
+    .out_pgm_data(pgm2goe_data),
+    .out_pgm_data_wr(pgm2goe_data_wr),
+    .out_pgm_valid_wr(pgm2goe_valid_wr),
+    .out_pgm_valid(pgm2goe_valid),
+    .in_pgm_alf(pgm2gac_alf),
+
+    .out_pgm_phv(pgm2goe_phv),
+    .out_pgm_phv_wr(pgm2goe_phv_wr),
+    .in_pgm_phv_alf(goe2pgm_phv_alf),
+
+
+//alf to GAC
+    .out_pgm_sent_start_flag(pgm2gac_sent_start_flag),
+    .out_pgm_sent_finish_flag(pgm2gac_sent_finish_flag),
+
+
+
+//input configuree pkt from DMA
+    .cin_pgm_data(cout_gac_data),
+    .cin_pgm_data_wr(cout_gac_data_wr),
+    .cout_pgm_ready(cin_gac_ready),
+
+//output configure pkt to next module
+    .cout_pgm_data(cout_pgm_data),
+    .cout_pgm_data_wr(cout_pgm_data_wr),
+    .cin_pgm_ready(cin_pgm_ready)
+);
+
 
 goe #(
     .PLATFORM(PLATFORM),
@@ -664,15 +816,15 @@ goe #(
     .clk(clk),
     .rst_n(rst_n),
 //gac module's pkt waiting for transmit
-    .in_goe_data(gac2goe_data),
-    .in_goe_data_wr(gac2goe_data_wr),
-	.in_goe_valid(gac2goe_valid),
-    .in_goe_valid_wr(gac2goe_valid_wr),
-	.out_goe_alf(goe2gac_alf),
+    .in_goe_data(pgm2goe_data),
+    .in_goe_data_wr(pgm2goe_data_wr),
+	.in_goe_valid(pgm2goe_valid),
+    .in_goe_valid_wr(pgm2goe_valid_wr),
+	.out_goe_alf(goe2pgm_alf),
 	
-	.in_goe_phv(gac2goe_phv),
-	.in_goe_phv_wr(gac2goe_phv_wr),
-	.out_goe_phv_alf(goe2gac_phv_alf),
+	.in_goe_phv(pgm2goe_phv),
+	.in_goe_phv_wr(pgm2goe_phv_wr),
+	.out_goe_phv_alf(goe2pgm_phv_alf),
 //transmit to down port
     .pktout_data_wr(pktout_data_wr),
     .pktout_data(pktout_data),
@@ -688,9 +840,9 @@ goe #(
 	.cfg2goe_wdata(cfg2goe_wdata),
 	.goe2cfg_rdata(goe2cfg_rdata),
 	
-	.cin_goe_data(cout_gac_data),
-	.cin_goe_data_wr(cout_gac_data_wr),
-	.cout_goe_ready(cin_gac_ready),
+	.cin_goe_data(cout_pgm_data),
+	.cin_goe_data_wr(cout_pgm_data_wr),
+	.cout_goe_ready(cin_pgm_ready),
 	
 	.cout_goe_data(um2dma_data),
 	.cout_goe_data_wr(um2dma_data_wr),

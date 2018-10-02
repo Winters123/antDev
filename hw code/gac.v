@@ -78,9 +78,14 @@
 //output configure pkt to next module 
     output [133:0] cout_gac_data,
 	output cout_gac_data_wr,
-	input cin_gac_ready
-	
+	input cin_gac_ready,
 
+//for ANT control of SCM
+	input in_gac_sent_start_flag,
+	input in_gac_sent_finish_flag,
+
+	output out_gac_sent_start_flag,
+	output out_gac_sent_finish_flag
 );    
 
 //***************************************************
@@ -138,6 +143,10 @@ assign cout_gac_ready = cin_gac_ready;
 assign cout_gac_data_wr = cin_gac_data_wr;
 assign cout_gac_data = cin_gac_data;
 
+
+//signals for PGM
+assign out_gac_sent_start_flag = in_gac_sent_start_flag;
+assign out_gac_sent_finish_flag = in_gac_sent_finish_flag;
 //*****************************************
 //         Flow table configuration
 //*****************************************
