@@ -28,15 +28,6 @@ module scm #(
     input gac2scm_sent_start,
     input gac2scm_sent_end,
     
-    /*
-    //localbus to scm
-    input cfg2scm_cs_n, //low active
-    output reg scm2cfg_ack_n, //low active
-    input cfg2scm_rw, //0: write 1: read
-    input [31:0] cfg2scm_addr,
-    input [31:0] cfg2scm_wdata,
-    output reg [31:0] gme2cfg_rdata,
-    */
     //input configure pkt from DMA
     input [133:0] cin_scm_data,
     input cin_scm_data_wr,
