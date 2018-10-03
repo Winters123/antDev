@@ -136,27 +136,27 @@ always @(posedge clk or negedge rst_n) begin
                 cout_scm_data_wr <= 1'b1;
                 case (cin_scm_data[95:64])
                     32'h70000008: begin
-                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, scm_bit_num_cnt[31:0]};
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_bit_num_cnt[31:0]};
                     end
 
                     32'h70000009 :begin
-                        cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_bit_num_cnt[63:32]};
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_bit_num_cnt[63:32]};
                     end
 
                     32'h7000000A: begin
-                        cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_pkt_num_cnt[31:0]};
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_pkt_num_cnt[31:0]};
                     end
 
                     32'h7000000B: begin
-                        cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_pkt_num_cnt[63:32]};
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_pkt_num_cnt[63:32]};
                     end
 
                     32'h7000000C: begin
-                        cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_time_cnt[31:0]};
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_time_cnt[31:0]};
                     end
 
                     32'h7000000D: begin
-                        cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_time_cnt[63:32]};
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_time_cnt[63:32]};
                     end
                 endcase
             end
