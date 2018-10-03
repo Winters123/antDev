@@ -1,5 +1,5 @@
 module scm #(
-    parameter platform = "Xilinx",
+    parameter PLATFORM = "Xilinx",
               LMID = 8'd7,
               NMID = 8'd5
 )(
