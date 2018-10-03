@@ -87,7 +87,7 @@ module pgm #(
 
 wire [1023:0] wr2rd_phv;
 wire wr2rd_phv_wr;
-wire wr2rd_phv_alf;
+wire rd2wr_phv_alf;
 
 wire [133:0]wr2rd_data;
 wire wr2rd_data_wr;
@@ -167,7 +167,7 @@ pgm_wr #(
 //transport phv and data to pgm_rd
     .out_wr_phv(wr2rd_phv),
 	.out_wr_phv_wr(wr2rd_phv_wr),
-	.in_wr_phv_alf(in_wr_phv_alf),
+	.in_wr_phv_alf(rd2wr_phv_alf),
 
 	.out_wr_data(wr2rd_data), 
 	.out_wr_data_wr(wr2rd_data_wr),
@@ -220,9 +220,9 @@ pgm_rd #(
 	.in_rd_phv_alf(in_pgm_phv_alf),
 
 	.out_rd_data(out_pgm_data), 
-	.out_rd_data_wr(out_rd_data_wr),
+	.out_rd_data_wr(out_pgm_data_wr),
 	.out_rd_valid(out_pgm_valid),
-	.out_rd_valid_wr(out_rd_valid_wr),
+	.out_rd_valid_wr(out_pgm_valid_wr),
 	.in_rd_alf(in_pgm_alf),
 
 //signals from PGM_WR
