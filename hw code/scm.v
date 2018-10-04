@@ -158,6 +158,10 @@ always @(posedge clk or negedge rst_n) begin
                     32'h7000000D: begin
                         cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_time_cnt[63:32]};
                     end
+
+                    32'h11111111: begin
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:3], scm_state}
+                    end
                 endcase
             end
         end

@@ -73,13 +73,112 @@ int ant_rst()
 
 /**
  * check the hw module of ANT to see if all the modules are waiting for software reset
- * @param  mid [mid of hw module]
  * @return     [1 if waiting for software reset, otherwise return 0]
  */
-int ant_check_finish(u8 mid)
+int ant_check_finish()
 {
+	if(fast_ua_hw_rd(PGM_RD_MID, ANT_HW_STATE, MASK_1) == PGM_RD_FIN_S 
+		&& fast_ua_hw_rd(PGM_RD_MID, ANT_HW_STATE, MASK_1) == PGM_RD_FIN_S){
+		return 1;
+	}
+	else 
+		return 0;
+}
+
+/**
+ * set test parameters on registers of ANT modules 
+ * @param  antp [the struct of ANT parameters]
+ * @return      [0 if success]
+ */
+int ant_set_test_para(struct ant_parameter antp)
+{
+	int i=0;
+	i += ant_set_sent_time_reg((u64)antp.sent_time);
+	i += ant_set_sent_rate_reg((u64)antp.sent_rate);
+	i += ant_set_lat_pkt_reg((u64)antp.lat_pkt);
+	i += ant_set_lat_flag((u64)antp.lat_flag);
+	i += ant_set_n_rtt((u64)antp.n_rtt);
+	return i;
+}
+
+/**
+ * send a model packet to ANT hw and trigger ANT to start testing
+ * @param  pkt     [model packet]
+ * @param  pkt_len [the length of model packet]
+ * @return         [0 if success, else return -1]
+ */
+int ant_pkt_send(struct fast_packet *pkt, int pkt_len)
+{
+	//used for debug
+	print_pkt(pkt, pkt_len);
+	//sent model packet
+	fast_ua_send(pkt, pkt_len);
 	
 }
+
+/**
+ * test the throughput using dich method, caution that this is a blocking function, only
+ * returns onces finished
+ * @param  pkt     [model packet]
+ * @param  pkt_len [the length of model packet]
+ * @return         [final throughput of the tested port]
+ */
+u32 ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnt, u32 sent_rate, u64 test_time)
+{
+	int rnt_cnt;
+	u32 sent_rate_low = 0, sent_rate_high = sent_rate;
+	struct ant_cnt antc;
+	//set test paramters
+	struct ant_parameter antp;
+	antp.sent_time = test_time;
+	antp.sent_rate = sent_rate;
+	antp.lat_pkt = 0;
+	antp.lat_flag = 0;
+	antp.n_rtt = 2; //we set n_rtt as 2 as default
+
+
+	ant_set_test_para(antp);
+
+	ant_pkt_send(pkt, pkt_len);
+
+	usleep(test_time/100);
+	//chech if the test is finished
+	for(rnt_cnt = 0; rnt_cnt < rnt; rnt_cnt++){
+		ant_set_test_para(antp);
+		ant_pkt_send(pkt, pkt_len);
+		usleep(test_time/100);
+		while(!ant_check_finish()){
+			usleep(100);
+		}
+		if(ant_collect_counters(antc)){
+			printf("the dich exit with an error\n")
+			return -1;
+		}
+		if (antc.sent_pkts == antc.recv_pkts)
+		{
+			sent_rate_low = (sent_rate_high + sent_rate_low) / 2;
+			antp.sent_rate = sent_rate_low; 
+		}
+		else {
+			sent_rate_high = (sent_rate_high + sent_rate_low) / 2;
+			antp.sent_rate = sent_rate_high;
+		}
+	}
+	return antp.sent_rate;
+
+}
+
+/**
+ * conduct latency test, obtain packets with timestamp on the packet
+ * @param  fast_pkt [description]
+ * @param  pkt_len  [description]
+ * @return          [description]
+
+u32 ant_latency_test(struct fast_pkt, int pkt_len)
+{
+
+}
+ */
 /*---------------------------------ANT CORE FUNCTION ----------------------------*/
 
 

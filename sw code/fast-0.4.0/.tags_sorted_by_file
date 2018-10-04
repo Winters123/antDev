@@ -42,13 +42,16 @@ update_mac_time	app\l2switch\main_l2switch.c	/^void update_mac_time(u8 inport,u8
 valid	app\l2switch\main_l2switch.c	/^	u8  valid;	 \/*地址有效位标记*\/$/;"	m	struct:nm08_port_mac	file:
 xprintf	app\l2switch\main_l2switch.c	40;"	d	file:
 main	app\openflow\main_xofp.c	/^int main(int argc,char* argv[])$/;"	f
+ANT_HW_STATE	include\ant_driver.h	64;"	d
 LAT_FLAG	include\ant_driver.h	49;"	d
 LAT_PKT_CNT	include\ant_driver.h	45;"	d
 LAT_PKT_REG	include\ant_driver.h	46;"	d
 N_RTT	include\ant_driver.h	58;"	d
+PGM_RD_FIN_S	include\ant_driver.h	70;"	d
 PROTO_TYPE	include\ant_driver.h	56;"	d
 RD_SOFT_RST	include\ant_driver.h	50;"	d
 SCM_BIT_CNT	include\ant_driver.h	59;"	d
+SCM_FETCH_S	include\ant_driver.h	69;"	d
 SCM_PKT_CNT	include\ant_driver.h	60;"	d
 SCM_SOFT_RST	include\ant_driver.h	57;"	d
 SCM_TIME_CNT	include\ant_driver.h	61;"	d
@@ -454,6 +457,7 @@ PGM_MID	lib\libant\main_libant.c	31;"	d	file:
 PGM_RD_MID	lib\libant\main_libant.c	33;"	d	file:
 PGM_WR_MID	lib\libant\main_libant.c	32;"	d	file:
 SCM_MID	lib\libant\main_libant.c	30;"	d	file:
+ant_check_finish	lib\libant\main_libant.c	/^int ant_check_finish()$/;"	f
 ant_collect_counters	lib\libant\main_libant.c	/^int ant_collect_counters(struct ant_cnt &outc)$/;"	f
 ant_get_lat_flag	lib\libant\main_libant.c	/^int ant_get_lat_flag(u64 &regvalue)$/;"	f
 ant_get_lat_pkt_cnt	lib\libant\main_libant.c	/^int ant_get_lat_pkt_cnt(u64 &regvalue)$/;"	f
@@ -472,6 +476,8 @@ ant_get_sent_rate_reg	lib\libant\main_libant.c	/^int ant_get_sent_rate_reg(u64 &
 ant_get_sent_time_cnt	lib\libant\main_libant.c	/^int ant_get_sent_time_cnt(u64 &regvalue)$/;"	f
 ant_get_sent_time_reg	lib\libant\main_libant.c	/^int ant_get_sent_time_reg(u64 &regvalue)$/;"	f
 ant_get_wr_soft_rst	lib\libant\main_libant.c	/^int ant_get_wr_soft_rst(u64 &regvalue)$/;"	f
+ant_pkt_send	lib\libant\main_libant.c	/^int ant_pkt_send(struct fast_packet *pkt, int pkt_len)$/;"	f
+ant_rst	lib\libant\main_libant.c	/^int ant_rst()$/;"	f
 ant_set_lat_flag	lib\libant\main_libant.c	/^int ant_set_lat_flag(u64 regvalue)$/;"	f
 ant_set_lat_pkt_cnt	lib\libant\main_libant.c	/^int ant_set_lat_pkt_cnt(u64 regvalue)$/;"	f
 ant_set_lat_pkt_reg	lib\libant\main_libant.c	/^int ant_set_lat_pkt_reg(u64 regvalue)$/;"	f

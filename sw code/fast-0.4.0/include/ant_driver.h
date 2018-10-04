@@ -91,7 +91,6 @@ struct ant_parameter
 	u32 n_rtt;      /** Controlling the waiting time after sending last packet*/
 };
 
-
 /*-------------------ANT CORE FUNCTION ------------------*/
 
 int  ant_collect_counters(struct ant_cnt &result); /**获取FPGA中相关计数器的当前值*/
