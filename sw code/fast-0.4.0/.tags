@@ -205,6 +205,9 @@ I	.\lib\libofp\md5.h	15;"	d
 IDX	.\lib\libofp\main_libofp.h	88;"	d
 II	.\lib\libofp\md5.h	33;"	d
 L2SWITCH_VERSION	.\include\fast_version.h	64;"	d
+LAT_FLAG	.\include\ant_driver.h	49;"	d
+LAT_PKT_CNT	.\include\ant_driver.h	45;"	d
+LAT_PKT_REG	.\include\ant_driver.h	46;"	d
 LIBAMS_VERSION	.\include\fast_version.h	60;"	d
 LIBOFP_VERSION	.\include\fast_version.h	42;"	d
 LIBREG_VERSION	.\include\fast_version.h	38;"	d
@@ -222,6 +225,7 @@ LOOKUP_BV	.\include\fast.h	74;"	d
 LOOKUP_BV	.\include\fast.h	75;"	d
 MAC_LEN	.\app\l2switch\main_l2switch.c	36;"	d	file:
 MAC_LIFE_TIME	.\app\l2switch\main_l2switch.c	37;"	d	file:
+MASK_1	.\lib\libant\main_libant.c	35;"	d	file:
 MAXLINE	.\lib\libofp\ofp_v4.h	30;"	d
 MAX_IF_CNT	.\lib\libofp\main_libofp.h	45;"	d
 MAX_NEIGH_CNT	.\lib\libofp\main_libofp.h	47;"	d
@@ -262,6 +266,7 @@ NM_REG_WR	.\include\fast_struct.h	/^	NM_REG_WR,		\/**< NMAC的写操作报文*\/
 NM_RELESE	.\include\fast_struct.h	/^	NM_RELESE,		\/**< NMAC的释放（关闭）报文*\/$/;"	e	enum:__anon1
 NM_WR_RPL	.\include\fast_struct.h	/^	NM_WR_RPL,		\/**< NMAC的写回应报文*\/$/;"	e	enum:__anon1
 NONE	.\lib\libofp\main_libofp.h	57;"	d
+N_RTT	.\include\ant_driver.h	58;"	d
 OBX_BASE_ADDR	.\lib\libreg\main_libreg.c	/^u64 OBX_BASE_ADDR = BASE_ADDR;$/;"	v
 OBX_PCIE	.\include\openboxS28.h	30;"	d
 OBX_REG_LEN	.\lib\libreg\main_libreg.c	/^u64 OBX_REG_LEN = REG_LEN;$/;"	v
@@ -488,13 +493,18 @@ OPENBOX_S4	.\include\fast.h	58;"	d
 PADDING	.\lib\libofp\md5.c	/^unsigned char PADDING[]={0x80,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  $/;"	v
 PFX	.\include\fast.h	104;"	d
 PFX	.\include\fast.h	99;"	d
+PGM_MID	.\lib\libant\main_libant.c	31;"	d	file:
+PGM_RD_MID	.\lib\libant\main_libant.c	33;"	d	file:
+PGM_WR_MID	.\lib\libant\main_libant.c	32;"	d	file:
 PORT_COUNTS_VERSION	.\include\fast_version.h	74;"	d
 PORT_REG	.\tools\port_counts\main_port_counts.c	/^u64 PORT_REG(u8 port,u64 regaddr)$/;"	f
 PORT_REG	.\tools\port_status\main_port_status.c	/^u64 PORT_REG(int port,u64 regaddr)$/;"	f
 PORT_STATUS_VERSION	.\include\fast_version.h	82;"	d
 PRINT	.\lib\libofp\main_libofp.h	90;"	d
+PROTO_TYPE	.\include\ant_driver.h	56;"	d
 PURPLE	.\lib\libofp\main_libofp.h	67;"	d
 P_COLOR	.\lib\libofp\main_libofp.h	/^static char P_COLOR[MAX_IF_CNT][24]  = $/;"	v
+RD_SOFT_RST	.\include\ant_driver.h	50;"	d
 RED	.\lib\libofp\main_libofp.h	58;"	d
 REG	.\lib\libreg\main_libreg.c	35;"	d	file:
 REG32	.\lib\libreg\main_libreg.c	36;"	d	file:
@@ -508,6 +518,17 @@ ROUND_UP	.\lib\libofp\main_libofp.h	132;"	d
 RULE_LEN	.\lib\librule\main_librule.c	35;"	d	file:
 RULE_RW_VERSION	.\include\fast_version.h	80;"	d
 S	.\lib\libams\main_libams.c	/^		S:1,$/;"	m	struct:fast_ams_head	file:
+SCM_BIT_CNT	.\include\ant_driver.h	59;"	d
+SCM_MID	.\lib\libant\main_libant.c	30;"	d	file:
+SCM_PKT_CNT	.\include\ant_driver.h	60;"	d
+SCM_SOFT_RST	.\include\ant_driver.h	57;"	d
+SCM_TIME_CNT	.\include\ant_driver.h	61;"	d
+SENT_BIT_CNT	.\include\ant_driver.h	47;"	d
+SENT_PKT_CNT	.\include\ant_driver.h	48;"	d
+SENT_RATE_CNT	.\include\ant_driver.h	43;"	d
+SENT_RATE_REG	.\include\ant_driver.h	44;"	d
+SENT_TIME_CNT	.\include\ant_driver.h	40;"	d
+SENT_TIME_REG	.\include\ant_driver.h	41;"	d
 SERIAL_NUM_LEN	.\lib\libofp\ofp_v4.h	820;"	d
 SHOW_FUN	.\lib\libofp\main_libofp.h	115;"	d
 SPEED_10	.\include\fast_vaddr.h	50;"	d
@@ -530,6 +551,7 @@ Usage	.\tools\version\main_version.c	/^void Usage(char *argv)$/;"	f
 VERSION_VERSION	.\include\fast_version.h	86;"	d
 W	.\lib\libams\main_libams.c	/^		W:1,$/;"	m	struct:fast_ams_head	file:
 WHITE	.\lib\libofp\main_libofp.h	72;"	d
+WR_SOFT_RST	.\include\ant_driver.h	42;"	d
 XDL_DEBUG	.\include\fast.h	54;"	d
 XDL_DEBUG	.\include\fast.h	55;"	d
 XOF_VERSION	.\include\fast_version.h	66;"	d
@@ -537,6 +559,7 @@ YELLOW	.\lib\libofp\main_libofp.h	70;"	d
 _DBG	.\lib\libofp\main_libofp.h	/^	_DBG = 1<<1,$/;"	e	enum:__anon13
 _ERR	.\lib\libofp\main_libofp.h	/^	_ERR = 1<<2,$/;"	e	enum:__anon13
 _FUN	.\lib\libofp\main_libofp.h	/^	_FUN = 1<<0,$/;"	e	enum:__anon13
+__ANT_DRIVER_H__	.\include\ant_driver.h	33;"	d
 __FAST_ERR_H__	.\include\fast_err.h	29;"	d
 __FAST_H__	.\include\fast.h	32;"	d
 __FAST_STRUCT_H__	.\include\fast_struct.h	32;"	d
@@ -577,6 +600,43 @@ advertised	.\lib\libofp\ofp_v4.h	/^    uint32_t advertised; \/* Features adverti
 aging_rule_sw	.\lib\libofp\main_libofp.c	/^void *aging_rule_sw(void *argv)$/;"	f
 aging_rule_time	.\lib\libofp\main_libofp.c	/^struct timeval aging_rule_time[OFP_MAX_RULE_CNT] = {0};\/*规则的老化时间记录*\/$/;"	v	typeref:struct:timeval
 ams_pkt_count	.\lib\libams\main_libams.c	/^int ams_pkt_count = 0;$/;"	v
+ant_cnt	.\include\ant_driver.h	/^struct ant_cnt$/;"	s
+ant_collect_counters	.\lib\libant\main_libant.c	/^int ant_collect_counters(struct ant_cnt &outc)$/;"	f
+ant_get_lat_flag	.\lib\libant\main_libant.c	/^int ant_get_lat_flag(u64 &regvalue)$/;"	f
+ant_get_lat_pkt_cnt	.\lib\libant\main_libant.c	/^int ant_get_lat_pkt_cnt(u64 &regvalue)$/;"	f
+ant_get_lat_pkt_reg	.\lib\libant\main_libant.c	/^int ant_get_lat_pkt_reg(u64 &regvalue)$/;"	f
+ant_get_n_rtt	.\lib\libant\main_libant.c	/^int ant_get_n_rtt(u64 &regvalue)$/;"	f
+ant_get_proto_type	.\lib\libant\main_libant.c	/^int ant_get_proto_type(u64 &regvalue)$/;"	f
+ant_get_rd_soft_rst	.\lib\libant\main_libant.c	/^int ant_get_rd_soft_rst(u64 &regvalue)$/;"	f
+ant_get_scm_bit_cnt	.\lib\libant\main_libant.c	/^int ant_get_scm_bit_cnt(u64 &regvalue)$/;"	f
+ant_get_scm_pkt_cnt	.\lib\libant\main_libant.c	/^int ant_get_scm_pkt_cnt(u64 &regvalue)$/;"	f
+ant_get_scm_soft_rst	.\lib\libant\main_libant.c	/^int ant_get_scm_soft_rst(u64 &regvalue)$/;"	f
+ant_get_scm_time_cnt	.\lib\libant\main_libant.c	/^int ant_get_scm_time_cnt(u64 &regvalue)$/;"	f
+ant_get_sent_bit_cnt	.\lib\libant\main_libant.c	/^int ant_get_sent_bit_cnt(u64 &regvalue)$/;"	f
+ant_get_sent_pkt_cnt	.\lib\libant\main_libant.c	/^int ant_get_sent_pkt_cnt(u64 &regvalue)$/;"	f
+ant_get_sent_rate_cnt	.\lib\libant\main_libant.c	/^int ant_get_sent_rate_cnt(u64 &regvalue)$/;"	f
+ant_get_sent_rate_reg	.\lib\libant\main_libant.c	/^int ant_get_sent_rate_reg(u64 &regvalue)$/;"	f
+ant_get_sent_time_cnt	.\lib\libant\main_libant.c	/^int ant_get_sent_time_cnt(u64 &regvalue)$/;"	f
+ant_get_sent_time_reg	.\lib\libant\main_libant.c	/^int ant_get_sent_time_reg(u64 &regvalue)$/;"	f
+ant_get_wr_soft_rst	.\lib\libant\main_libant.c	/^int ant_get_wr_soft_rst(u64 &regvalue)$/;"	f
+ant_parameter	.\include\ant_driver.h	/^struct ant_parameter$/;"	s
+ant_set_lat_flag	.\lib\libant\main_libant.c	/^int ant_set_lat_flag(u64 regvalue)$/;"	f
+ant_set_lat_pkt_cnt	.\lib\libant\main_libant.c	/^int ant_set_lat_pkt_cnt(u64 regvalue)$/;"	f
+ant_set_lat_pkt_reg	.\lib\libant\main_libant.c	/^int ant_set_lat_pkt_reg(u64 regvalue)$/;"	f
+ant_set_n_rtt	.\lib\libant\main_libant.c	/^int ant_set_n_rtt(u64 regvalue)$/;"	f
+ant_set_proto_type	.\lib\libant\main_libant.c	/^int ant_set_proto_type(u64 regvalue)$/;"	f
+ant_set_rd_soft_rst	.\lib\libant\main_libant.c	/^int ant_set_rd_soft_rst(u64 regvalue)$/;"	f
+ant_set_scm_bit_cnt	.\lib\libant\main_libant.c	/^int ant_set_scm_bit_cnt(u64 regvalue)$/;"	f
+ant_set_scm_pkt_cnt	.\lib\libant\main_libant.c	/^int ant_set_scm_pkt_cnt(u64 regvalue)$/;"	f
+ant_set_scm_soft_rst	.\lib\libant\main_libant.c	/^int ant_set_scm_soft_rst(u64 regvalue)$/;"	f
+ant_set_scm_time_cnt	.\lib\libant\main_libant.c	/^int ant_set_scm_time_cnt(u64 regvalue)$/;"	f
+ant_set_sent_bit_cnt	.\lib\libant\main_libant.c	/^int ant_set_sent_bit_cnt(u64 regvalue)$/;"	f
+ant_set_sent_pkt_cnt	.\lib\libant\main_libant.c	/^int ant_set_sent_pkt_cnt(u64 regvalue)$/;"	f
+ant_set_sent_rate_cnt	.\lib\libant\main_libant.c	/^int ant_set_sent_rate_cnt(u64 regvalue)$/;"	f
+ant_set_sent_rate_reg	.\lib\libant\main_libant.c	/^int ant_set_sent_rate_reg(u64 regvalue)$/;"	f
+ant_set_sent_time_cnt	.\lib\libant\main_libant.c	/^int ant_set_sent_time_cnt(u64 regvalue)$/;"	f
+ant_set_sent_time_reg	.\lib\libant\main_libant.c	/^int ant_set_sent_time_reg(u64 regvalue)$/;"	f
+ant_set_wr_soft_rst	.\lib\libant\main_libant.c	/^int ant_set_wr_soft_rst(u64 regvalue)$/;"	f
 arp	.\include\fast_struct.h	/^				} arp;					\/**< @brief ARP的MAC地址信息*\/$/;"	m	union:flow::__anon4::__anon5::__anon6	typeref:struct:flow::__anon4::__anon5::__anon6::__anon8
 auxiliary_id	.\lib\libofp\ofp_v4.h	/^	uint8_t auxiliary_id; 		 \/* Identify auxiliary connections *\/$/;"	m	struct:ofp_switch_features
 b	.\include\fast_struct.h	/^	u64 b:32,$/;"	m	struct:common_metadata
@@ -896,6 +956,8 @@ ipv6	.\include\fast_struct.h	/^		} ipv6;						\/**< @brief IPv6协议相关字�
 key	.\include\fast_struct.h	/^	struct flow key;		\/**< @brief 规则内容存储结构 @see ::flow*\/$/;"	m	struct:fast_rule	typeref:struct:fast_rule::flow
 key	.\include\fast_struct.h	/^	struct tuple5 key;$/;"	m	struct:row_bv	typeref:struct:row_bv::tuple5
 label	.\include\fast_struct.h	/^			u32 label;				\/**< @brief IPv6 flow label. *\/$/;"	m	struct:flow::__anon4::__anon9
+lat_flag	.\include\ant_driver.h	/^	u8  lat_flag;   \/** Flag for enabling latency test*\/$/;"	m	struct:ant_parameter
+lat_pkt	.\include\ant_driver.h	/^	u32 lat_pkt;    \/** blocking num pof packet between two latency flag packets*\/$/;"	m	struct:ant_parameter
 learn_smac	.\app\l2switch\main_l2switch.c	/^void learn_smac(u8 inport,u8 *src_mac)$/;"	f
 len	.\include\fast_struct.h	/^		len:12,			\/**< @brief 报文长度 @note 最大可表示4095字节，但FAST平台报文缓存区最大为2048，完整以太网报文的MTU不要超过1500*\/$/;"	m	struct:um_metadata
 len	.\lib\libofp\ofp_v4.h	/^	uint16_t len; \/* Length is 16. *\/$/;"	m	struct:ofp_action_output
@@ -958,6 +1020,7 @@ n2rule16	.\lib\librule\main_librule.c	/^u16 n2rule16(u16 n)$/;"	f
 n2rule32	.\lib\librule\main_librule.c	/^u32 n2rule32(u32 n)$/;"	f
 n2rule64	.\lib\librule\main_librule.c	/^u64 n2rule64(u64 n)$/;"	f
 n_buffers	.\lib\libofp\ofp_v4.h	/^	uint32_t n_buffers; 		 \/* Max packets buffered at once. *\/$/;"	m	struct:ofp_switch_features
+n_rtt	.\include\ant_driver.h	/^	u32 n_rtt;      \/** Controlling the waiting time after sending last packet*\/$/;"	m	struct:ant_parameter
 n_tables	.\lib\libofp\ofp_v4.h	/^	uint8_t n_tables; 			 \/* Number of tables supported by datapath. *\/$/;"	m	struct:ofp_switch_features
 name	.\lib\libofp\main_libofp.h	/^	u8 name[16];$/;"	m	struct:nms_port
 name	.\lib\libofp\ofp_v4.h	/^	char name[OFP_MAX_TABLE_NAME_LEN];$/;"	m	struct:ofp_table_features
@@ -1159,10 +1222,12 @@ read_port_status	.\tools\port_status\main_port_status.c	/^void read_port_status(
 reason	.\lib\libofp\ofp_v4.h	/^	uint8_t reason; 				\/* One of OFPRR_*. *\/$/;"	m	struct:ofp_flow_removed
 reason	.\lib\libofp\ofp_v4.h	/^	uint8_t reason; 			\/* Reason packet is being sent (one of OFPR_*) *\/$/;"	m	struct:ofp_packet_in
 reason	.\lib\libofp\ofp_v4.h	/^	uint8_t reason;$/;"	m	struct:ofp_port_status
+recv_bits	.\include\ant_driver.h	/^	u64 recv_bits; \/** total received bytes of sending packets*\/$/;"	m	struct:ant_cnt
 recv_bytes	.\app\l2switch\main_l2switch.c	/^	u64 recv_bytes;$/;"	m	struct:nm08_port_stats	file:
 recv_openflow_message	.\lib\libofp\main_libofp.c	/^void *recv_openflow_message(void *argv)$/;"	f
 recv_pkt	.\app\ams\main_delay_ams.c	/^struct fast_packet *recv_pkt[MAX_PKT] = {0};$/;"	v	typeref:struct:fast_packet
 recv_pkts	.\app\l2switch\main_l2switch.c	/^	u64 recv_pkts;$/;"	m	struct:nm08_port_stats	file:
+recv_pkts	.\include\ant_driver.h	/^	u64 recv_pkts; \/** total received number of sending packets*\/$/;"	m	struct:ant_cnt
 recv_poll	.\lib\libua\main_libua.c	/^int recv_poll = 1;$/;"	v
 recv_thread	.\lib\libua\main_libua.c	/^void recv_thread(void *argv)$/;"	f
 reg_value	.\lib\librule\main_librule.c	/^struct reg_value{$/;"	s	file:
@@ -1217,6 +1282,10 @@ send_packet_in_message_meter	.\lib\libofp\main_libofp.c	/^void send_packet_in_me
 send_packet_in_message_normal	.\lib\libofp\main_libofp.c	/^void send_packet_in_message_normal(u32 in_port,u8 *pkt,int len)$/;"	f
 send_pkt_ts	.\lib\libams\main_libams.c	/^u64 send_pkt_ts[AMS_MAX_PKTS];$/;"	v
 send_pkts	.\app\l2switch\main_l2switch.c	/^	u64 send_pkts;$/;"	m	struct:nm08_port_stats	file:
+sent_bits	.\include\ant_driver.h	/^	u64 sent_bits; \/** total sent bytes of pcakets *\/$/;"	m	struct:ant_cnt
+sent_pkts	.\include\ant_driver.h	/^	u64 sent_pkts; \/** total sent num of packets *\/$/;"	m	struct:ant_cnt
+sent_rate	.\include\ant_driver.h	/^	u32 sent_rate;$/;"	m	struct:ant_parameter
+sent_time	.\include\ant_driver.h	/^	u64 sent_time;$/;"	m	struct:ant_parameter
 seq	.\include\fast_struct.h	/^		seq:12,			\/**< @brief 报文接收时的序列号 @note 每个端口独立维护一个编号*\/$/;"	m	struct:um_metadata
 seq	.\include\fast_struct.h	/^		seq:12,$/;"	m	struct:ctl_metadata
 seq	.\include\fast_struct.h	/^    u16 seq;			\/**< @brief NMAC报文头的序号，每发一个报文计数加1*\/$/;"	m	struct:nm_head
@@ -1271,6 +1340,7 @@ table_id	.\lib\libofp\ofp_v4.h	/^	uint8_t table_id; 		\/* ID of table to read (f
 table_id	.\lib\libofp\ofp_v4.h	/^	uint8_t table_id;$/;"	m	struct:ofp_table_stats
 table_stats	.\lib\libofp\ofp_v4.h	/^		struct ofp_table_stats table_stats[0];$/;"	m	union:ofp_multipart::__anon20	typeref:struct:ofp_multipart::__anon20::ofp_table_stats
 tci	.\include\fast_struct.h	/^	u16 tci;			\/**< @brief 0 if no VLAN, VLAN_TAG_PRESENT set otherwise. *\/$/;"	m	struct:flow
+test_time	.\include\ant_driver.h	/^	u64 test_time; \/** 共计测试时间 *\/$/;"	m	struct:ant_cnt
 tha	.\include\fast_struct.h	/^					u8 tha[ETH_ALEN];	\/**< @brief ARP target hardware address. *\/$/;"	m	struct:flow::__anon4::__anon5::__anon6::__anon8
 thread_idx	.\lib\libofp\main_libofp.c	/^static u8 thread_idx = 1;   \/*启动线程号标识,用来控制每个线程打印输出的颜色*\/$/;"	v	file:
 tmp	.\include\fast_struct.h	/^	u32 *tmp;   \/*在S4系统中，上面变量指针大小为32*\/$/;"	m	struct:fast_rule

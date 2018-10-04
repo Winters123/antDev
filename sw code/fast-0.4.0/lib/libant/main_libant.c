@@ -36,9 +36,50 @@
 
 
 /*---------------------------------ANT CORE FUNCTION ----------------------------*/
+/**
+ * collect result counter values from PGM and SCM modules
+ * @param  outc valuable counter values in SCM and PGM module
+ * @return      0 if success
+ */
+int ant_collect_counters(struct ant_cnt &outc)
+{
+	u64 test_time = (u64)fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_CNT, MASK_1)<<32 + (u64)fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_CNT-1, MASK_1);
+	u64 sent_bits = (u64)fast_ua_hw_rd(PGM_RD_MID, SENT_BIT_CNT, MASK_1)<<32 + (u64)fast_ua_hw_rd(PGM_RD_MID, SENT_BIT_CNT-1, MASK_1);
+	u64 sent_pkts = (u64)fast_ua_hw_rd(PGM_RD_MID, SENT_PKT_CNT, MASK_1)<<32 + (u64)fast_ua_hw_rd(PGM_RD_MID, SENT_PKT_CNT-1, MASK_1);
+	u64 recv_bits = (u64)fast_ua_hw_rd(SCM_MID, SCM_BIT_CNT, MASK_1)<<32 + (u64)fast_ua_hw_rd(SCM_MID, SCM_BIT_CNT-1, MASK_1);
+	u64 recv_pkts = (u64)fast_ua_hw_rd(SCM_MID, SCM_PKT_CNT, MASK_1)<<32 + (u64)fast_ua_hw_rd(SCM_MID, SCM_PKT_CNT-1, MASK_1);
+	
+	outc.test_time = test_time;
+	outc.sent_bits = sent_bits;
+	outc.sent_pkts = sent_pkts;
+	outc.recv_bits = recv_bits;
+	outc.recv_pkts = recv_pkts;
 
+	return 0;
+}
 
+/**
+ * using softwre reset to rst PGM and SCM module of ANT
+ * @return 0 if success
+ */
+int ant_rst()
+{
+	fast_ua_hw_wr(PGM_WR_MID, WR_SOFT_RST, 1, MASK_1);
+	fast_ua_hw_wr(PGM_RD_MID, RD_SOFT_RST, 1, MASK_1);
+	fast_ua_hw_wr(SCM_MID, SCM_SOFT_RST, 1, MASK_1);
 
+	return 0;
+}
+
+/**
+ * check the hw module of ANT to see if all the modules are waiting for software reset
+ * @param  mid [mid of hw module]
+ * @return     [1 if waiting for software reset, otherwise return 0]
+ */
+int ant_check_finish(u8 mid)
+{
+	
+}
 /*---------------------------------ANT CORE FUNCTION ----------------------------*/
 
 

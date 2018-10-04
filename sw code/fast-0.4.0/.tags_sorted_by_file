@@ -42,6 +42,36 @@ update_mac_time	app\l2switch\main_l2switch.c	/^void update_mac_time(u8 inport,u8
 valid	app\l2switch\main_l2switch.c	/^	u8  valid;	 \/*地址有效位标记*\/$/;"	m	struct:nm08_port_mac	file:
 xprintf	app\l2switch\main_l2switch.c	40;"	d	file:
 main	app\openflow\main_xofp.c	/^int main(int argc,char* argv[])$/;"	f
+LAT_FLAG	include\ant_driver.h	49;"	d
+LAT_PKT_CNT	include\ant_driver.h	45;"	d
+LAT_PKT_REG	include\ant_driver.h	46;"	d
+N_RTT	include\ant_driver.h	58;"	d
+PROTO_TYPE	include\ant_driver.h	56;"	d
+RD_SOFT_RST	include\ant_driver.h	50;"	d
+SCM_BIT_CNT	include\ant_driver.h	59;"	d
+SCM_PKT_CNT	include\ant_driver.h	60;"	d
+SCM_SOFT_RST	include\ant_driver.h	57;"	d
+SCM_TIME_CNT	include\ant_driver.h	61;"	d
+SENT_BIT_CNT	include\ant_driver.h	47;"	d
+SENT_PKT_CNT	include\ant_driver.h	48;"	d
+SENT_RATE_CNT	include\ant_driver.h	43;"	d
+SENT_RATE_REG	include\ant_driver.h	44;"	d
+SENT_TIME_CNT	include\ant_driver.h	40;"	d
+SENT_TIME_REG	include\ant_driver.h	41;"	d
+WR_SOFT_RST	include\ant_driver.h	42;"	d
+__ANT_DRIVER_H__	include\ant_driver.h	33;"	d
+ant_cnt	include\ant_driver.h	/^struct ant_cnt$/;"	s
+ant_parameter	include\ant_driver.h	/^struct ant_parameter$/;"	s
+lat_flag	include\ant_driver.h	/^	u8  lat_flag;   \/** Flag for enabling latency test*\/$/;"	m	struct:ant_parameter
+lat_pkt	include\ant_driver.h	/^	u32 lat_pkt;    \/** blocking num pof packet between two latency flag packets*\/$/;"	m	struct:ant_parameter
+n_rtt	include\ant_driver.h	/^	u32 n_rtt;      \/** Controlling the waiting time after sending last packet*\/$/;"	m	struct:ant_parameter
+recv_bits	include\ant_driver.h	/^	u64 recv_bits; \/** total received bytes of sending packets*\/$/;"	m	struct:ant_cnt
+recv_pkts	include\ant_driver.h	/^	u64 recv_pkts; \/** total received number of sending packets*\/$/;"	m	struct:ant_cnt
+sent_bits	include\ant_driver.h	/^	u64 sent_bits; \/** total sent bytes of pcakets *\/$/;"	m	struct:ant_cnt
+sent_pkts	include\ant_driver.h	/^	u64 sent_pkts; \/** total sent num of packets *\/$/;"	m	struct:ant_cnt
+sent_rate	include\ant_driver.h	/^	u32 sent_rate;$/;"	m	struct:ant_parameter
+sent_time	include\ant_driver.h	/^	u64 sent_time;$/;"	m	struct:ant_parameter
+test_time	include\ant_driver.h	/^	u64 test_time; \/** 共计测试时间 *\/$/;"	m	struct:ant_cnt
 EPFX	include\fast.h	100;"	d
 EPFX	include\fast.h	105;"	d
 FAST_10	include\fast.h	67;"	d
@@ -419,6 +449,46 @@ reserve	lib\libams\main_libams.c	/^		reserve:32,$/;"	m	struct:fast_ams_head	file
 reserve2	lib\libams\main_libams.c	/^		reserve2:13;$/;"	m	struct:fast_ams_head	file:
 send_pkt_ts	lib\libams\main_libams.c	/^u64 send_pkt_ts[AMS_MAX_PKTS];$/;"	v
 ts	lib\libams\main_libams.c	/^	u64 ts;$/;"	m	struct:fast_ams_head	file:
+MASK_1	lib\libant\main_libant.c	35;"	d	file:
+PGM_MID	lib\libant\main_libant.c	31;"	d	file:
+PGM_RD_MID	lib\libant\main_libant.c	33;"	d	file:
+PGM_WR_MID	lib\libant\main_libant.c	32;"	d	file:
+SCM_MID	lib\libant\main_libant.c	30;"	d	file:
+ant_collect_counters	lib\libant\main_libant.c	/^int ant_collect_counters(struct ant_cnt &outc)$/;"	f
+ant_get_lat_flag	lib\libant\main_libant.c	/^int ant_get_lat_flag(u64 &regvalue)$/;"	f
+ant_get_lat_pkt_cnt	lib\libant\main_libant.c	/^int ant_get_lat_pkt_cnt(u64 &regvalue)$/;"	f
+ant_get_lat_pkt_reg	lib\libant\main_libant.c	/^int ant_get_lat_pkt_reg(u64 &regvalue)$/;"	f
+ant_get_n_rtt	lib\libant\main_libant.c	/^int ant_get_n_rtt(u64 &regvalue)$/;"	f
+ant_get_proto_type	lib\libant\main_libant.c	/^int ant_get_proto_type(u64 &regvalue)$/;"	f
+ant_get_rd_soft_rst	lib\libant\main_libant.c	/^int ant_get_rd_soft_rst(u64 &regvalue)$/;"	f
+ant_get_scm_bit_cnt	lib\libant\main_libant.c	/^int ant_get_scm_bit_cnt(u64 &regvalue)$/;"	f
+ant_get_scm_pkt_cnt	lib\libant\main_libant.c	/^int ant_get_scm_pkt_cnt(u64 &regvalue)$/;"	f
+ant_get_scm_soft_rst	lib\libant\main_libant.c	/^int ant_get_scm_soft_rst(u64 &regvalue)$/;"	f
+ant_get_scm_time_cnt	lib\libant\main_libant.c	/^int ant_get_scm_time_cnt(u64 &regvalue)$/;"	f
+ant_get_sent_bit_cnt	lib\libant\main_libant.c	/^int ant_get_sent_bit_cnt(u64 &regvalue)$/;"	f
+ant_get_sent_pkt_cnt	lib\libant\main_libant.c	/^int ant_get_sent_pkt_cnt(u64 &regvalue)$/;"	f
+ant_get_sent_rate_cnt	lib\libant\main_libant.c	/^int ant_get_sent_rate_cnt(u64 &regvalue)$/;"	f
+ant_get_sent_rate_reg	lib\libant\main_libant.c	/^int ant_get_sent_rate_reg(u64 &regvalue)$/;"	f
+ant_get_sent_time_cnt	lib\libant\main_libant.c	/^int ant_get_sent_time_cnt(u64 &regvalue)$/;"	f
+ant_get_sent_time_reg	lib\libant\main_libant.c	/^int ant_get_sent_time_reg(u64 &regvalue)$/;"	f
+ant_get_wr_soft_rst	lib\libant\main_libant.c	/^int ant_get_wr_soft_rst(u64 &regvalue)$/;"	f
+ant_set_lat_flag	lib\libant\main_libant.c	/^int ant_set_lat_flag(u64 regvalue)$/;"	f
+ant_set_lat_pkt_cnt	lib\libant\main_libant.c	/^int ant_set_lat_pkt_cnt(u64 regvalue)$/;"	f
+ant_set_lat_pkt_reg	lib\libant\main_libant.c	/^int ant_set_lat_pkt_reg(u64 regvalue)$/;"	f
+ant_set_n_rtt	lib\libant\main_libant.c	/^int ant_set_n_rtt(u64 regvalue)$/;"	f
+ant_set_proto_type	lib\libant\main_libant.c	/^int ant_set_proto_type(u64 regvalue)$/;"	f
+ant_set_rd_soft_rst	lib\libant\main_libant.c	/^int ant_set_rd_soft_rst(u64 regvalue)$/;"	f
+ant_set_scm_bit_cnt	lib\libant\main_libant.c	/^int ant_set_scm_bit_cnt(u64 regvalue)$/;"	f
+ant_set_scm_pkt_cnt	lib\libant\main_libant.c	/^int ant_set_scm_pkt_cnt(u64 regvalue)$/;"	f
+ant_set_scm_soft_rst	lib\libant\main_libant.c	/^int ant_set_scm_soft_rst(u64 regvalue)$/;"	f
+ant_set_scm_time_cnt	lib\libant\main_libant.c	/^int ant_set_scm_time_cnt(u64 regvalue)$/;"	f
+ant_set_sent_bit_cnt	lib\libant\main_libant.c	/^int ant_set_sent_bit_cnt(u64 regvalue)$/;"	f
+ant_set_sent_pkt_cnt	lib\libant\main_libant.c	/^int ant_set_sent_pkt_cnt(u64 regvalue)$/;"	f
+ant_set_sent_rate_cnt	lib\libant\main_libant.c	/^int ant_set_sent_rate_cnt(u64 regvalue)$/;"	f
+ant_set_sent_rate_reg	lib\libant\main_libant.c	/^int ant_set_sent_rate_reg(u64 regvalue)$/;"	f
+ant_set_sent_time_cnt	lib\libant\main_libant.c	/^int ant_set_sent_time_cnt(u64 regvalue)$/;"	f
+ant_set_sent_time_reg	lib\libant\main_libant.c	/^int ant_set_sent_time_reg(u64 regvalue)$/;"	f
+ant_set_wr_soft_rst	lib\libant\main_libant.c	/^int ant_set_wr_soft_rst(u64 regvalue)$/;"	f
 OFP_MAX_RULE_CNT	lib\libofp\main_libofp.c	39;"	d	file:
 __ofp_exit	lib\libofp\main_libofp.c	/^void __ofp_exit(int argc)$/;"	f
 aging_rule_sw	lib\libofp\main_libofp.c	/^void *aging_rule_sw(void *argv)$/;"	f

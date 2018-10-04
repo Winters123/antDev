@@ -144,11 +144,11 @@ static int fast_ua_register(int mid)
 	//设置通信参数
 	memcpy(NLMSG_DATA(nlh),(char *)&register_ua,sizeof(struct fast_ua_kernel_msg));
 	memset(&register_ua,0,sizeof(struct fast_ua_kernel_msg));
-	iov.iov_base = (void *)nlh;
+	iov.iov_base = (void *)nlh;  //对iov_base的修改即为对nlh的修改
 	iov.iov_len = nlh->nlmsg_len;
 	netlink_msg.msg_name = (void *)&dest_addr;
 	netlink_msg.msg_namelen = sizeof(dest_addr);
-	netlink_msg.msg_iov = &iov;
+	netlink_msg.msg_iov = &iov; //通过传引用的方式获取iov,所以对netlink_msg的修改可以直接映射到iov中
 	netlink_msg.msg_iovlen = 1;
 
 	//向内核发送NetLink消息，消息内容为注册数据结构
@@ -198,7 +198,7 @@ int fast_ua_send(struct fast_packet *pkt,int pkt_len)
 		printf("ERROR:um->len:%d,pkt_len:%d\n",pkt->um.len,pkt_len);
 		exit(0);
 	}	
-	pkt->um.srcmid = cur_mid;
+	pkt->um.srcmid = cur_mid;  //set src_mid
 	pkt->md.pkttype = 0;
 #ifdef FAST_UA_FILE
 	return write(uaf,(char *)pkt,pkt_len);
@@ -402,15 +402,15 @@ void recv_thread(void *argv)
 #ifdef FAST_UA_FILE
 		rc = read(uaf,pkt,FAST_UA_PKT_MAX_LEN);
 #else
-		rc = recv(nlsk_recv,pkt,FAST_UA_PKT_MAX_LEN, 0);
+		rc = recv(nlsk_recv,pkt,FAST_UA_PKT_MAX_LEN, 0); //rc是成功收到的字节数
 #endif
 		if(rc >0)
 		{			
-			if(pkt->md.pkttype == 0)
+			if(pkt->md.pkttype == 0)  //如果收到的是数据报文
 			{
 				ua_recv_callback(pkt,rc);
 			}
-			else
+			else //如果收到的是控制报文
 			{
 				struct fast_packet *ctl_pkt = (struct fast_packet *)pkt->cm.sessionID;				
 				ctl_pkt->cm.data = pkt->cm.data;

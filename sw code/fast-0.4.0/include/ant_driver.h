@@ -33,6 +33,7 @@
 #define __ANT_DRIVER_H__
 
 #include "fast.h"
+#include <unistd.h>
 
 /*
 //declaration of vaddr on ANT
@@ -61,14 +62,52 @@
 #define SCM_TIME_CNT  0x7000000d		  // 64b, total monitoring time of SCM
 
 
+#define ANT_HW_STATE  0x11111111
 
+/*
+//decalartion of state machine of PGM and SCM
+ */
+#define SCM_FETCH_S   4
+#define PGM_RD_FIN_S  16
+
+/**
+ * 
+ */
+struct ant_cnt
+{
+	u64 test_time; /** 共计测试时间 */
+	u64 sent_bits; /** total sent bytes of pcakets */
+	u64 sent_pkts; /** total sent num of packets */
+	u64 recv_bits; /** total received bytes of sending packets*/
+	u64 recv_pkts; /** total received number of sending packets*/
+};
+
+struct ant_parameter
+{
+	u64 sent_time;
+	u32 sent_rate;
+	u32 lat_pkt;    /** blocking num pof packet between two latency flag packets*/
+	u8  lat_flag;   /** Flag for enabling latency test*/
+	u32 n_rtt;      /** Controlling the waiting time after sending last packet*/
+};
 
 
 /*-------------------ANT CORE FUNCTION ------------------*/
 
-int ant_collect_counters();
-int ant_rst();
+int  ant_collect_counters(struct ant_cnt &result); /**获取FPGA中相关计数器的当前值*/
 
+int  ant_rst(); 	/**将ANT的硬件模块重置为idle状态*/
+
+int  ant_check_finish(u8 mid); /**检查ANT hw是否已经运行结束*/
+
+int  ant_pkt_send(struct fast_packet *pkt, int pkt_len); /**发送ant报文，并触发ANT开始进行测试*/
+
+u32  ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnd, u32 sent_rate, u64 test_time); /**通过二分法测量吞吐率*/
+
+int  ant_set_test_para(struct ant_parameter antp); /**设置ANT测试参数*/
+
+//@TODO support latency test in the future
+//u32  ant_latency_test(struct fast_packet *pkt, int pkt_len); /**测量平均时延*/
 
 /*-------------------ANT CORE FUNCTION ------------------*/
 
