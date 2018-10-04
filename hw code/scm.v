@@ -1,5 +1,5 @@
 module scm #(
-    parameter platform = "Xilinx",
+    parameter PLATFORM = "Xilinx",
               LMID = 8'd7,
               NMID = 8'd5
 )(
@@ -89,17 +89,17 @@ reg [31:0] last_timestamp;
 reg [31:0] end_time;
 reg [255:0] out_scm_md_reg;
 //State Declaration
-localparam IDLE_S   = 3'd0;
-           SEND_S   = 3'd1;
-           CNT_S    = 3'd2;
-           WAIT_S   = 3'd3;
+localparam IDLE_S   = 3'd0,
+           SEND_S   = 3'd1,
+           CNT_S    = 3'd2,
+           WAIT_S   = 3'd3,
            FETCH_S  = 3'd4;
 //Protocol Declaration
-localparam IPv4_TCP     = 3'b000;
-           IPv4_UDP     = 3'b001;
-           ARP          = 3'b010;
-           IPv6_TCP     = 3'b011;
-           IPv6_UDP     = 3'b100;
+localparam IPv4_TCP     = 3'b000,
+           IPv4_UDP     = 3'b001,
+           ARP          = 3'b010,
+           IPv6_TCP     = 3'b011,
+           IPv6_UDP     = 3'b100,
            IPv6_LISP    = 3'b101;
 
 //**************************************************
@@ -130,31 +130,38 @@ always @(posedge clk or negedge rst_n) begin
                     32'h70000002: begin
                         n_RTT <= cin_scm_data[31:0];
                     end
-
+                endcase
+            end
+            else if ((cin_scm_ready == 1'b1) && (cin_scm_data[126:124] == 3'b001)) begin
+                cout_scm_data_wr <= 1'b1;
+                case (cin_scm_data[95:64])
                     32'h70000008: begin
-                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, scm_bit_num_cnt[31:0]};
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_bit_num_cnt[31:0]};
                     end
 
                     32'h70000009 :begin
-                        cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_bit_num_cnt[63:32]};
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_bit_num_cnt[63:32]};
                     end
 
                     32'h7000000A: begin
-                        cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_pkt_num_cnt[31:0]};
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_pkt_num_cnt[31:0]};
                     end
 
                     32'h7000000B: begin
-                        cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_pkt_num_cnt[63:32]};
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_pkt_num_cnt[63:32]};
                     end
 
                     32'h7000000C: begin
-                        cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_time_cnt[31:0]};
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_time_cnt[31:0]};
                     end
 
                     32'h7000000D: begin
-                        cout_scm_data <= {cin_scm_data[133:32], 4'b1011, scm_time_cnt[63:32]};
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_time_cnt[63:32]};
                     end
 
+                    32'h11111111: begin
+                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:3], scm_state}
+                    end
                 endcase
             end
         end

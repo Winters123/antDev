@@ -694,7 +694,7 @@ scm #(
     //output configure pkt to next module
     .cout_scm_data(cout_scm_data),
     .cout_scm_data_wr(cout_scm_data_wr),
-    .cin_scm_ready(cout_scm_ready)
+    .cin_scm_ready(cin_scm_ready)
 
 );
     
