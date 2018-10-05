@@ -206,7 +206,7 @@ pgm_rd #(
 	
     .in_rd_phv(wr2rd_phv),
 	.in_rd_phv_wr(wr2rd_phv_wr), 
-	.out_rd_phv_alf(in_wr_alf),
+	.out_rd_phv_alf(rd2wr_phv_alf),
 
 	.in_rd_data(wr2rd_data),
 	.in_rd_data_wr(wr2rd_data_wr),

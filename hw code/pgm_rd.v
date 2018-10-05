@@ -165,9 +165,9 @@ always @(posedge clk or negedge rst_n) begin
 		//intermidiate set to 0
 		soft_rst <= 1'b0;
 		sent_rate_cnt <= 32'b0;
-		sent_rate_reg <= 32'hffffffff;
+		sent_rate_reg <= 32'h0;
 		lat_pkt_cnt <= 32'b0; //num of pkt between Probes
-		lat_pkt_reg <= 32'hffffffff; //num of pkt between Probes
+		lat_pkt_reg <= 32'h0; //num of pkt between Probes
 		sent_bit_cnt <= 64'b0;
 		sent_pkt_cnt <= 64'b0;
 
@@ -180,14 +180,14 @@ always @(posedge clk or negedge rst_n) begin
 	else begin
 		case(pgm_rd_state)
 			IDLE_S: begin
-				if(pgm_bypass_flag == 1'b1 && in_rd_data[133:132] == 2'b01 && in_rd_valid == 1'b1) begin
+				if(pgm_bypass_flag == 1'b1 && in_rd_data[133:132] == 2'b01 && in_rd_data_wr == 1'b1) begin
 					
 					out_rd_data <= in_rd_data;
 					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= 1'b1;
+					out_rd_valid <= in_rd_valid;
 					out_rd_phv <= in_rd_phv;
 					out_rd_phv_wr <= 1'b1;
-					out_rd_valid_wr <= 1'b0;
+					out_rd_valid_wr <= in_rd_valid_wr;
 
 					pgm_rd_state <= SENT_S;
 				end
@@ -234,9 +234,10 @@ always @(posedge clk or negedge rst_n) begin
 				if(in_rd_data[133:132] == 2'b11 && in_rd_data_wr == 1'b1) begin
 					out_rd_data <= in_rd_data;
 					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= 1'b1;
+					out_rd_valid <= in_rd_valid;
 					out_rd_phv <= in_rd_phv;
 					out_rd_phv_wr <= 1'b1;
+					out_rd_valid_wr <= in_rd_valid_wr;
 				end
 				else if(in_rd_data[133:132] == 2'b10 && in_rd_data_wr == 1'b1) begin
 					out_rd_data <= in_rd_data;
@@ -254,6 +255,8 @@ always @(posedge clk or negedge rst_n) begin
 					out_rd_valid <= 1'b0;
 					out_rd_phv <= 1024'b0;
 					out_rd_phv_wr <= 1'b0;
+					
+					out_rd_valid_wr <= in_rd_valid_wr;
 
 					pgm_rd_state <= IDLE_S;
 				end
@@ -293,7 +296,7 @@ always @(posedge clk or negedge rst_n) begin
 
 					out_rd_data <= ram2rd_rdata[133:0];
 					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= 1'b1;
+					out_rd_valid <= 1'b0;
 					out_rd_phv <= 1024'b0;
 					out_rd_phv_wr <= 1'b1;
 					out_rd_valid_wr <= 1'b0;
@@ -335,7 +338,7 @@ always @(posedge clk or negedge rst_n) begin
 
 					out_rd_data <= ram2rd_rdata[133:0];
 					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= 1'b1;
+					out_rd_valid <= 1'b0;
 					out_rd_phv <= 1024'b1;
 					out_rd_phv_wr <= 1'b1;
 					out_rd_valid_wr <= 1'b0;
@@ -422,7 +425,7 @@ always @(posedge clk or negedge rst_n) begin
 					rd2ram_rd <= 1'b1;
 					rd2ram_addr <= rd2ram_addr + 7'b1;
 					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= 1'b1;
+					out_rd_valid <= 1'b0;
 					out_rd_phv_wr <= 1'b1;
 					out_rd_phv <= 1024'b0;
 					out_rd_valid_wr <= 1'b0;
