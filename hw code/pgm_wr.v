@@ -142,7 +142,7 @@ always @(posedge clk or negedge rst_n) begin
 		/*****used for tb, shall be delete later*****/
 
 
-		sent_time_reg <= 64'd70;
+		sent_time_reg <= 64'b0;
 
 
 		/*****used for tb, shall be delete later*****/
