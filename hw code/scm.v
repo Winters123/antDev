@@ -131,6 +131,7 @@ always @(posedge clk or negedge rst_n) begin
                         n_RTT <= cin_scm_data[31:0];
                     end
                 endcase
+                //cout_scm_data <= cin_scm_data;
             end
             else if ((cin_scm_ready == 1'b1) && (cin_scm_data[126:124] == 3'b001)) begin
                 cout_scm_data_wr <= 1'b1;
@@ -159,10 +160,13 @@ always @(posedge clk or negedge rst_n) begin
                         cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_time_cnt[63:32]};
                     end
 
-                    32'h11111111: begin
-                        cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:3], scm_state}
+                    default: begin
+                        cout_scm_data <= cin_scm_data;
                     end
                 endcase
+            end
+            else if (cin_scm_ready == 1'b1) begin
+                cout_scm_data <= cin_scm_data;
             end
         end
         else begin
@@ -308,22 +312,9 @@ always @(posedge clk or negedge rst_n) begin
 
             FETCH_S: begin
                 if (statistic_reset == 1'b1) begin
-                    scm_bit_num_cnt <= 64'b0;
-                    scm_pkt_num_cnt <= 64'b0;
-                    scm_time_cnt <= 64'b0;
-                    last_timestamp <= 32'b0;
-                    protocol_type <= 8'b0;
-                    n_RTT <= 32'b0;
-                    record_endtime_tag <= 1'b0;
                     scm_state <= IDLE_S;
                 end
                 else begin
-                    scm_bit_num_cnt <= scm_bit_num_cnt;
-                    scm_pkt_num_cnt <= scm_pkt_num_cnt;
-                    scm_time_cnt <= scm_time_cnt;
-                    last_timestamp <= last_timestamp;
-                    protocol_type <= protocol_type;
-                    n_RTT <= n_RTT;
                     scm_state <= FETCH_S;
                 end
             end
@@ -333,6 +324,29 @@ always @(posedge clk or negedge rst_n) begin
             end
 
         endcase
+    end
+end
+
+//**************************************************
+//                Reset Statisitc Reg
+//**************************************************
+always @(posedge clk) begin 
+    if (statistic_reset == 1'b1) begin
+        scm_bit_num_cnt <= 64'b0;
+        scm_pkt_num_cnt <= 64'b0;
+        scm_time_cnt <= 64'b0;
+        last_timestamp <= 32'b0;
+        protocol_type <= 8'b0;
+        n_RTT <= 32'b0;
+        record_endtime_tag <= 1'b0;
+    end
+    else begin
+        scm_bit_num_cnt <= scm_bit_num_cnt;
+        scm_pkt_num_cnt <= scm_pkt_num_cnt;
+        scm_time_cnt <= scm_time_cnt;
+        last_timestamp <= last_timestamp;
+        protocol_type <= protocol_type;
+        n_RTT <= n_RTT;
     end
 end
 

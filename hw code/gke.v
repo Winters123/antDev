@@ -129,6 +129,7 @@ always @(posedge clk or negedge rst_n) begin
 	     in_gke_md_dly <= in_gke_md;     //Synchronize with key
         in_gke_md_wr_dly <= in_gke_md_wr;
 		  in_gke_phv_dly <= in_gke_phv;
+          
         if((in_gke_md_wr_dly == 1'b1)&&(in_gke_md_dly[87:80] == LMID))begin 
             out_gke_md <= {in_gke_md_dly[255:88],8'd3,in_gke_md_dly[79:0]};
             out_gke_phv <= in_gke_phv_dly;

@@ -142,7 +142,7 @@ always @(posedge clk or negedge rst_n) begin
 		/*****used for tb, shall be delete later*****/
 
 
-		sent_time_reg <= 64'hfffffffffffffffa;
+		sent_time_reg <= 64'b0;
 
 
 		/*****used for tb, shall be delete later*****/
@@ -153,19 +153,19 @@ always @(posedge clk or negedge rst_n) begin
 			IDLE_S: begin
 				
 				//start bypassing
-				if(in_wr_valid == 1'b1 && in_wr_data[133:132]==2'b01 && in_wr_data[111:109]!=3'b111) begin
+				if(in_wr_data_wr == 1'b1 && in_wr_data[133:132]==2'b01 && in_wr_data[111:109]!=3'b111) begin
 					out_wr_data <= in_wr_data;
 					out_wr_data_wr <= 1'b1;
 					out_wr_phv <= in_wr_phv;
 					out_wr_phv_wr <= 1'b1;
-					out_wr_valid <= 1'b1;
+					out_wr_valid <= in_wr_valid;
 
 					pgm_bypass_flag <= 1'b1;
 					pgm_wr_state <= SENT_S;
 				end
 
 				//PGM start to store packet.
-				else if(in_wr_valid == 1'b1 && in_wr_data[133:132]==2'b01 && in_wr_data[111:109]==3'b111) begin
+				else if(in_wr_data_wr == 1'b1 && in_wr_data[133:132]==2'b01 && in_wr_data[111:109]==3'b111) begin
 					wr2ram_wr_en <= 1'b1;
 					wr2ram_addr <= 7'b0;
 					wr2ram_wdata <= {10'b0,in_wr_data};
@@ -196,16 +196,16 @@ always @(posedge clk or negedge rst_n) begin
 			end
 
 			SENT_S: begin
-				if(in_wr_valid == 1'b1 && in_wr_data[133:132] == 2'b11) begin
+				if(in_wr_data_wr == 1'b1 && in_wr_data[133:132] == 2'b11) begin
 					out_wr_data <= in_wr_data;
 					out_wr_data_wr <= 1'b1;
 					out_wr_phv <= in_wr_phv;
 					out_wr_phv_wr <= 1'b1;
-					out_wr_valid <= 1'b1;
+					out_wr_valid <= in_wr_valid;
 					pgm_wr_state <= SENT_S;
 				end
 
-				else if(in_wr_valid == 1'b1 && in_wr_data[133:132] == 2'b10) begin
+				else if(in_wr_data_wr == 1'b1 && in_wr_data[133:132] == 2'b10) begin
 					out_wr_data <= in_wr_data;
 					out_wr_data_wr <= 1'b1;
 					out_wr_valid <= 1'b1;
@@ -229,7 +229,7 @@ always @(posedge clk or negedge rst_n) begin
 			end
 
 			STORE_S: begin
-				if(in_wr_data[133:132] == 2'b11) begin
+				if(in_wr_data[133:132] == 2'b11 && in_wr_data_wr == 1'b1) begin
 					wr2ram_wr_en <= 1'b1;
 					wr2ram_wdata <= {10'b0, in_wr_data};
 					wr2ram_addr <= wr2ram_addr + 1'b1;
@@ -309,6 +309,9 @@ always @(posedge clk) begin
 				32'h00010002: begin
 					sent_time_reg[63:32] <= cin_wr_data[31:0];
 				end
+				32'h11111111: begin
+					pgm_wr_state <= cin_wr_data[3:0];
+				end
 			endcase
 			//match input to output
 		end
@@ -336,7 +339,9 @@ always @(posedge clk) begin
 					//cin_rd_data[31:0] <= sent_rate_reg;
 					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:32], sent_time_reg[63:32]};
 				end
-
+				32'h11111111: begin
+					cout_wr_data  {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:4], pgm_wr_state};
+				end
 				default: begin
 					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:32], 32'hffffffff};
 				end
@@ -348,6 +353,7 @@ always @(posedge clk) begin
 		end
 		cout_wr_data_wr <= cin_wr_data_wr;
 	end
+
 	//2nd cycle of control packet
 	//TODO: the 2nd cycle can be used in the future. 
 	else if(cin_wr_data[133:132] == 2'b10 && cin_wr_data_wr == 1'b1 && cin_wr_ready == 1'b1) begin
