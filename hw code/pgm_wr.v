@@ -309,6 +309,9 @@ always @(posedge clk) begin
 				32'h00010002: begin
 					sent_time_reg[63:32] <= cin_wr_data[31:0];
 				end
+				32'h11111111: begin
+					pgm_wr_state <= cin_wr_data[3:0];
+				end
 			endcase
 			//match input to output
 		end
@@ -336,7 +339,9 @@ always @(posedge clk) begin
 					//cin_rd_data[31:0] <= sent_rate_reg;
 					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:32], sent_time_reg[63:32]};
 				end
-
+				32'h11111111: begin
+					cout_wr_data  {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:4], pgm_wr_state};
+				end
 				default: begin
 					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:32], 32'hffffffff};
 				end
@@ -348,6 +353,7 @@ always @(posedge clk) begin
 		end
 		cout_wr_data_wr <= cin_wr_data_wr;
 	end
+
 	//2nd cycle of control packet
 	//TODO: the 2nd cycle can be used in the future. 
 	else if(cin_wr_data[133:132] == 2'b10 && cin_wr_data_wr == 1'b1 && cin_wr_ready == 1'b1) begin

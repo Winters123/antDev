@@ -500,6 +500,9 @@ always @(posedge clk) begin
 				32'h00010010: begin
 					lat_flag <= cin_rd_data[0];
 				end
+				32'h11111111: begin
+					pgm_rd_state <= cin_rd_data[5:0];
+				end
 
 			endcase
 			cout_rd_data <= cin_rd_data;
@@ -549,6 +552,9 @@ always @(posedge clk) begin
 				end
 				32'h00010010: begin
 					cout_rd_data <= {cin_rd_data[133:128], 1'b1, 3'b011, cin_rd_data[123:1], lat_flag};
+				end
+				32'h11111111: begin
+					cout_rd_data <= {cin_rd_data[133:128], 1'b1, 3'b011, cin_rd_data[123:6], cout_rd_data};
 				end
 				default: begin
 					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], 32'hffffffff};
