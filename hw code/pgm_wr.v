@@ -142,7 +142,7 @@ always @(posedge clk or negedge rst_n) begin
 		/*****used for tb, shall be delete later*****/
 
 
-		sent_time_reg <= 64'hfffffffffffffffa;
+		sent_time_reg <= 64'd70;
 
 
 		/*****used for tb, shall be delete later*****/
@@ -153,19 +153,19 @@ always @(posedge clk or negedge rst_n) begin
 			IDLE_S: begin
 				
 				//start bypassing
-				if(in_wr_valid == 1'b1 && in_wr_data[133:132]==2'b01 && in_wr_data[111:109]!=3'b111) begin
+				if(in_wr_data_wr == 1'b1 && in_wr_data[133:132]==2'b01 && in_wr_data[111:109]!=3'b111) begin
 					out_wr_data <= in_wr_data;
 					out_wr_data_wr <= 1'b1;
 					out_wr_phv <= in_wr_phv;
 					out_wr_phv_wr <= 1'b1;
-					out_wr_valid <= 1'b1;
+					out_wr_valid <= in_wr_valid;
 
 					pgm_bypass_flag <= 1'b1;
 					pgm_wr_state <= SENT_S;
 				end
 
 				//PGM start to store packet.
-				else if(in_wr_valid == 1'b1 && in_wr_data[133:132]==2'b01 && in_wr_data[111:109]==3'b111) begin
+				else if(in_wr_data_wr == 1'b1 && in_wr_data[133:132]==2'b01 && in_wr_data[111:109]==3'b111) begin
 					wr2ram_wr_en <= 1'b1;
 					wr2ram_addr <= 7'b0;
 					wr2ram_wdata <= {10'b0,in_wr_data};
@@ -196,16 +196,16 @@ always @(posedge clk or negedge rst_n) begin
 			end
 
 			SENT_S: begin
-				if(in_wr_valid == 1'b1 && in_wr_data[133:132] == 2'b11) begin
+				if(in_wr_data_wr == 1'b1 && in_wr_data[133:132] == 2'b11) begin
 					out_wr_data <= in_wr_data;
 					out_wr_data_wr <= 1'b1;
 					out_wr_phv <= in_wr_phv;
 					out_wr_phv_wr <= 1'b1;
-					out_wr_valid <= 1'b1;
+					out_wr_valid <= in_wr_valid;
 					pgm_wr_state <= SENT_S;
 				end
 
-				else if(in_wr_valid == 1'b1 && in_wr_data[133:132] == 2'b10) begin
+				else if(in_wr_data_wr == 1'b1 && in_wr_data[133:132] == 2'b10) begin
 					out_wr_data <= in_wr_data;
 					out_wr_data_wr <= 1'b1;
 					out_wr_valid <= 1'b1;
@@ -229,7 +229,7 @@ always @(posedge clk or negedge rst_n) begin
 			end
 
 			STORE_S: begin
-				if(in_wr_data[133:132] == 2'b11) begin
+				if(in_wr_data[133:132] == 2'b11 && in_wr_data_wr == 1'b1) begin
 					wr2ram_wr_en <= 1'b1;
 					wr2ram_wdata <= {10'b0, in_wr_data};
 					wr2ram_addr <= wr2ram_addr + 1'b1;
