@@ -712,7 +712,7 @@ gac #(
 //************************************	 
     .in_gac_md(scm2gac_md),
 	.in_gac_md_wr(scm2gac_md_wr),
-	.out_gac_md_alf(scm2gme_md_alf),
+	.out_gac_md_alf(gac2scm_md_alf),
 	
     .in_gac_phv(scm2gac_phv),
 	.in_gac_phv_wr(scm2gac_phv_wr),   

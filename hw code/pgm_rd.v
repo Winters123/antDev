@@ -476,36 +476,18 @@ always @(posedge clk) begin
 				32'h00000000: begin
 					soft_rst <= cin_rd_data[0];
 				end
-				32'h00000001: begin
-					 sent_rate_cnt <= cin_rd_data[31:0];
-				end
+				
 				32'h00010001: begin
 					 sent_rate_reg <= cin_rd_data[31:0];
 				end
-				32'h00000002: begin
-					 lat_pkt_cnt <= cin_rd_data[31:0];
-				end
 				32'h00010002: begin
 					 lat_pkt_reg <= cin_rd_data[31:0];
-				end
-				32'h00000003: begin
-					 sent_bit_cnt[31:0] <= cin_rd_data[31:0];
-				end
-				32'h00000004: begin
-					 sent_bit_cnt[63:32] <= cin_rd_data[31:0];
-				end
-				32'h00000005: begin
-					 sent_pkt_cnt[31:0] <= cin_rd_data[31:0];
-				end
-				32'h00000006: begin
-					 sent_pkt_cnt[63:32] <= cin_rd_data[31:0];
+				
 				end
 				32'h00010010: begin
 					lat_flag <= cin_rd_data[0];
 				end
-				32'h11111111: begin
-					pgm_rd_state <= cin_rd_data[5:0];
-				end
+				
 
 			endcase
 			cout_rd_data <= cin_rd_data;
