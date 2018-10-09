@@ -216,7 +216,7 @@ pgm_rd #(
 
 //transport phv and data to pgm_rd
     .out_rd_phv(out_pgm_phv),
-	.out_rd_phv_wr(out_pgm_valid_wr),
+	.out_rd_phv_wr(out_pgm_phv_wr),
 	.in_rd_phv_alf(in_pgm_phv_alf),
 
 	.out_rd_data(out_pgm_data), 
