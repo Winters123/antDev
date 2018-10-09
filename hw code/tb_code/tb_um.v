@@ -60,7 +60,7 @@ end
 //reset signal
 initial begin
     rst_n = 1'b0;
-    # 200
+    # 5
     rst_n = 1'b1;
 end
 //*************************************************************************************
@@ -90,7 +90,7 @@ initial begin
     dma2um_data_wr = 1'b1;
     dma2um_ready = 1'b1;
 end
-*/
+
 //software fetch signal from reg scm_bit_num_cnt
 //software fetch signal from reg scm_pkt_num_cnt
 //software fetch signal from reg scm_time_cnt
@@ -98,19 +98,191 @@ initial begin
     dma2um_data = {6'b010000, 128'hA0008007700000000000000000000082};
     dma2um_data_wr = 1'b1;
     dma2um_ready = 1'b1;
-    # 500
+    # 10
     dma2um_data = {6'b010000, 128'hA0008007700000020000000000000030};
     dma2um_data_wr = 1'b1;
     dma2um_ready = 1'b1;
-    # 500
-    pktin_data = {};
-    pktin_data_wr = 1'b1;
-    pktin_data_valid = 1'b1;
-    pktin_data_valid_wr = 1'b1;
+	# 10
+	dma2um_data = {6'b010000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
+	dma2um_data_wr = 1'b1;
+	dma2um_ready = 1'b1;
 end
-
+*/
 //*************************************************************************************
 
+//*************************************************************************************
+//test the data path
+
+/*
+//bypass
+initial begin    
+    //pkt_count 1
+    pktin_data = {6'b010000, 40'b0, 8'b00000111, 8'b10000010, 40'b0, 32'd10};
+	pktin_data_wr = 1'b1; 
+
+    //pkt_count 2
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 3
+    # 10
+    pktin_data = {6'b110000, 96'b0, 16'h86dd, 16'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 4
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 5
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 6
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 7
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 8
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 9
+    # 10
+    pktin_data = {6'b100000, 128'b0};
+
+    pktin_data_wr = 1'b1; 
+    pktin_data_valid = 1'b1;
+	pktin_data_valid_wr = 1'b1;
+	
+	# 500
+	$finish;
+end
+*/
+//not bypass
+initial begin
+	pktin_data = {6'b010000, 16'b0, 3'b111, 13'b0, 8'b0, 8'd61, 80'b0};
+	pktin_data_wr = 1'b1;
+	
+	# 10
+	pktin_data = {6'b110000, 128'b0};
+	pktin_data_wr = 1'b1;
+	
+	//pkt_count 3
+    # 10
+    pktin_data = {6'b110000, 96'b0, 16'h86dd, 16'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 4
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 5
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 6
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 7
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 8
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 9
+    # 10
+    pktin_data = {6'b100000, 128'b0};
+
+    pktin_data_wr = 1'b1; 
+    pktin_data_valid = 1'b1;
+	pktin_data_valid_wr = 1'b1;
+	
+	#10
+	pktin_data_wr = 1'b0;
+	pktin_data_valid = 1'b0;
+	pktin_data_valid_wr = 1'b0;
+	
+	
+	# 100 
+	dma2um_data = {6'b010000, 128'hA0008007700000000000000000000082};
+    dma2um_data_wr = 1'b1;
+    dma2um_ready = 1'b1;
+	
+	# 10
+	//pkt_count 1
+    pktin_data = {6'b010000, 40'b0, 8'b00000111, 8'b10000010, 40'b0, 32'd10};
+	pktin_data_wr = 1'b1; 
+
+    //pkt_count 2
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 3
+    # 10
+    pktin_data = {6'b110000, 96'b0, 16'h86dd, 16'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 4
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 5
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 6
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 7
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 8
+    # 10
+    pktin_data = {6'b110000, 128'b0};
+    pktin_data_wr = 1'b1; 
+
+    //pkt_count 9
+    # 10
+    pktin_data = {6'b100000, 128'b0};
+
+    pktin_data_wr = 1'b1; 
+    pktin_data_valid = 1'b1;
+	pktin_data_valid_wr = 1'b1;
+	
+	#10
+	pktin_data_wr = 1'b0;
+	pktin_data_valid = 1'b0;
+	pktin_data_valid_wr = 1'b0;
+	
+	# 1500
+	$finish;
+end
+	
+	
 um um(
     .clk(clk),
     .um_timestamp(um_timestamp),
