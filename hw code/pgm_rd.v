@@ -165,7 +165,8 @@ always @(posedge clk or negedge rst_n) begin
 		//intermidiate set to 0
 		soft_rst <= 1'b0;
 		sent_rate_cnt <= 32'b0;
-		sent_rate_reg <= 32'h0;
+		//sent_rate_reg <= 32'h0;
+		sent_rate_reg <= 32'd1000;
 		lat_pkt_cnt <= 32'b0; //num of pkt between Probes
 		lat_pkt_reg <= 32'h0; //num of pkt between Probes
 		sent_bit_cnt <= 64'b0;

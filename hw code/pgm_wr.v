@@ -128,7 +128,7 @@ always @(posedge clk or negedge rst_n) begin
 
 		//intermediate set to 0
 		sent_time_cnt <= 64'b0;
-		sent_time_reg <= 64'b0;
+		sent_time_reg <= 64'd100000000000;
 		soft_rst <= 1'b0;
 
 		pgm_bypass_flag <= 1'b0;
@@ -139,13 +139,7 @@ always @(posedge clk or negedge rst_n) begin
 		pgm_wr_state <= IDLE_S;
 
 
-		/*****used for tb, shall be delete later*****/
-
-
-		sent_time_reg <= 64'b0;
-
-
-		/*****used for tb, shall be delete later*****/
+		
 		
 	end
 	else begin

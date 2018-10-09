@@ -252,7 +252,7 @@ wire [31:0] goe2cfg_rdata;
 wire gac2cfg_ack;
 assign gac2cfg_ack_n = ~gac2cfg_ack;
 //debug
-assign pktout_ready = 1'b1;
+//assign pktout_ready = 1'b1;
 
 
 wire cfg_valid;
