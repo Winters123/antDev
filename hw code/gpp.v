@@ -378,7 +378,7 @@ always @(posedge clk or negedge rst_n) begin
 	       out_gpp_md_wr <= 1'b0;
 	    end         
         if(MD[87:80]== LMID) begin 
-            out_gpp_md <= {MD[255:128],MD[127:88],8'd2,PST,MD[71:0]};  //NMID[87:80],PST[79:72]
+            out_gpp_md <= {MD[255:128],MD[127:88],NMID,PST,MD[71:0]};  //NMID[87:80],PST[79:72]
         end
         else begin 
             out_gpp_md <= {MD[255:128],MD[127:0]};
