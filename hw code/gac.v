@@ -428,7 +428,7 @@ always @(posedge clk or negedge rst_n) begin
 						out_gac_data[125:120] <= MD_fifo_rdata[125:120];  //inport
 						out_gac_data[119:118] <= 2'b0;         //outtype
 						out_gac_data[117:112] <= gac_rdata[5:0];          //outport
-						out_gac_data[111:109] <=MD_fifo_rdata[111:109];                  //priority
+						out_gac_data[111:109] <= MD_fifo_rdata[111:109];      //priority
 						out_gac_data[108]     <= MD_fifo_rdata[108];      //discard
 						out_gac_data[107:88]  <= MD_fifo_rdata[107:88];
 						out_gac_data[87:80]   <= 8'd5;          //dmid
