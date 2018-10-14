@@ -56,15 +56,15 @@ module pgm_wr #(
 	input in_wr_alf,
 
 //output to PGM_RAM
-	output reg wr2ram_wr_en,
+	(*mark_debug = "true"*)output reg wr2ram_wr_en,
 	output reg [143:0] wr2ram_wdata,
-	output reg [6:0] wr2ram_addr,
+	(*mark_debug = "true"*)output reg [6:0] wr2ram_addr,
 
 
 //signals to PRM_RD
 	output reg pgm_bypass_flag,
-	output reg pgm_sent_start_flag,
-	output reg pgm_sent_finish_flag,
+	(*mark_debug = "true"*)output reg pgm_sent_start_flag,
+	(*mark_debug = "true"*)output reg pgm_sent_finish_flag,
 
 //input cfg packet from DMA
     input [133:0] cin_wr_data,
@@ -97,7 +97,7 @@ assign cout_wr_ready = cin_wr_ready;
 //assign cout_wr_data = cin_wr_data;
 //assign cout_wr_data_wr = cin_wr_data_wr;
 
-reg [4:0] pgm_wr_state;
+(*mark_debug = "true"*)reg [4:0] pgm_wr_state;
 
 //***************************************************
 //             Pkt Store & Transmit

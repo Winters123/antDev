@@ -75,6 +75,7 @@ module gpp #(
     output [133:0] cout_gpp_data,
 	output cout_gpp_data_wr,
 	input cin_gpp_ready
+		
 );
 
 //***************************************************
@@ -105,7 +106,7 @@ wire is_ipv6_udp;
 wire is_ipv6_lisp;
 wire is_arp;
 
-reg [1:0] gpp_state;
+(*mark_debug = "true"*)reg [1:0] gpp_state;
 reg flag;       
 //***************************************************
 //             Retransmit Pkt To Data_Cache
@@ -378,7 +379,7 @@ always @(posedge clk or negedge rst_n) begin
 	       out_gpp_md_wr <= 1'b0;
 	    end         
         if(MD[87:80]== LMID) begin 
-            out_gpp_md <= {MD[255:128],MD[127:88],NMID,PST,MD[71:0]};  //NMID[87:80],PST[79:72]
+            out_gpp_md <= {MD[255:128],MD[127:88],8'd2,PST,MD[71:0]};  //NMID[87:80],PST[79:72]
         end
         else begin 
             out_gpp_md <= {MD[255:128],MD[127:0]};

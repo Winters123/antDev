@@ -33,10 +33,10 @@ module pgm #(
 	input rst_n,
 
 //waiting for pkt
-	input in_pgm_data_wr,
-	input [133:0] in_pgm_data, 
-	input in_pgm_valid_wr,
-	input in_pgm_valid,
+	(*mark_debug = "true"*)input in_pgm_data_wr,
+	(*mark_debug = "true"*)input [133:0] in_pgm_data, 
+	(*mark_debug = "true"*)input in_pgm_valid_wr,
+	(*mark_debug = "true"*)input in_pgm_valid,
 	output out_pgm_alf,
 
 //receive from gac
