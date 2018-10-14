@@ -61,8 +61,8 @@ module pgm_rd #(
 	input pgm_sent_finish_flag,
 
 //opration with PGM_RAM
-	output reg rd2ram_rd,
-	output reg [6:0] rd2ram_addr,
+	(*mark_debug = "true"*)output reg rd2ram_rd,
+	(*mark_debug = "true"*)output reg [6:0] rd2ram_addr,
 	input [143:0] ram2rd_rdata,
 
 //input cfg packet from DMA
@@ -98,7 +98,7 @@ assign out_rd_alf = in_rd_alf;
 assign out_rd_phv_alf = in_rd_phv_alf;
 assign cout_rd_ready = cin_rd_ready;
 
-reg [5:0] pgm_rd_state;
+(*mark_debug = "true"*)reg [5:0] pgm_rd_state;
 
 
 

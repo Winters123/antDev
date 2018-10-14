@@ -37,9 +37,9 @@
 	
 	 
 //waiting for pkt
-    input in_gac_data_wr,
-    input [133:0] in_gac_data,
-    input in_gac_valid_wr,
+    (*mark_debug = "true"*)input in_gac_data_wr,
+    (*mark_debug = "true"*)input [133:0] in_gac_data,
+    (*mark_debug = "true"*)input in_gac_valid_wr,
     input in_gac_valid,
     output out_gac_data_alf,		
 //receive form gme 
@@ -122,7 +122,7 @@ wire PHV_fifo_empty;
 
 
 reg [5:0] polling_cpuid;
-reg [2:0] gac_state;
+(*mark_debug = "true"*)reg [2:0] gac_state;
 reg flag;
 reg [2:0] cfg_state;
 
@@ -133,7 +133,7 @@ reg cfg_ram_wr;
 //reg cfg_ram_rd;
 //reg gac_ram_rd;
 wire [31:0] cfg_rdata;
-wire [31:0] gac_rdata;
+(*mark_debug = "true"*)wire [31:0] gac_rdata;
 wire sync_cfg2gac_cs;
 
 assign out_gac_data_alf = gac_dfifo_usedw[9];
@@ -428,7 +428,7 @@ always @(posedge clk or negedge rst_n) begin
 						out_gac_data[125:120] <= MD_fifo_rdata[125:120];  //inport
 						out_gac_data[119:118] <= 2'b0;         //outtype
 						out_gac_data[117:112] <= gac_rdata[5:0];          //outport
-						out_gac_data[111:109] <= MD_fifo_rdata[111:109];      //priority
+						out_gac_data[111:109] <=MD_fifo_rdata[111:109];                  //priority
 						out_gac_data[108]     <= MD_fifo_rdata[108];      //discard
 						out_gac_data[107:88]  <= MD_fifo_rdata[107:88];
 						out_gac_data[87:80]   <= 8'd5;          //dmid
@@ -453,9 +453,16 @@ always @(posedge clk or negedge rst_n) begin
                     end									
                     
                    default: begin //discard
+                        gac_state <= TRANS_S;
+                        out_gac_phv_wr <= 1'b1;
+                        out_gac_phv <= 1024'b0;
+                        out_gac_data_wr <= 1'b1;
+                        out_gac_data <= {gac_dfifo_rdata[133:88], 8'd5, gac_dfifo_rdata[79:0]};
+                        /*
                         gac_state <= DISCARD_S;
 						out_gac_phv_wr <= 1'b0;	
 						out_gac_phv <=1024'b0;
+						*/
                    end
                endcase		  
 			  end
