@@ -37,9 +37,9 @@
 	
 	 
 //waiting for pkt
-    (*mark_debug = "true"*)input in_gac_data_wr,
-    (*mark_debug = "true"*)input [133:0] in_gac_data,
-    (*mark_debug = "true"*)input in_gac_valid_wr,
+    input in_gac_data_wr,
+    input [133:0] in_gac_data,
+    input in_gac_valid_wr,
     input in_gac_valid,
     output out_gac_data_alf,		
 //receive form gme 
