@@ -33,10 +33,10 @@ module pgm #(
 	input rst_n,
 
 //waiting for pkt
-	(*mark_debug = "true"*)input in_pgm_data_wr,
-	(*mark_debug = "true"*)input [133:0] in_pgm_data, 
-	(*mark_debug = "true"*)input in_pgm_valid_wr,
-	(*mark_debug = "true"*)input in_pgm_valid,
+	input in_pgm_data_wr,
+	input [133:0] in_pgm_data, 
+	input in_pgm_valid_wr,
+	input in_pgm_valid,
 	output out_pgm_alf,
 
 //receive from gac
@@ -65,14 +65,14 @@ module pgm #(
 
 
 //input configuree pkt from DMA
-	input [133:0] cin_pgm_data,
-	input cin_pgm_data_wr,
-	output cout_pgm_ready,
+	(*mark_debug = "true"*)input [133:0] cin_pgm_data,
+	(*mark_debug = "true"*)input cin_pgm_data_wr,
+	(*mark_debug = "true"*)output cout_pgm_ready,
 
 //output configure pkt to next module
-	output [133:0] cout_pgm_data,
-	output cout_pgm_data_wr,
-	input cin_pgm_ready
+	(*mark_debug = "true"*)output [133:0] cout_pgm_data,
+	(*mark_debug = "true"*)output cout_pgm_data_wr,
+	(*mark_debug = "true"*)input cin_pgm_ready
 
 );
 

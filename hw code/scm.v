@@ -29,14 +29,14 @@ module scm #(
     input gac2scm_sent_end,
     
     //input configure pkt from DMA
-    input [133:0] cin_scm_data,
-    input cin_scm_data_wr,
-    output cout_scm_ready,
+    (*mark_debug = "true"*)input [133:0] cin_scm_data,
+    (*mark_debug = "true"*)input cin_scm_data_wr,
+    (*mark_debug = "true"*)output cout_scm_ready,
 
     //output configure pkt to next module
-    output reg [133:0] cout_scm_data,
-    output reg cout_scm_data_wr,
-    input cin_scm_ready
+    (*mark_debug = "true"*)output reg [133:0] cout_scm_data,
+    (*mark_debug = "true"*)output reg cout_scm_data_wr,
+    (*mark_debug = "true"*)input cin_scm_ready
 );
 
 //**************************************************
@@ -116,8 +116,8 @@ always @(posedge clk or negedge rst_n) begin
     end
     else begin
         if (cin_scm_data_wr == 1'b1) begin
-            if ((cin_scm_ready == 1'b1) && (cin_scm_data[126:124] == 3'b010)) begin
-                cout_scm_data_wr <= 1'b1;
+            if ((cin_scm_ready == 1'b1) && (cin_scm_data[126:124] == 3'b010) &&(statistic_reset==1'b0)) begin
+                cout_scm_data_wr <= cin_scm_data_wr;
                 case (cin_scm_data[95:64])
                     32'h70000000: begin
                         protocol_type <= cin_scm_data[7:0];
@@ -134,7 +134,7 @@ always @(posedge clk or negedge rst_n) begin
                 //cout_scm_data <= cin_scm_data;
             end
             else if ((cin_scm_ready == 1'b1) && (cin_scm_data[126:124] == 3'b001)) begin
-                cout_scm_data_wr <= 1'b1;
+                cout_scm_data_wr <= cin_scm_data_wr;
                 case (cin_scm_data[95:64])
                     32'h70000008: begin
                         cout_scm_data <= {cin_scm_data[133:128], 4'b1011, cin_scm_data[123:32], scm_bit_num_cnt[31:0]};
@@ -167,11 +167,14 @@ always @(posedge clk or negedge rst_n) begin
             end
             else if (cin_scm_ready == 1'b1) begin
                 cout_scm_data <= cin_scm_data;
+                cout_scm_data_wr <= cin_scm_data_wr;
             end
         end
         else begin
             protocol_type <= 8'b0;
             statistic_reset <= 1'b0;
+            cout_scm_data_wr <= cin_scm_data_wr;
+            cout_scm_data <= cin_scm_data;
             n_RTT <= 32'b0;
         end
     end
@@ -340,14 +343,7 @@ always @(posedge clk) begin
         n_RTT <= 32'b0;
         record_endtime_tag <= 1'b0;
     end
-    else begin
-        scm_bit_num_cnt <= scm_bit_num_cnt;
-        scm_pkt_num_cnt <= scm_pkt_num_cnt;
-        scm_time_cnt <= scm_time_cnt;
-        last_timestamp <= last_timestamp;
-        protocol_type <= protocol_type;
-        n_RTT <= n_RTT;
-    end
+
 end
 
 //**************************************************
