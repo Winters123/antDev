@@ -475,7 +475,7 @@ end
 always @(posedge clk) begin
 	//1st cycle of control packet 
 	if(cin_rd_data[133:132] == 2'b01 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
-		if (cin_rd_data[103:96]== 8'd62 && cin_rd_data[126:124] == 3'b010) begin
+		if ((cin_rd_data[103:96]== 8'd62) && (cin_rd_data[126:124] == 3'b010) && (rst_n==1'b1) && (soft_rst==1'b0)) begin
 			//write signal from SW
 			ctl_write_flag <= 1'b1;
 			case(cin_rd_data[95:64])

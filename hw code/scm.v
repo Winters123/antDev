@@ -111,7 +111,7 @@ localparam IPv4_TCP     = 3'b000,
 always @(posedge clk) begin
 
     if (cin_scm_data_wr == 1'b1 && cin_scm_data[133:132] == 2'b01 && cin_scm_ready == 1'b1) begin
-        if ((cin_scm_data[126:124] == 3'b010) && (cin_scm_data[103:96] == 8'd7)) begin
+        if ((cin_scm_data[126:124] == 3'b010) && (cin_scm_data[103:96] == 8'd7)&& (rst_n==1'b1) && (statistic_reset==1'b0)) begin
                 ctl_write_flag <= 1'b1;
                 case (cin_scm_data[95:64])
                     32'h70000000: begin
@@ -194,7 +194,7 @@ end
 //                Transport MD & PHV
 //**************************************************
 always @(posedge clk or negedge rst_n) begin
-    if (rst_n == 1'b0) begin
+    if (rst_n == 1'b0 || statistic_reset == 1'b1) begin
         out_scm_md <= 256'b0;
         out_scm_md_wr <= 1'b0;
         out_scm_phv <= 1024'b0;
@@ -349,7 +349,7 @@ end
 //**************************************************
 //                Reset Statisitc Reg
 //**************************************************
-always @(posedge clk) begin 
+/*always @(posedge clk) begin 
     if (statistic_reset == 1'b1) begin
         scm_bit_num_cnt <= 64'b0;
         scm_pkt_num_cnt <= 64'b0;
@@ -367,7 +367,7 @@ always @(posedge clk) begin
         protocol_type <= protocol_type;
         n_RTT <= n_RTT;
     end
-end
+end*/
 
 //**************************************************
 //                Other IP Instance
