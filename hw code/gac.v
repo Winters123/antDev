@@ -122,7 +122,7 @@ wire PHV_fifo_empty;
 
 
 reg [5:0] polling_cpuid;
-(*mark_debug = "true"*)reg [2:0] gac_state;
+reg [2:0] gac_state;
 reg flag;
 reg [2:0] cfg_state;
 
@@ -133,7 +133,7 @@ reg cfg_ram_wr;
 //reg cfg_ram_rd;
 //reg gac_ram_rd;
 wire [31:0] cfg_rdata;
-(*mark_debug = "true"*)wire [31:0] gac_rdata;
+wire [31:0] gac_rdata;
 wire sync_cfg2gac_cs;
 
 assign out_gac_data_alf = gac_dfifo_usedw[9];
