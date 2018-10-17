@@ -291,7 +291,7 @@ always @ ( posedge clk or negedge rst_n ) begin
           cnt_rw <= 1'b0;
 		  address_a <= 8'b0;
 	      if((ctrl_fifo_empty == 1'b0)&&(cin_goe_ready == 1'b1)) begin
-//		     cin_goe_rd <= 1'b1;
+		     cin_goe_rd <= 1'b1;
 		     if(cin_goe_rdata[103:96] == LMID ) begin
 			    if((cin_goe_rdata[126:124] == 3'b001) && (cin_goe_rdata[133:132] == 2'b01) ) begin  //read
 				   address_a <= cin_goe_rdata[71:64];     //read address
