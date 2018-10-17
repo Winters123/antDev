@@ -100,6 +100,8 @@ assign cout_rd_ready = cin_rd_ready;
 
 reg [5:0] pgm_rd_state;
 
+(*mark_debug="true"*)reg ctl_write_flag;  //if its a write signal that the destination is it self, we set it as 1, otherwise we set it as 0
+
 
 
 
@@ -173,6 +175,8 @@ always @(posedge clk or negedge rst_n) begin
 		sent_pkt_cnt <= 64'b0;
 
 		lat_flag <= 1'b0;  //TODO add latency flag here
+
+		ctl_write_flag <= 1'b0;
 
 
 		pgm_rd_state <= IDLE_S;
@@ -473,6 +477,7 @@ always @(posedge clk) begin
 	if(cin_rd_data[133:132] == 2'b01 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
 		if (cin_rd_data[103:96]== 8'd62 && cin_rd_data[126:124] == 3'b010) begin
 			//write signal from SW
+			ctl_write_flag <= 1'b1;
 			case(cin_rd_data[95:64])
 				32'h00000000: begin
 					soft_rst <= cin_rd_data[0];
@@ -491,8 +496,8 @@ always @(posedge clk) begin
 				
 
 			endcase
-			cout_rd_data <= cin_rd_data;
-			cout_rd_data_wr <= cin_rd_data_wr;
+			cout_rd_data <= 134'b0;
+			cout_rd_data_wr <= 1'b0;
 			
 		end
 
@@ -502,48 +507,48 @@ always @(posedge clk) begin
 			case(cin_rd_data[95:64])
 				32'h00000000: begin
 					//cin_rd_data[0] <= soft_rst;
-					cout_rd_data <= {cin_rd_data[133:128], 1'b1, 3'b011, cin_rd_data[123:1], soft_rst};
+					cout_rd_data <= {cin_rd_data[133:128], 1'b1, 3'b011, cin_rd_data[123:112], cin_rd_data[103:96], cin_rd_data[111:104], cin_rd_data[95:1], soft_rst};
 				end
 				32'h00000001: begin
 					//cin_rd_data[31:0] <= sent_rate_cnt;
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_rate_cnt};
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:112], cin_rd_data[103:96], cin_rd_data[111:104], cin_rd_data[95:32], sent_rate_cnt};
 				end
 				32'h00010001: begin
 					//cin_rd_data[31:0] <= sent_rate_reg;
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_rate_reg};
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:112], cin_rd_data[103:96], cin_rd_data[111:104], cin_rd_data[95:32], sent_rate_reg};
 				end
 				32'h00000002: begin
 					//cin_rd_data[31:0] <= lat_pkt_cnt;
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], lat_pkt_cnt};
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:112], cin_rd_data[103:96], cin_rd_data[111:104], cin_rd_data[95:32], lat_pkt_cnt};
 				end
 				32'h00010002: begin
 					//cin_rd_data[31:0] <= lat_pkt_reg;
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], lat_pkt_reg};
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:112], cin_rd_data[103:96], cin_rd_data[111:104], cin_rd_data[95:32], lat_pkt_reg};
 				end
 				32'h00000003: begin
 					//cin_rd_data[31:0] <= sent_bit_cnt[31:0];
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_bit_cnt[31:0]};
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:112], cin_rd_data[103:96], cin_rd_data[111:104], cin_rd_data[95:32], sent_bit_cnt[31:0]};
 				end
 				32'h00000004: begin
 					//cin_rd_data[31:0] <= sent_bit_cnt[63:32];
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_bit_cnt[63:32]};
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:112], cin_rd_data[103:96], cin_rd_data[111:104], cin_rd_data[95:32], sent_bit_cnt[63:32]};
 				end
 				32'h00000005: begin
 					//cin_rd_data[31:0] <= sent_pkt_cnt[31:0];
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_pkt_cnt[31:0]};
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:112], cin_rd_data[103:96], cin_rd_data[111:104], cin_rd_data[95:32], sent_pkt_cnt[31:0]};
 				end
 				32'h00000006: begin
 					//cin_rd_data[31:0] <= sent_pkt_cnt[63:32];
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], sent_pkt_cnt[63:32]};
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:112], cin_rd_data[103:96], cin_rd_data[111:104], cin_rd_data[95:32], sent_pkt_cnt[63:32]};
 				end
 				32'h00010010: begin
-					cout_rd_data <= {cin_rd_data[133:128], 1'b1, 3'b011, cin_rd_data[123:1], lat_flag};
+					cout_rd_data <= {cin_rd_data[133:128], 1'b1, 3'b011, cin_rd_data[123:112], cin_rd_data[103:96], cin_rd_data[111:104], cin_rd_data[95:1], lat_flag};
 				end
 				32'h11111111: begin
-					cout_rd_data <= {cin_rd_data[133:128], 1'b1, 3'b011, cin_rd_data[123:6], cout_rd_data};
+					cout_rd_data <= {cin_rd_data[133:128], 1'b1, 3'b011, cin_rd_data[123:112], cin_rd_data[103:96], cin_rd_data[111:104], cin_rd_data[95:6], pgm_rd_state};
 				end
 				default: begin
-					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:32], 32'hffffffff};
+					cout_rd_data <= {cin_rd_data[133:128], 4'b1011, cin_rd_data[123:112], cin_rd_data[103:96], cin_rd_data[111:104], cin_rd_data[95:32], 32'hffffffff};
 				end
 
 			endcase
@@ -557,8 +562,18 @@ always @(posedge clk) begin
 	end
 	//2nd cycle of control packet
 	else if(cin_rd_data[133:132] == 2'b10 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
-		cout_rd_data_wr <= cin_rd_data_wr;
-		cout_rd_data <= cin_rd_data;
+		if (ctl_write_flag == 1'b1) begin
+			cout_rd_data_wr <= 1'b0;
+			cout_rd_data <= 134'b0;
+			ctl_write_flag <= 1'b0;
+		end
+
+		else begin
+			
+			cout_rd_data_wr <= cin_rd_data_wr;
+			cout_rd_data <= cin_rd_data;
+		end
+
 	end
 
 	else begin

@@ -72,7 +72,7 @@ module pgm #(
 //output configure pkt to next module
 	(*mark_debug = "true"*)output [133:0] cout_pgm_data,
 	(*mark_debug = "true"*)output cout_pgm_data_wr,
-	(*mark_debug = "true"*)input cin_pgm_ready
+	input cin_pgm_ready
 
 );
 
