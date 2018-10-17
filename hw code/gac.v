@@ -37,9 +37,9 @@
 	
 	 
 //waiting for pkt
-    (*mark_debug = "true"*)input in_gac_data_wr,
-    (*mark_debug = "true"*)input [133:0] in_gac_data,
-    (*mark_debug = "true"*)input in_gac_valid_wr,
+    input in_gac_data_wr,
+    input [133:0] in_gac_data,
+    input in_gac_valid_wr,
     input in_gac_valid,
     output out_gac_data_alf,		
 //receive form gme 
@@ -122,7 +122,7 @@ wire PHV_fifo_empty;
 
 
 reg [5:0] polling_cpuid;
-(*mark_debug = "true"*)reg [2:0] gac_state;
+reg [2:0] gac_state;
 reg flag;
 reg [2:0] cfg_state;
 
@@ -133,7 +133,7 @@ reg cfg_ram_wr;
 //reg cfg_ram_rd;
 //reg gac_ram_rd;
 wire [31:0] cfg_rdata;
-(*mark_debug = "true"*)wire [31:0] gac_rdata;
+wire [31:0] gac_rdata;
 wire sync_cfg2gac_cs;
 
 assign out_gac_data_alf = gac_dfifo_usedw[9];
