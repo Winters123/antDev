@@ -72,9 +72,9 @@ module pgm_wr #(
 	output cout_wr_ready,
 
 //output configure pkt to next module
-    output reg [133:0] cout_wr_data,
-	output reg cout_wr_data_wr,
-	input cin_wr_ready
+    (*mark_debug = "true"*)output reg [133:0] cout_wr_data,
+	(*mark_debug = "true"*)output reg cout_wr_data_wr,
+	(*mark_debug = "true"*)input cin_wr_ready
 
 );
 
@@ -87,7 +87,7 @@ module pgm_wr #(
 //user defined counters and regs
 reg [63:0] sent_time_cnt;
 reg [63:0] sent_time_reg;
-reg soft_rst;
+//reg soft_rst;
 
 //used for recording 2nd part of control data
 (*mark_debug="true"*)reg ctl_write_flag; //if its a read cin or a wirte cin that the destination is not it self, then we should send the second part of the packet; else, we should delete it.
@@ -114,7 +114,7 @@ localparam  IDLE_S = 4'd0,
 
 always @(posedge clk or negedge rst_n) begin
 
-	if(rst_n == 1'b0 || soft_rst == 1'b1) begin
+	if(rst_n == 1'b0) begin
 
 		wr2ram_wr_en <= 1'b0;
 		wr2ram_wdata <= 144'b0;
@@ -131,15 +131,14 @@ always @(posedge clk or negedge rst_n) begin
 
 		//intermediate set to 0
 		sent_time_cnt <= 64'b0;
-		sent_time_reg <= 64'd100000000000;
-		soft_rst <= 1'b0;
+		//sent_time_reg <= 64'd100000000000;
 
 		pgm_bypass_flag <= 1'b0;
 
 		pgm_sent_start_flag <= 1'b0;
 		pgm_sent_finish_flag <= 1'b0;
 
-		ctl_write_flag <= 1'b0;
+		//ctl_write_flag <= 1'b0;
 
 		pgm_wr_state <= IDLE_S;
 
@@ -289,14 +288,13 @@ end
 
 always @(posedge clk) begin
 	//1st cycle of control packet 
-	if(cin_wr_data[133:132] == 2'b01 && cin_wr_data_wr == 1'b1 && cin_wr_ready == 1'b1) begin
-		if ((cin_wr_data[103:96]== 8'd61) && (cin_wr_data[126:124] == 3'b010) && (rst_n==1'b1) && (soft_rst==1'b0)) begin
+	if(cin_wr_data[133:132] == 2'b01 && cin_wr_data_wr == 1'b1) begin
+		if ((cin_wr_data[103:96]== 8'd61) && (cin_wr_data[126:124] == 3'b010)) begin
 			//write signal from SW
-			ctl_write_flag <= 1'b1;
+			ctl_write_flag <= 1'b1;	
+
 			case(cin_wr_data[95:64])
-				32'h00000000: begin
-					soft_rst <= cin_wr_data[0];
-				end
+			
 				32'h00010001: begin
 					sent_time_reg[31:0] <= cin_wr_data[31:0];
 				end
@@ -311,11 +309,9 @@ always @(posedge clk) begin
 		end
 		else if(cin_wr_data[103:96]== 8'd61 && cin_wr_data[126:124] == 3'b001) begin
 			//read signal from SW
+			ctl_write_flag <= 1'b0;
 			case(cin_wr_data[95:64])
-				32'h00000000: begin
-					//cin_rd_data[0] <= soft_rst;
-					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:112], cin_wr_data[103:96], cin_wr_data[111:104], cin_wr_data[95:1], soft_rst};
-				end
+
 				32'h00000001: begin
 					//cin_rd_data[31:0] <= sent_rate_cnt;
 					cout_wr_data <= {cin_wr_data[133:128], 4'b1011, cin_wr_data[123:112], cin_wr_data[103:96], cin_wr_data[111:104], cin_wr_data[95:32],  sent_time_cnt[31:0]};
@@ -342,6 +338,7 @@ always @(posedge clk) begin
 			cout_wr_data_wr <= cin_wr_data_wr;
 		end
 		else begin
+			ctl_write_flag <= 1'b0;
 			cout_wr_data <= cin_wr_data;
 			cout_wr_data_wr <= cin_wr_data_wr;
 		end
@@ -350,7 +347,7 @@ always @(posedge clk) begin
 
 	//2nd cycle of control packet
 	//TODO: the 2nd cycle can be used in the future. 
-	else if(cin_wr_data[133:132] == 2'b10 && cin_wr_data_wr == 1'b1 && cin_wr_ready == 1'b1 ) begin
+	else if(cin_wr_data[133:132] == 2'b10 && cin_wr_data_wr == 1'b1) begin
 		if (ctl_write_flag == 1'b1) begin
 			cout_wr_data_wr <= 1'b0;
 			cout_wr_data <= 134'b0;

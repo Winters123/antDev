@@ -110,7 +110,7 @@ localparam IPv4_TCP     = 3'b000,
 //**************************************************
 always @(posedge clk) begin
 
-    if (cin_scm_data_wr == 1'b1 && cin_scm_data[133:132] == 2'b01 && cin_scm_ready == 1'b1) begin
+    if (cin_scm_data_wr == 1'b1 && cin_scm_data[133:132] == 2'b01) begin
         if ((cin_scm_data[126:124] == 3'b010) && (cin_scm_data[103:96] == 8'd7)&& (rst_n==1'b1) && (statistic_reset==1'b0)) begin
                 ctl_write_flag <= 1'b1;
                 case (cin_scm_data[95:64])
@@ -128,9 +128,11 @@ always @(posedge clk) begin
                 endcase
                 cout_scm_data <= 134'b0;
                 cout_scm_data_wr <= 1'b0;
-                //a = 1'b0;
+                
         end
         else if ((cin_scm_data[126:124] == 3'b001) && (cin_scm_data[103:96]== 8'd7)) begin
+
+                ctl_write_flag <= 1'b0;
                 
                 cout_scm_data_wr <= cin_scm_data_wr;
                 
@@ -166,6 +168,7 @@ always @(posedge clk) begin
 
         end
         else if (cin_scm_ready == 1'b1) begin
+            ctl_write_flag <= 1'b0;
             cout_scm_data <= cin_scm_data;
             cout_scm_data_wr <= cin_scm_data_wr;
         end
@@ -212,11 +215,11 @@ always @(posedge clk or negedge rst_n) begin
         out_scm_md_reg <= 256'b0;
         scm_state <= IDLE_S;
 
-        protocol_type <= 8'b0;
-        statistic_reset <= 1'b0;
-        n_RTT <= 32'b0;
+        //protocol_type <= 8'b0;
+        //statistic_reset <= 1'b0;
+        //n_RTT <= 32'b0;
 
-        ctl_write_flag <= 1'b0;
+        //ctl_write_flag <= 1'b0;
     end
     else begin
         case (scm_state)
