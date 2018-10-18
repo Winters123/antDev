@@ -151,7 +151,7 @@ localparam  IDLE_S = 6'd0,
 			FIN_S = 6'd16;
 
 always @(posedge clk or negedge rst_n) begin
-	if (rst_n == 1'b0 || soft_rst) begin
+	if (rst_n == 1'b0) begin
 		// reset
 		rd2ram_rd <= 1'b0;
 		rd2ram_addr <= 7'b0;
@@ -165,18 +165,19 @@ always @(posedge clk or negedge rst_n) begin
 		out_rd_phv_wr <= 1'b0;
 
 		//intermidiate set to 0
-		soft_rst <= 1'b0;
+		//soft_rst <= 1'b0;
 		sent_rate_cnt <= 32'b0;
 		//sent_rate_reg <= 32'h0;
-		sent_rate_reg <= 32'd1000;
+		
+		//sent_rate_reg <= 32'd1000;
 		lat_pkt_cnt <= 32'b0; //num of pkt between Probes
-		lat_pkt_reg <= 32'h0; //num of pkt between Probes
+		//lat_pkt_reg <= 32'h0; //num of pkt between Probes
 		sent_bit_cnt <= 64'b0;
 		sent_pkt_cnt <= 64'b0;
 
-		lat_flag <= 1'b0;  //TODO add latency flag here
+		//lat_flag <= 1'b0;  //TODO add latency flag here
 
-		ctl_write_flag <= 1'b0;
+		//ctl_write_flag <= 1'b0;
 
 
 		pgm_rd_state <= IDLE_S;
@@ -474,11 +475,12 @@ end
 
 always @(posedge clk) begin
 	//1st cycle of control packet 
-	if(cin_rd_data[133:132] == 2'b01 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
-		if (cin_rd_data[103:96]== 8'd62 && cin_rd_data[126:124] == 3'b010) begin
+	if(cin_rd_data[133:132] == 2'b01 && cin_rd_data_wr == 1'b1) begin
+		if ((cin_rd_data[103:96]== 8'd62) && (cin_rd_data[126:124] == 3'b010) && (rst_n==1'b1) && (soft_rst==1'b0)) begin
 			//write signal from SW
-			ctl_write_flag <= 1'b1;
+			
 			case(cin_rd_data[95:64])
+
 				32'h00000000: begin
 					soft_rst <= cin_rd_data[0];
 				end
@@ -496,6 +498,7 @@ always @(posedge clk) begin
 				
 
 			endcase
+			ctl_write_flag <= 1'b1;
 			cout_rd_data <= 134'b0;
 			cout_rd_data_wr <= 1'b0;
 			
@@ -503,7 +506,7 @@ always @(posedge clk) begin
 
 		else if(cin_rd_data[103:96]== 8'd62 && cin_rd_data[126:124] == 3'b001) begin
 			//read signal from SW
-			
+			ctl_write_flag <= 1'b0;
 			case(cin_rd_data[95:64])
 				32'h00000000: begin
 					//cin_rd_data[0] <= soft_rst;
@@ -556,12 +559,13 @@ always @(posedge clk) begin
 		end
 
 		else begin
+			ctl_write_flag <= 1'b0;
 			cout_rd_data <= cin_rd_data;
 			cout_rd_data_wr <= cin_rd_data_wr;
 		end
 	end
 	//2nd cycle of control packet
-	else if(cin_rd_data[133:132] == 2'b10 && cin_rd_data_wr == 1'b1 && cin_rd_ready == 1'b1) begin
+	else if(cin_rd_data[133:132] == 2'b10 && cin_rd_data_wr == 1'b1) begin
 		if (ctl_write_flag == 1'b1) begin
 			cout_rd_data_wr <= 1'b0;
 			cout_rd_data <= 134'b0;
@@ -572,6 +576,7 @@ always @(posedge clk) begin
 			
 			cout_rd_data_wr <= cin_rd_data_wr;
 			cout_rd_data <= cin_rd_data;
+			
 		end
 
 	end

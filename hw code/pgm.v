@@ -67,7 +67,7 @@ module pgm #(
 //input configuree pkt from DMA
 	(*mark_debug = "true"*)input [133:0] cin_pgm_data,
 	(*mark_debug = "true"*)input cin_pgm_data_wr,
-	(*mark_debug = "true"*)output cout_pgm_ready,
+	output cout_pgm_ready,
 
 //output configure pkt to next module
 	(*mark_debug = "true"*)output [133:0] cout_pgm_data,
