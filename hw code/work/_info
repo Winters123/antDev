@@ -1,0 +1,641 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dE:/IntelFPGA
+vbeh_vlog_ff_ce_clr_v8_4
+Z0 !s110 1538398972
+!i10b 1
+!s100 fDhWk>T2lebn;efljR]4W1
+IhJINV:VYQU5TRK9VYe0<C0
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+Z2 dD:/Fast-Ant/DevFiles/antDev/hw code
+Z3 w1538022693
+Z4 8D:/Fast-Ant/DevFiles/antDev/hw code/blk_mem_gen_v8_4.v
+Z5 FD:/Fast-Ant/DevFiles/antDev/hw code/blk_mem_gen_v8_4.v
+L0 148
+Z6 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z7 !s108 1538398972.000000
+Z8 !s107 D:/Fast-Ant/DevFiles/antDev/hw code/blk_mem_gen_v8_4.v|
+Z9 !s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/blk_mem_gen_v8_4.v|
+!i113 1
+Z10 o-work work
+Z11 tCvgOpt 0
+vbeh_vlog_ff_clr_v8_4
+R0
+!i10b 1
+!s100 E[?m6==2`5zcSGO_DlREZ3
+IMhF[Acf<_X6ZgX@d[_AH12
+R1
+R2
+R3
+R4
+R5
+L0 109
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vbeh_vlog_ff_pre_v8_4
+R0
+!i10b 1
+!s100 mN7B7=ehdi@KiGW7C1g7;3
+IIdoX<LK0?nl4TTzFhPNE:0
+R1
+R2
+R3
+R4
+R5
+L0 129
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vbeh_vlog_muxf7_v8_4
+R0
+!i10b 1
+!s100 R8;jfGh8i2;8f058`ZBki3
+I3;ACkY;C<ozQ3X;Zd4HiB1
+R1
+R2
+R3
+R4
+R5
+L0 95
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vblk_mem_axi_read_wrapper_beh_v8_4
+R0
+!i10b 1
+!s100 >7BI;_oEZCI<VF<h2cfh21
+IKZ@70edzi=jX2=<_YmUkB2
+R1
+R2
+R3
+R4
+R5
+L0 1270
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vblk_mem_axi_regs_fwd_v8_4
+R0
+!i10b 1
+!s100 E^j=VYZTmKFGD7E=IAE<43
+Ij7A_R;1;k6N^zUJfQ>4jY0
+R1
+R2
+R3
+R4
+R5
+L0 1493
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vblk_mem_axi_write_wrapper_beh_v8_4
+R0
+!i10b 1
+!s100 eYB3YBCC[4ZP`ODELGB8@3
+ILeW?elzW]DnDa^dNih:]52
+R1
+R2
+R3
+R4
+R5
+L0 994
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vblk_mem_gen_v8_4_1
+R0
+!i10b 1
+!s100 DYG=E4f[0EAa;_lF?3M4N1
+IW82[6ZEThmJVMbzFNY?1o2
+R1
+R2
+R3
+R4
+R5
+L0 3412
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vblk_mem_gen_v8_4_1_mem_module
+R0
+!i10b 1
+!s100 62k;A1ML^52m`5c9bekf_1
+IA[b[>o?j76<R<[;kcfggN3
+R1
+R2
+R3
+R4
+R5
+L0 1951
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vblk_mem_gen_v8_4_1_output_stage
+R0
+!i10b 1
+!s100 zHY3zO8Nmmc_8f2o>^=a61
+IT`LNS_5EYETRG62OJ_Dn72
+R1
+R2
+R3
+R4
+R5
+L0 1563
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vblk_mem_gen_v8_4_1_softecc_output_reg_stage
+R0
+!i10b 1
+!s100 _ZBV38M@AGGW8YoSe@[cn2
+IAKER?gTj0IQ>YGocQEJ1c0
+R1
+R2
+R3
+R4
+R5
+L0 1859
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vdata_cache
+R0
+!i10b 1
+!s100 FCTQ@dP2hEZYmRP[[n:JZ2
+IfKMX]4oa=b=S16PKIL;5Z1
+R1
+R2
+Z12 w1537674971
+8D:/Fast-Ant/DevFiles/antDev/hw code/data_cache.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/data_cache.v
+Z13 L0 28
+R6
+r1
+!s85 0
+31
+R7
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/data_cache.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/data_cache.v|
+!i113 1
+R10
+R11
+vgac
+Z14 !s110 1538398973
+!i10b 1
+!s100 8IN4N?P7DH`LMRlYIYma@1
+IMGo@A=SCWn=V0ncOX10Sj2
+R1
+R2
+w1538228675
+8D:/Fast-Ant/DevFiles/antDev/hw code/gac.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/gac.v
+R13
+R6
+r1
+!s85 0
+31
+Z15 !s108 1538398973.000000
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/gac.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/gac.v|
+!i113 1
+R10
+R11
+vgke
+R14
+!i10b 1
+!s100 E@g4bEGVz?U[:bmOM>GOE1
+ImzLZGe294LDn6kfJaL3z23
+R1
+R2
+R12
+8D:/Fast-Ant/DevFiles/antDev/hw code/gke.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/gke.v
+Z16 L0 27
+R6
+r1
+!s85 0
+31
+R15
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/gke.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/gke.v|
+!i113 1
+R10
+R11
+vgme
+R14
+!i10b 1
+!s100 4Z4FB:30G6U`GcQLUfPRB2
+IoV[LFkXU18?g2Wdl6nlP31
+R1
+R2
+w1538316690
+8D:/Fast-Ant/DevFiles/antDev/hw code/gme.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/gme.v
+R16
+R6
+r1
+!s85 0
+31
+R15
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/gme.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/gme.v|
+!i113 1
+R10
+R11
+vgoe
+R14
+!i10b 1
+!s100 c7Dm0L1_LH`McYCMMJJ^l2
+I9e@1e4Z?=>dnJXo8^]?@o2
+R1
+R2
+R12
+8D:/Fast-Ant/DevFiles/antDev/hw code/goe.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/goe.v
+L0 25
+R6
+r1
+!s85 0
+31
+R15
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/goe.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/goe.v|
+!i113 1
+R10
+R11
+vgpp
+R14
+!i10b 1
+!s100 WN^0AS3HSITb1P9cfz<9T0
+IoZQW@zniOW2e]2k;[1X223
+R1
+R2
+R12
+8D:/Fast-Ant/DevFiles/antDev/hw code/gpp.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/gpp.v
+L0 29
+R6
+r1
+!s85 0
+31
+R15
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/gpp.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/gpp.v|
+!i113 1
+R10
+R11
+vpgm
+R14
+!i10b 1
+!s100 ^`<g2OX3g_PMg_@;WTW`Q1
+I=RORDRb2mJfQ6L]hFzh402
+R1
+R2
+Z17 w1538317261
+8D:/Fast-Ant/DevFiles/antDev/hw code/pgm.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/pgm.v
+R16
+R6
+r1
+!s85 0
+31
+R15
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/pgm.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/pgm.v|
+!i113 1
+R10
+R11
+vpgm_rd
+R14
+!i10b 1
+!s100 L?REz`FQ7H[j7hK[001Oj0
+IG9:WJAzG4gETz:bR[WaE42
+R1
+R2
+w1538396423
+8D:/Fast-Ant/DevFiles/antDev/hw code/pgm_rd.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/pgm_rd.v
+R16
+R6
+r1
+!s85 0
+31
+R15
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/pgm_rd.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/pgm_rd.v|
+!i113 1
+R10
+R11
+vpgm_rd_test
+Z18 !s110 1538398974
+!i10b 1
+!s100 2f4^UOh6k1D[kkXoG_Hfm0
+Ifbz;9ae<>W@OPX`G5MPaY3
+R1
+R2
+R17
+8D:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm_rd.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm_rd.v
+L0 2
+R6
+r1
+!s85 0
+31
+R15
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm_rd.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm_rd.v|
+!i113 1
+R10
+R11
+vpgm_tb
+R18
+!i10b 1
+!s100 6WOc]T6R^1=H[XOcB@oga3
+Igg:]`]Go9dRe@1XNi@iMT2
+R1
+R2
+w1538398958
+Z19 8D:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm.v
+Z20 FD:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm.v
+L0 2
+R6
+r1
+!s85 0
+31
+!s108 1538398974.000000
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm.v|
+Z21 !s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm.v|
+!i113 1
+R10
+R11
+vpgm_test
+!s110 1538189932
+!i10b 1
+!s100 2cgC?^lC[Z:b_8jD3;i]m3
+In;[>X7bFL:WC:oH=4XFAQ0
+R1
+R2
+w1538189916
+R19
+R20
+L0 2
+R6
+r1
+!s85 0
+31
+!s108 1538189932.000000
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm.v|
+R21
+!i113 1
+R10
+R11
+vpgm_wr
+R14
+!i10b 1
+!s100 Yc=R`NkZ;BFaXlF0Kf>OC0
+IQ87l70[F9A[Gh?CaF?i7m1
+R1
+R2
+R17
+8D:/Fast-Ant/DevFiles/antDev/hw code/pgm_wr.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/pgm_wr.v
+R16
+R6
+r1
+!s85 0
+31
+R15
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/pgm_wr.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/pgm_wr.v|
+!i113 1
+R10
+R11
+vpgm_wr_test
+R14
+!i10b 1
+!s100 <ZkDY0RR[9h?j8DE`J`UY0
+I7`@HkEPXL3IBVDYoje]Sk3
+R1
+R2
+R17
+8D:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm_wr.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm_wr.v
+L0 2
+R6
+r1
+!s85 0
+31
+R15
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm_wr.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/tb_code/tb_pgm_wr.v|
+!i113 1
+R10
+R11
+vram_144_128
+R14
+!i10b 1
+!s100 iaa@7XAVzk_a<3Di=Cd4M1
+I>9bM=YV@NmJ[i4_E:bHdb3
+R1
+R2
+R3
+8D:/Fast-Ant/DevFiles/antDev/hw code/ram_144_128.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/ram_144_128.v
+L0 56
+R6
+r1
+!s85 0
+31
+R15
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/ram_144_128.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/ram_144_128.v|
+!i113 1
+R10
+R11
+vread_netlist_v8_4
+R0
+!i10b 1
+!s100 ;;8PJC@IMQcejV@V_B6Yd2
+IMeMPc]PaVJUzf4m8c40Ab0
+R1
+R2
+R3
+R4
+R5
+L0 635
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vSTATE_LOGIC_v8_4
+R0
+!i10b 1
+!s100 k>U[WISOcbVBS3]nkRADH2
+I[j^A_M9J:zzAc9kQHhCX[1
+R1
+R2
+R3
+R4
+R5
+L0 73
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+n@s@t@a@t@e_@l@o@g@i@c_v8_4
+vsync_sig
+R14
+!i10b 1
+!s100 G?a1OCcBDo;SR[Af>N=mY0
+Ij96bF2A1Tk^HIiBUMEjI43
+R1
+R2
+R12
+8D:/Fast-Ant/DevFiles/antDev/hw code/sync_sig.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/sync_sig.v
+R16
+R6
+r1
+!s85 0
+31
+R15
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/sync_sig.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/sync_sig.v|
+!i113 1
+R10
+R11
+vum
+R0
+!i10b 1
+!s100 Gf?_Hj1^<FW2<G@00CIA`2
+IzgCOO3>]8??Gi9:=RKedL2
+R1
+R2
+R12
+8D:/Fast-Ant/DevFiles/antDev/hw code/um.v
+FD:/Fast-Ant/DevFiles/antDev/hw code/um.v
+R16
+R6
+r1
+!s85 0
+31
+R7
+!s107 D:/Fast-Ant/DevFiles/antDev/hw code/um.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/Fast-Ant/DevFiles/antDev/hw code/um.v|
+!i113 1
+R10
+R11
+vwrite_netlist_v8_4
+R0
+!i10b 1
+!s100 e46K^[8=HIXD5b8LSU?<42
+I?:2gHgjTl^CB[^17E;J@M2
+R1
+R2
+R3
+R4
+R5
+L0 166
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
