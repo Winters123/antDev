@@ -98,9 +98,9 @@ assign out_rd_alf = in_rd_alf;
 assign out_rd_phv_alf = in_rd_phv_alf;
 assign cout_rd_ready = cin_rd_ready;
 
-reg [5:0] pgm_rd_state;
+(*mark_debug="true"*)reg [5:0] pgm_rd_state;
 
-(*mark_debug="true"*)reg ctl_write_flag;  //if its a write signal that the destination is it self, we set it as 1, otherwise we set it as 0
+reg ctl_write_flag;  //if its a write signal that the destination is it self, we set it as 1, otherwise we set it as 0
 
 
 

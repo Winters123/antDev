@@ -1,0 +1,18 @@
+## Process this file with automake to produce Makefile.in
+
+
+bin_PROGRAMS =  \
+	ant
+
+l2switch_SOURCES =  \
+	main_ant.c \
+	../../include/ant_driver.h
+
+l2switch_LDADD = -L../../lib/libua \
+	-L../../lib/librule \
+	-L../../lib/libreg  \
+	-lua \
+	-lrule \
+	-lreg \
+	-lpthread
+	 

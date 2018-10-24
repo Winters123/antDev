@@ -72,9 +72,9 @@ module pgm_wr #(
 	output cout_wr_ready,
 
 //output configure pkt to next module
-    (*mark_debug = "true"*)output reg [133:0] cout_wr_data,
-	(*mark_debug = "true"*)output reg cout_wr_data_wr,
-	(*mark_debug = "true"*)input cin_wr_ready
+    output reg [133:0] cout_wr_data,
+	output reg cout_wr_data_wr,
+	input cin_wr_ready
 
 );
 
@@ -90,7 +90,7 @@ reg [63:0] sent_time_reg;
 //reg soft_rst;
 
 //used for recording 2nd part of control data
-(*mark_debug="true"*)reg ctl_write_flag; //if its a read cin or a wirte cin that the destination is not it self, then we should send the second part of the packet; else, we should delete it.
+reg ctl_write_flag; //if its a read cin or a wirte cin that the destination is not it self, then we should send the second part of the packet; else, we should delete it.
 
 
 
@@ -100,7 +100,7 @@ assign cout_wr_ready = cin_wr_ready;
 //assign cout_wr_data = cin_wr_data;
 //assign cout_wr_data_wr = cin_wr_data_wr;
 
-reg [4:0] pgm_wr_state;
+(*mark_debug="true"*)reg [4:0] pgm_wr_state;
 
 //***************************************************
 //             Pkt Store & Transmit
