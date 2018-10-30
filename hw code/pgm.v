@@ -107,20 +107,18 @@ wire cin_wr_ready;
 //WR to RAM
 
 wire wr2ram_wr_en;
-wire [143:0]wr2ram_wdata;
-wire [6:0]wr2ram_addr;
+wire [143:0] wr2ram_wdata;
+wire [6:0] wr2ram_addr;
 
 //RD to RAM
 wire rd2ram_rd;
-wire [143:0]ram2rd_rdata;
-wire [6:0]rd2ram_raddr;
-
+wire [143:0] ram2rd_rdata;
+wire [6:0] rd2ram_raddr;
 
 
 reg [2:0]pgm_state;
 
-//assign out_pgm_phv_alf = 1'b0;
-//assign out_pgm_alf = in_pgm_alf;
+wire [63:0] wr2rd_sent_time_reg;
 
 assign out_pgm_sent_start_flag = pgm_sent_start_flag;
 assign out_pgm_sent_finish_flag = pgm_sent_finish_flag;
@@ -194,7 +192,8 @@ pgm_wr #(
 //output configure pkt to next module
     .cout_wr_data(cout_wr_data),
 	.cout_wr_data_wr(cout_wr_data_wr),
-	.cin_wr_ready(cin_wr_ready)
+	.cin_wr_ready(cin_wr_ready),
+	.out_wr_sent_time_reg(wr2rd_sent_time_reg)
 );
 
 pgm_rd #(
@@ -228,7 +227,6 @@ pgm_rd #(
 //signals from PGM_WR
 	.pgm_bypass_flag(pgm_bypass_flag),
 	.pgm_sent_start_flag(pgm_sent_start_flag),
-	.pgm_sent_finish_flag(pgm_sent_finish_flag),
 
 //opration with PGM_RAM
 	.rd2ram_rd(rd2ram_rd),
@@ -243,7 +241,8 @@ pgm_rd #(
 //output configure pkt to next module
     .cout_rd_data(cout_pgm_data),
 	.cout_rd_data_wr(cout_pgm_data_wr),
-	.cin_rd_ready(cin_pgm_ready)
+	.cin_rd_ready(cin_pgm_ready),
+	.in_rd_sent_time_reg(wr2rd_sent_time_reg)
 );
 
 endmodule 

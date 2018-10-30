@@ -1,13 +1,14 @@
 /** *************************************************************************
  *  @file          scm.v
- *  @brief		硬件统计模块
+ *  @brief      硬件统计模块
  * 
  *   此文件包括对测试报文信息的统计和
  * 
- *  @date		2018/10/24 10:53:51 星期三
- *  @author		Jiang(Copyright  2018  JInag Yue)
- *  @email		<lang_jy@outlook.com>
- *  @version	0.1.0
+ *  @date       2018/10/24 10:53:51 星期三
+ *  @author     Jiang(Copyright  2018  JInag Yue)
+ *  @modified   Yang XR
+ *  @email      <lang_jy@outlook.com>
+ *  @version    0.1.0
  ****************************************************************************/
 module scm #(
     parameter PLATFORM = "Xilinx",
@@ -55,12 +56,6 @@ module scm #(
 //**************************************************
 //all wire/ref/parameter variable
 //should be declared below here
-reg [31:0] scm_status;
-reg [31:0] in_scm_md_count;
-reg [31:0] in_scm_phv_count;
-reg [31:0] out_scm_md_count;
-reg [31:0] out_scm_phv_count;
-
 reg MD_fifo_rd;
 wire [255:0] MD_fifo_rdata;
 wire MD_fifo_empty;
@@ -100,7 +95,7 @@ reg record_endtime_tag;
 reg [2:0] scm_state;
 reg [31:0] last_timestamp;
 reg [31:0] end_time;
-reg [255:0] out_scm_md_reg;
+//reg [255:0] out_scm_md_reg;
 
 //State Declaration
 localparam IDLE_S   = 3'd0,
@@ -115,6 +110,108 @@ localparam IPv4_TCP     = 3'b000,
            IPv6_TCP     = 3'b011,
            IPv6_UDP     = 3'b100,
            IPv6_LISP    = 3'b101;
+
+
+//**************************************************
+//                Transport MD & PHV
+//**************************************************
+always @(posedge clk or negedge rst_n) begin
+        if (rst_n == 1'b0 || statistic_reset == 1'b1) begin
+            out_scm_md <= 256'b0;
+            out_scm_md_wr <= 1'b0;
+            out_scm_phv <= 1024'b0;
+            out_scm_phv_wr <= 1'b0;
+            scm_bit_num_cnt <= 64'b0;
+            scm_pkt_num_cnt <= 64'b0;
+            scm_time_cnt <= 64'b0;
+            last_timestamp <= 32'b0;
+            end_time <= 32'b0;
+            //protocol_type <= 8'b0;
+            //statistic_reset <= 1'b0;
+            //nRTT <= 32'b0;
+            record_endtime_tag <= 1'b0;
+            scm_state <= IDLE_S;
+        end
+        else begin
+            case(scm_state)
+                IDLE_S: begin
+                    out_scm_md <= 256'b0;
+                    out_scm_md_wr <= 1'b0;
+                    out_scm_phv <= 1024'b0;
+                    out_scm_phv_wr <= 1'b0;
+                    //if there are MD and PHV in fifo, need to read them out
+                    if ((MD_fifo_empty == 1'b0) && (PHV_fifo_empty == 1'b0)) begin
+                        if (MD_fifo_rdata[87:80] == LMID) begin
+                            MD_fifo_rd <= 1'b1;
+                            PHV_fifo_rd <= 1'b1;
+                            if (gac2scm_sent_start == 1'b1) begin  //start to count
+                                scm_state <= CNT_S;
+                            end
+                            else begin  //no need to count, just modify NMID and trans
+                                scm_state <= SEND_S;
+                            end
+                        end
+                        else begin  //just bypass
+                            MD_fifo_rd <= 1'b1;
+                            PHV_fifo_rd <= 1'b1;
+                            scm_state <= SEND_S;
+                        end
+                    end
+                    else begin
+                        scm_state <= IDLE_S;
+                    end
+                end
+                SEND_S: begin
+                    out_scm_md <= {MD_fifo_rdata[255:88], NMID, MD_fifo_rdata[79:0]};
+                    out_scm_md_wr <= 1'b1;
+
+                    out_scm_phv <= PHV_fifo_rdata;
+                    out_scm_phv_wr <= 1'b1;
+
+                    if(MD_fifo_empty == 1'b0 && PHV_fifo_empty == 1'b0) begin
+                        MD_fifo_rd <= 1'b1;
+                        PHV_fifo_rd <= 1'b1;
+                        scm_state <= SEND_S;
+                    end
+                    else begin
+                        MD_fifo_rd <= 1'b0;
+                        PHV_fifo_rd <= 1'b0;
+                        scm_state <= IDLE_S;
+                    end
+
+                end
+                
+                CNT_S: begin
+                    out_scm_md <= {MD_fifo_rdata[255:88], NMID, MD_fifo_rdata[79:0]};
+                    out_scm_md_wr <= 1'b1;
+
+                    out_scm_phv <= PHV_fifo_rdata;
+                    out_scm_phv_wr <= 1'b1;
+
+                    /**updata all the counter values*/
+                    if(MD_fifo_empty == 1'b0 && PHV_fifo_empty == 1'b0) begin
+                        MD_fifo_rd <= 1'b1;
+                        PHV_fifo_rd <= 1'b1;
+                        scm_state <= CNT_S;
+                    end
+                    else begin
+                        MD_fifo_rd <= 1'b0;
+                        PHV_fifo_rd <= 1'b0;
+                        scm_state <= WAIT_S;
+                    end
+                end
+
+                WAIT_S: begin
+                    
+                end
+                FETCH_S: begin
+                    
+                end
+            endcase
+        end
+end
+
+
 
 //**************************************************
 //                Software Signal
@@ -203,164 +300,6 @@ always @(posedge clk) begin
     end
 
 end
-
-//**************************************************
-//                Transport MD & PHV
-//**************************************************
-always @(posedge clk or negedge rst_n) begin
-    if (rst_n == 1'b0 || statistic_reset == 1'b1) begin
-        out_scm_md <= 256'b0;
-        out_scm_md_wr <= 1'b0;
-        out_scm_phv <= 1024'b0;
-        out_scm_phv_wr <= 1'b0;
-        scm_bit_num_cnt <= 64'b0;
-        scm_pkt_num_cnt <= 64'b0;
-        scm_time_cnt <= 64'b0;
-        last_timestamp <= 32'b0;
-        end_time <= 32'b0;
-        //protocol_type <= 8'b0;
-        //statistic_reset <= 1'b0;
-        //nRTT <= 32'b0;
-        md_flag <= 1'b0;
-        record_endtime_tag <= 1'b0;
-        out_scm_md_reg <= 256'b0;
-        scm_state <= IDLE_S;
-
-        //protocol_type <= 8'b0;
-        //statistic_reset <= 1'b0;
-        //n_RTT <= 32'b0;
-
-        //ctl_write_flag <= 1'b0;
-    end
-    else begin
-        case (scm_state)
-            IDLE_S: begin
-                out_scm_md <= 256'b0;
-                out_scm_md_wr <= 1'b0;
-                out_scm_phv <= 1024'b0;
-                out_scm_phv_wr <= 1'b0;
-                if ((MD_fifo_empty == 1'b0) && (PHV_fifo_empty == 1'b0)) begin
-                    if (MD_fifo_rdata[87:80] == LMID) begin
-                        MD_fifo_rd <= 1'b1;
-                        PHV_fifo_rd <= 1'b1;
-                        out_scm_md_reg <= {MD_fifo_rdata[255:88], NMID, MD_fifo_rdata[79:0]};
-                        if (gac2scm_sent_start == 1'b1) begin  //start to statistic
-                            scm_state <= CNT_S;
-                        end
-                        else begin  //no need to statistic, just modify NMID and trans
-                            md_flag <= 1'b1;
-                            scm_state <= SEND_S;
-                        end
-                    end
-                    else begin  //just bypass
-                        MD_fifo_rd <= 1'b1;
-                        PHV_fifo_rd <= 1'b1;
-                        out_scm_md_reg <= 256'b0;
-                        md_flag <= 1'b0;
-                        scm_state <= SEND_S;
-                    end
-                end
-                else begin
-                    scm_state <= IDLE_S;
-                end
-            end
-
-            SEND_S: begin  //bypass, just trans
-                MD_fifo_rd <= 1'b0;
-                PHV_fifo_rd <= 1'b0;
-                out_scm_md_wr <= 1'b1;
-                if (md_flag == 1'b1) begin
-                    out_scm_md <= out_scm_md_reg;
-                end 
-                else begin
-                    out_scm_md <= MD_fifo_rdata;
-                end 
-                out_scm_phv_wr <= 1'b1;
-                out_scm_phv <= PHV_fifo_rdata;
-                scm_state <= IDLE_S;
-            end
-
-            CNT_S: begin  //statistic the data and information
-                if (gac2scm_sent_end == 1'b1) begin
-                    scm_state <= WAIT_S;
-                end
-                else begin
-                    if (out_scm_md_reg[79:72] == protocol_type) begin  //satisfy the requirement of protocol
-                        //statistic
-                        scm_bit_num_cnt <= scm_bit_num_cnt + {52'b0, out_scm_md_reg[107:96]};
-                        scm_pkt_num_cnt <= scm_pkt_num_cnt + 64'b1;
-                        last_timestamp <= out_scm_md_reg[31:0];
-                        scm_time_cnt <= scm_time_cnt + out_scm_md_reg[31:0] - last_timestamp;
-                        //discard
-                        out_scm_md_reg[108] <= 1;
-                        //trans
-                        MD_fifo_rd <= 1'b1;
-                        PHV_fifo_rd <= 1'b1;
-                        md_flag <= 1'b1;
-                        scm_state <= SEND_S;
-                    end
-                    else begin
-                        //just trans
-                        MD_fifo_rd <= 1'b1;
-                        PHV_fifo_rd <= 1'b1;
-                        md_flag <= 1'b1;
-                        scm_state <= SEND_S;
-                    end
-                end
-            end
-
-            WAIT_S: begin
-                if (!record_endtime_tag) begin
-                    end_time <= last_timestamp;
-                    record_endtime_tag <= 1'b1;
-                end
-
-                if (out_scm_md_reg[31:0] < (end_time + n_RTT)) begin
-                    if (out_scm_md_reg[79:72] == protocol_type) begin  //satisfy the requirement of protocol
-                        //statistic
-                        scm_bit_num_cnt <= scm_bit_num_cnt + {52'b0, out_scm_md_reg[107:96]};
-                        scm_pkt_num_cnt <= scm_pkt_num_cnt + 64'b1;
-                        last_timestamp <= out_scm_md_reg[31:0];
-                        scm_time_cnt <= scm_time_cnt + out_scm_md_reg[31:0] - last_timestamp;
-                        //discard
-                        out_scm_md_reg[108] <= 1;
-                        //trans
-                        MD_fifo_rd <= 1'b1;
-                        PHV_fifo_rd <= 1'b1;
-                        md_flag <= 1'b1;
-                        scm_state <= SEND_S;
-                    end
-                    else begin
-                        //just trans
-                        MD_fifo_rd <= 1'b1;
-                        PHV_fifo_rd <= 1'b1;
-                        md_flag <= 1'b1;
-                        scm_state <= SEND_S;
-                    end
-                end
-                else begin
-                    scm_state <= FETCH_S;
-                end
-            end
-
-            FETCH_S: begin
-                if (statistic_reset == 1'b1) begin
-                    scm_state <= IDLE_S;
-                end
-                else begin
-                    scm_state <= FETCH_S;
-                end
-            end
-
-            default: begin
-                scm_state <= IDLE_S;
-            end
-
-        endcase
-    end
-end
-
-
 
 
 //**************************************************

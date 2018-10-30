@@ -74,7 +74,10 @@ module pgm_wr #(
 //output configure pkt to next module
     output reg [133:0] cout_wr_data,
 	output reg cout_wr_data_wr,
-	input cin_wr_ready
+	input cin_wr_ready,
+
+//output sent_time_reg to pgm_rd
+	output [63:0] out_wr_sent_time_reg
 
 );
 
@@ -97,8 +100,8 @@ reg ctl_write_flag; //if its a read cin or a wirte cin that the destination is n
 assign out_wr_phv_alf = in_wr_phv_alf;
 assign out_wr_alf = in_wr_alf;
 assign cout_wr_ready = cin_wr_ready;
-//assign cout_wr_data = cin_wr_data;
-//assign cout_wr_data_wr = cin_wr_data_wr;
+assign out_wr_sent_time_reg = sent_time_reg;
+
 
 (*mark_debug="true"*)reg [4:0] pgm_wr_state;
 
@@ -114,7 +117,7 @@ localparam  IDLE_S = 4'd0,
 
 always @(posedge clk or negedge rst_n) begin
 
-	if(rst_n == 1'b0) begin
+		if(rst_n == 1'b0) begin
 
 		wr2ram_wr_en <= 1'b0;
 		wr2ram_wdata <= 144'b0;
@@ -185,9 +188,13 @@ always @(posedge clk or negedge rst_n) begin
 					out_wr_phv <= 1024'b0;
 					out_wr_phv_wr <= 1'b0;
 
+
+					//reset all the counters once test finished.
+					sent_time_cnt <= 64'b0;
+					
 					pgm_bypass_flag <= 1'b0;
 					pgm_sent_start_flag <= 1'b0;
-					//pgm_sent_finish_flag <= 1'b0;
+					pgm_sent_finish_flag <= 1'b0;
 
 					pgm_wr_state <= IDLE_S;
 				end
@@ -247,7 +254,7 @@ always @(posedge clk or negedge rst_n) begin
 			end
 
 			WAIT_S: begin
-				if(sent_time_cnt != sent_time_reg) begin
+				if(sent_time_cnt <= sent_time_reg) begin
 					wr2ram_addr <= 7'b0;
 					wr2ram_wdata <= 144'b0;
 					wr2ram_wr_en <= 1'b0;
