@@ -1,7 +1,18 @@
+/** *************************************************************************
+ *  @file          scm.v
+ *  @brief		硬件统计模块
+ * 
+ *   此文件包括对测试报文信息的统计和
+ * 
+ *  @date		2018/10/24 10:53:51 星期三
+ *  @author		Jiang(Copyright  2018  JInag Yue)
+ *  @email		<lang_jy@outlook.com>
+ *  @version	0.1.0
+ ****************************************************************************/
 module scm #(
     parameter PLATFORM = "Xilinx",
               LMID = 8'd7,
-              NMID = 8'd5
+              NMID = 8'd4
 )(
     input clk,
     input rst_n,
@@ -77,7 +88,7 @@ reg [31:0] n_RTT;
 reg ctl_write_flag; //if its a read signal or write signal that the destination isn't self, we set the flag as 0, else we set it as 1
 
 assign out_scm_md_alf = in_scm_md_alf || (MD_fifo_usedw > 8'd250);
-assign out_scm_phv_alf = in_scm_phv_alf || (MD_fifo_usedw > 8'd250);
+assign out_scm_phv_alf = in_scm_phv_alf || (PHV_fifo_usedw > 8'd250);
 /*
 assign cout_scm_data_wr = cin_scm_data_wr;
 assign cout_scm_data = cin_scm_data;
@@ -349,28 +360,8 @@ always @(posedge clk or negedge rst_n) begin
     end
 end
 
-//**************************************************
-//                Reset Statisitc Reg
-//**************************************************
-/*always @(posedge clk) begin 
-    if (statistic_reset == 1'b1) begin
-        scm_bit_num_cnt <= 64'b0;
-        scm_pkt_num_cnt <= 64'b0;
-        scm_time_cnt <= 64'b0;
-        last_timestamp <= 32'b0;
-        protocol_type <= 8'b0;
-        n_RTT <= 32'b0;
-        record_endtime_tag <= 1'b0;
-    end
-    else begin
-        scm_bit_num_cnt <= scm_bit_num_cnt;
-        scm_pkt_num_cnt <= scm_pkt_num_cnt;
-        scm_time_cnt <= scm_time_cnt;
-        last_timestamp <= last_timestamp;
-        protocol_type <= protocol_type;
-        n_RTT <= n_RTT;
-    end
-end*/
+
+
 
 //**************************************************
 //                Other IP Instance

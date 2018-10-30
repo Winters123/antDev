@@ -58,7 +58,6 @@ module pgm_rd #(
 //signals from PGM_WR
 	input pgm_bypass_flag,
 	input pgm_sent_start_flag,
-	input pgm_sent_finish_flag,
 
 //opration with PGM_RAM
 	output reg rd2ram_rd,
@@ -73,7 +72,9 @@ module pgm_rd #(
 //output configure pkt to next module
     output reg [133:0] cout_rd_data,
 	output reg cout_rd_data_wr,
-	input cin_rd_ready
+	input cin_rd_ready,
+//input sent_time_reg from pgm_wr
+	input [63:0] in_rd_sent_time_reg
 
 );
 
@@ -92,7 +93,9 @@ reg [63:0] sent_bit_cnt;
 reg [63:0] sent_pkt_cnt;
 reg lat_flag;
 
-
+//record sent_time set by ANT sw.
+reg [63:0] sent_time_reg;
+reg [63:0] sent_time_cnt;
 
 assign out_rd_alf = in_rd_alf;
 assign out_rd_phv_alf = in_rd_phv_alf;
@@ -151,6 +154,7 @@ localparam  IDLE_S = 6'd0,
 			FIN_S = 6'd16;
 
 always @(posedge clk or negedge rst_n) begin
+
 	if (rst_n == 1'b0) begin
 		// reset
 		rd2ram_rd <= 1'b0;
@@ -164,8 +168,6 @@ always @(posedge clk or negedge rst_n) begin
 		out_rd_phv <= 1024'b0;
 		out_rd_phv_wr <= 1'b0;
 
-		//intermidiate set to 0
-		//soft_rst <= 1'b0;
 		sent_rate_cnt <= 32'b0;
 		//sent_rate_reg <= 32'h0;
 		
@@ -176,9 +178,8 @@ always @(posedge clk or negedge rst_n) begin
 		sent_pkt_cnt <= 64'b0;
 
 		//lat_flag <= 1'b0;  //TODO add latency flag here
-
-		//ctl_write_flag <= 1'b0;
-
+		sent_time_reg <= 64'b0;
+		sent_time_cnt <= 64'b0;
 
 		pgm_rd_state <= IDLE_S;
 		
@@ -199,6 +200,7 @@ always @(posedge clk or negedge rst_n) begin
 				end
 
 				else if(pgm_sent_start_flag == 1'b1) begin
+					
 					out_rd_data <= 134'b0;
 					rd2ram_addr <= 7'b0;
 					rd2ram_rd <= 1'b1;
@@ -209,6 +211,8 @@ always @(posedge clk or negedge rst_n) begin
 					out_rd_phv_wr <= 1'b0;
 					//need jump to HAUNT1_S to wait for RAM output
 					pgm_rd_state <= HAUNT1_S;
+					//obtain sent_time_reg from input
+					sent_time_reg <= in_rd_sent_time_reg;
 				end
 
 				else begin
@@ -230,7 +234,7 @@ always @(posedge clk or negedge rst_n) begin
 					sent_bit_cnt <= 64'b0;
 					sent_pkt_cnt <= 64'b0;
 
-
+					sent_time_cnt <= 64'b0;
 
 					pgm_rd_state <= IDLE_S;
 				end
@@ -285,10 +289,14 @@ always @(posedge clk or negedge rst_n) begin
 				if(lat_flag == 1'b1) begin
 					rd2ram_addr <= 7'd2;
 					pgm_rd_state <= PROBE_S;
+					//need to increment sent_rate_cnt as needed
+					sent_time_cnt <= sent_rate_cnt + 1'b1;
 				end
 				else begin
 					rd2ram_addr <= 7'd2;
 					pgm_rd_state <= READ_S;
+					//need to increment sent_rate_cnt as needed
+					sent_time_cnt <= sent_rate_cnt + 1'b1;
 				end
 				
 
@@ -296,6 +304,9 @@ always @(posedge clk or negedge rst_n) begin
 			end
 
 			READ_S: begin
+				//need to increment sent_rate_cnt as needed
+				sent_time_cnt <= sent_rate_cnt + 1'b1;
+
 				if(ram2rd_rdata[133:132] == 2'b11) begin
 					//clear counters of rate
 					//sent_rate_cnt <= 64'b0;
@@ -329,7 +340,7 @@ always @(posedge clk or negedge rst_n) begin
 					sent_bit_cnt <= sent_bit_cnt + ram2rd_rdata[131:128];
 					sent_pkt_cnt <= sent_pkt_cnt + 1'b1;
 
-					if(pgm_sent_finish_flag == 1'b1) begin
+					if(sent_time_cnt >= sent_time_reg) begin
 						pgm_rd_state <= FIN_S;
 					end
 
@@ -375,21 +386,7 @@ always @(posedge clk or negedge rst_n) begin
 
 			WAIT_S: begin
 				
-				//if(sent_rate_cnt == sent_rate_reg && lat_flag == 1'b1 && lat_pkt_cnt == lat_pkt_reg) begin
-				//	rd2ram_rd <= 1'b1;
-				//	rd2ram_addr <= 7'b0000000;
-				//	out_rd_data <= ram2rd_rdata[133:0];
-				//	out_rd_data_wr <= 1'b1;
-				//	out_rd_valid <= 1'b1;
-				//	out_rd_phv_wr <= 1'b1;
-				//	out_rd_phv <= 1024'b1;
-
-				//	sent_rate_cnt <= 32'b0;
-				//	lat_pkt_cnt <= 32'b0;
-
-				//	//need to add another states for 2cycles delay of PROBE send.
-				//	pgm_rd_state <= PROBE_S;
-				//end
+				sent_time_cnt <= sent_time_cnt + 1'b1;
 
 				if(sent_rate_cnt==sent_rate_reg) begin
 					rd2ram_rd <= 1'b1;
@@ -426,6 +423,10 @@ always @(posedge clk or negedge rst_n) begin
 			PROBE_S: begin
 				//TODO: add timestamp in this part
 				//but I still think that the timestamp should be added in UDO
+				
+				sent_time_cnt <= sent_time_cnt + 1'b1;
+
+
 				if(out_rd_data[133:132] != 2'b10) begin
 					out_rd_data <= ram2rd_rdata[133:0];
 					rd2ram_rd <= 1'b1;
@@ -453,7 +454,7 @@ always @(posedge clk or negedge rst_n) begin
 					out_rd_phv <= 1024'b0;
 					out_rd_valid_wr <= 1'b1;
 
-					if(pgm_sent_finish_flag == 1'b1) begin
+					if(sent_time_cnt >= sent_time_reg) begin
 						pgm_rd_state <= FIN_S;
 					end
 

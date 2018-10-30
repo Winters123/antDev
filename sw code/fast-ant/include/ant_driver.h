@@ -63,12 +63,14 @@ typedef unsigned long long u64;
 /*
 //declaration of vaddr on ANT (SCM part)
  */
-#define PROTO_TYPE    0x70000000		  //  8b, protype of packets
+#define SCM_STATE 	  0x70000000		  //  3b, scm_state machine
 #define SCM_SOFT_RST  0x70000001		  //  1b, software rst for SCM
 #define N_RTT         0x70000002		  // 32b, total wait time after receiving finish signal
+#define PROTO_TYPE    0x70000003		  //  8b, protype of packets
 #define SCM_BIT_CNT   0x70000009		  // 64b, total received bits of SCM 
 #define SCM_PKT_CNT   0x7000000b		  // 64b, total received packets of SCM
-#define SCM_TIME_CNT  0x7000000d		  // 64b, total monitoring time of SCM
+//#define SCM_TIME_CNT  0x7000000d		  // 64b, total monitoring time of SCM
+
 
 
 #define ANT_HW_STATE  0x11111111
@@ -114,8 +116,7 @@ int  ant_pkt_send(struct fast_packet *pkt, int pkt_len); /**发送ant报文，�
 int  ant_set_test_para(struct ant_parameter antp); /**设置ANT测试参数*/
 
 //@TODO support latency test in the future
-//u32  ant_latency_test(struct fast_packet *pkt, int pkt_len); /**测量平均时延*/
-
+int  ant_latency_test(struct fast_packet *pkt, int pkt_len); /**测量平均时延*/
 
 void ant_print_counters(struct ant_cnt a_cnt);
 

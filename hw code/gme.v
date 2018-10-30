@@ -27,7 +27,7 @@
 module gme #(
     parameter    PLATFORM = "Xilinx",
          LMID = 8'd3,
-		 NMID = 8'd4
+		 NMID = 8'd7
 )(   
     input clk,
     input rst_n,
@@ -180,7 +180,7 @@ always @(posedge clk or negedge rst_n) begin
 					    MD_fifo_rd<=1'b1;
 						index_fifo_rd<=1'b1;
 			            PHV_fifo_rd <= 1'b1;	
-                        out_gme_md_reg <= {MD_fifo_rdata[255:88],8'd4,MD_fifo_rdata[79:0]};	
+                        out_gme_md_reg <= {MD_fifo_rdata[255:88],NMID,MD_fifo_rdata[79:0]};	
                         md_flag<=1'b1;	
 						md_phv_state<=md_phv_data;
                     end
