@@ -109,37 +109,6 @@ reg ctl_write_flag;  //if its a write signal that the destination is it self, we
 
 
 
-//**************************************************
-//             Delay check & addition
-//**************************************************
-
-//reg [133:0] out_rd_data_dly[1:0];
-//reg out_rd_data_wr_dly[1:0];
-//reg out_rd_valid_dly[1:0];
-//reg out_rd_valid_wr_dly[1:0];
-//reg [1023:0] out_rd_phv_dly[1:0];
-//reg out_rd_phy_wr_dly[1:0];
-//
-//always @(posedge clk) begin
-//	out_rd_data <= out_rd_data_dly[0];
-//	out_rd_data_dly[0] <= out_rd_data_dly[1];
-//
-//	out_rd_data_wr <= out_rd_data_wr_dly[0];
-//	out_rd_data_wr_dly[0] <= out_rd_data_wr_dly[1];
-//	
-//	out_rd_valid <= out_rd_valid_dly[0];
-//	out_rd_valid_dly[0] <= out_rd_valid_dly[1];
-//
-//	out_rd_valid_wr <= out_rd_valid_wr_dly[0];
-//	out_rd_valid_wr_dly[0] <= out_rd_valid_wr_dly[1];
-//
-//	out_rd_phv <= out_rd_phv_dly[0];
-//	out_rd_phv_dly[0] <= out_rd_phv_dly[1];
-//
-//	out_rd_phv_wr <= out_rd_phv_wr_dly[0];
-//	out_rd_phv_wr_dly[0] <= out_rd_phv_wr_dly[1];
-//end
-
 //***************************************************
 //             Pkt Rd & Transmit
 //***************************************************
@@ -169,9 +138,7 @@ always @(posedge clk or negedge rst_n) begin
 		out_rd_phv_wr <= 1'b0;
 
 		sent_rate_cnt <= 32'b0;
-		//sent_rate_reg <= 32'h0;
-		
-		//sent_rate_reg <= 32'd1000;
+
 		lat_pkt_cnt <= 32'b0; //num of pkt between Probes
 		//lat_pkt_reg <= 32'h0; //num of pkt between Probes
 		sent_bit_cnt <= 64'b0;
