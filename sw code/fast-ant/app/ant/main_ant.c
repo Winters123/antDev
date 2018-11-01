@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
 	ua_init(ANT_MID);
 
 	//set the test parameters
-	demo_parameter.sent_time = 0x100010001000; //0x100010000 is about 3 seconds
+	demo_parameter.sent_time = 0x10001000; //0x100010000 is about 3 seconds
 	demo_parameter.sent_rate = 0x00001000; //about 6.5ms send a pkt
 	demo_parameter.lat_pkt = 0;
 	demo_parameter.lat_flag = 0; //disable latency test
@@ -123,11 +123,10 @@ struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata
 		pkt->data[i] = 0xff;
 	}
 	//init packet
-	ant_pkt_send(pkt, pkt->um.len); //trigger ANT to start
-	printf("debug1\n");
+	ant_pkt_send(pkt, pkt->um.len); //trigger ANT to start/
 	usleep(demo_parameter.sent_time/100);
 	printf("debug2\n");
-	while(ant_check_finish()==1){
+	while(ant_check_finish()!=0){
 		printf("the final is %d\n", ant_check_finish());
 		sleep(1);
 	}
@@ -136,11 +135,15 @@ struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata
 		printf("test result obtaining error!\n");
 		return -1;
 	}
-
+	/**obtain all the counter values in hw*/
 	ant_print_counters(*demo_cnt);
 	printf("test finished\n");
 	
 	free(demo_cnt);
+
+	/**wirte letancy into file*/
+	import_latency_to_txt();
+	
 	ant_rst();
 	
 	return 0;
