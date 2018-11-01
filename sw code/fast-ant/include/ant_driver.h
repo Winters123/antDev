@@ -100,6 +100,7 @@ struct ant_parameter
 	u32 lat_pkt;    /** blocking num pof packet between two latency flag packets*/
 	u8  lat_flag;   /** Flag for enabling latency test*/
 	u32 n_rtt;      /** Controlling the waiting time after sending last packet*/
+	u8  proto_type;  /** Protocol type used in SCM*/
 };
 
 /*-------------------ANT CORE FUNCTION ------------------*/
@@ -171,8 +172,6 @@ int ant_get_scm_soft_rst(u64 *regvalue);
 int ant_get_n_rtt(u64 *regvalue);
 int ant_get_scm_bit_cnt(u64 *regvalue);
 int ant_get_scm_pkt_cnt(u64 *regvalue);
-int ant_get_scm_time_cnt(u64 *regvalue);
-
 /*-------------------COUNTER & REG------------------*/
 
 #endif

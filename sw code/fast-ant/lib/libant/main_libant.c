@@ -85,6 +85,8 @@ int ant_set_test_para(struct ant_parameter antp)
 	i += ant_set_lat_pkt_reg((u64)antp.lat_pkt);
 	i += ant_set_lat_flag((u64)antp.lat_flag);
 	i += ant_set_n_rtt((u64)antp.n_rtt);
+	i += ant_set_proto_type((u64)antp.proto_type);
+	
 	return i;
 }
 
@@ -110,6 +112,7 @@ int ant_pkt_send(struct fast_packet *pkt, int pkt_len)
  * @param  pkt_len [the length of model packet]
  * @return         [final throughput of the tested port]
  */
+/*
 u32 ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnt, u32 sent_rate, u64 test_time)
 {
 	int rnt_cnt;
@@ -122,7 +125,6 @@ u32 ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnt, u32 
 	antp.lat_pkt = 0;
 	antp.lat_flag = 0;
 	antp.n_rtt = 2; //we set n_rtt as 2 as default
-
 
 	ant_set_test_para(antp);
 
@@ -154,7 +156,7 @@ u32 ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnt, u32 
 	return antp.sent_rate;
 
 }
-
+*/
 
 
 /**
@@ -519,16 +521,6 @@ int ant_get_scm_pkt_cnt(u64 *regvalue)
 	return 0;
 }
 
-
-int ant_get_scm_time_cnt(u64 *regvalue)
-{
-	u32 regvalue_tmp_high = fast_ua_hw_rd(SCM_MID, SCM_TIME_CNT, MASK_1);
-	u32 regvalue_tmp_low  = fast_ua_hw_rd(SCM_MID, SCM_TIME_CNT - 1, MASK_1);
-
-	*regvalue = (u64)(regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
-
-	return 0;
-}
 
 
 
