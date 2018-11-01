@@ -387,7 +387,7 @@ int ant_get_sent_time_cnt(u64 *regvalue)
 	u32 regvalue_tmp_high = fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_CNT, MASK_1);
 	u32 regvalue_tmp_low  = fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_CNT - 1, MASK_1);
 
-	*regvalue = (u64)(regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
+	*regvalue = ((u64)regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
 
 	return 0;
 }
@@ -398,7 +398,7 @@ int ant_get_sent_time_reg(u64 *regvalue)
 	u32 regvalue_tmp_high = fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_REG, MASK_1);
 	u32 regvalue_tmp_low  = fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_REG - 1, MASK_1);
 
-	*regvalue = (u64)(regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
+	*regvalue = ((u64)regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
 
 	return 0;
 }
@@ -441,7 +441,7 @@ int ant_get_sent_bit_cnt(u64 *regvalue)
 	u32 regvalue_tmp_high = fast_ua_hw_rd(PGM_RD_MID, SENT_BIT_CNT, MASK_1);
 	u32 regvalue_tmp_low  = fast_ua_hw_rd(PGM_RD_MID, SENT_BIT_CNT - 1, MASK_1);
 
-	*regvalue = (u64)(regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
+	*regvalue = ((u64)regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
 
 	return 0;
 }
@@ -452,7 +452,7 @@ int ant_get_sent_pkt_cnt(u64 *regvalue)
 	u32 regvalue_tmp_high = fast_ua_hw_rd(PGM_RD_MID, SENT_PKT_CNT, MASK_1);
 	u32 regvalue_tmp_low  = fast_ua_hw_rd(PGM_RD_MID, SENT_PKT_CNT - 1, MASK_1);
 
-	*regvalue = (u64)(regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
+	*regvalue = ((u64)regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
 
 	return 0;
 }
@@ -505,7 +505,7 @@ int ant_get_scm_bit_cnt(u64 *regvalue)
 	u32 regvalue_tmp_high = fast_ua_hw_rd(SCM_MID, SCM_BIT_CNT, MASK_1);
 	u32 regvalue_tmp_low  = fast_ua_hw_rd(SCM_MID, SCM_BIT_CNT - 1, MASK_1);
 
-	*regvalue = (u64)(regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
+	*regvalue = ((u64)regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
 
 	return 0;
 }
@@ -516,7 +516,7 @@ int ant_get_scm_pkt_cnt(u64 *regvalue)
 	u32 regvalue_tmp_high = fast_ua_hw_rd(SCM_MID, SCM_PKT_CNT, MASK_1);
 	u32 regvalue_tmp_low  = fast_ua_hw_rd(SCM_MID, SCM_PKT_CNT - 1, MASK_1);
 
-	*regvalue = (u64)(regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
+	*regvalue = ((u64)regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
 
 	return 0;
 }
