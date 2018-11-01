@@ -26,8 +26,8 @@
 
 module pgm_rd #(
 	parameter PLATFORM = "Xilinx",
-	LMID = 8'd61, //self MID
-	NMID = 8'd62  //next MID
+	LMID = 8'd62, //self MID
+	NMID = 8'd5  //next MID
 )(
 	input clk,
 	input rst_n,
@@ -106,6 +106,9 @@ assign cout_rd_ready = cin_rd_ready;
 reg ctl_write_flag;  //if its a write signal that the destination is it self, we set it as 1, otherwise we set it as 0
 
 
+/**add cycle counters for test pkts*/
+reg [10:0] pkt_cycle_cnt;
+reg [31:0] sent_time_stamp;
 
 
 
@@ -147,6 +150,10 @@ always @(posedge clk or negedge rst_n) begin
 		//lat_flag <= 1'b0;  //TODO add latency flag here
 		sent_time_reg <= 64'b0;
 		sent_time_cnt <= 64'b0;
+
+		//this is only used for antDev v2
+		pkt_cycle_cnt <= 11'b0;
+		sent_time_stamp <= 32'b0;
 
 		pgm_rd_state <= IDLE_S;
 		
@@ -203,6 +210,10 @@ always @(posedge clk or negedge rst_n) begin
 
 					sent_time_cnt <= 64'b0;
 
+					//only used in antDev v2
+					pkt_cycle_cnt <= 11'b0;
+					sent_time_stamp <= 32'b0;
+
 					pgm_rd_state <= IDLE_S;
 				end
 			end
@@ -243,6 +254,8 @@ always @(posedge clk or negedge rst_n) begin
 				rd2ram_rd <= 1'b1;
 				rd2ram_addr <= 7'b1;
 				pgm_rd_state <= HAUNT2_S;	
+
+				sent_time_stamp <= sent_time_stamp + 32'b1;
 			end
 
 			HAUNT2_S: begin
@@ -257,13 +270,16 @@ always @(posedge clk or negedge rst_n) begin
 					rd2ram_addr <= 7'd2;
 					pgm_rd_state <= PROBE_S;
 					//need to increment sent_rate_cnt as needed
-					sent_time_cnt <= sent_rate_cnt + 1'b1;
+					sent_time_cnt <= sent_time_cnt + 1'b1;
 				end
 				else begin
 					rd2ram_addr <= 7'd2;
 					pgm_rd_state <= READ_S;
 					//need to increment sent_rate_cnt as needed
-					sent_time_cnt <= sent_rate_cnt + 1'b1;
+					sent_time_cnt <= sent_time_cnt + 1'b1;
+
+					//only needed in antDev v2
+					sent_time_stamp <= sent_time_stamp + 32'b1;
 				end
 				
 
@@ -272,25 +288,40 @@ always @(posedge clk or negedge rst_n) begin
 
 			READ_S: begin
 				//need to increment sent_rate_cnt as needed
-				sent_time_cnt <= sent_rate_cnt + 1'b1;
+				sent_time_cnt <= sent_time_cnt + 1'b1;
+
+				//only needed in antDev v2
+				sent_time_stamp <= sent_time_stamp + 32'b1;
 
 				if(ram2rd_rdata[133:132] == 2'b11) begin
-					//clear counters of rate
-					//sent_rate_cnt <= 64'b0;
-
-					out_rd_data <= ram2rd_rdata[133:0];
-					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= 1'b0;
-					out_rd_phv <= 1024'b0;
-					out_rd_phv_wr <= 1'b1;
-					out_rd_valid_wr <= 1'b0;
 
 					rd2ram_rd <= 1'b1;
 					rd2ram_addr <= rd2ram_addr + 1'b1;
-
 					sent_bit_cnt <= sent_bit_cnt + 64'd16;
 
+					//only used in antDev v2
+					pkt_cycle_cnt <= pkt_cycle_cnt + 11'b1;
+
 					pgm_rd_state <= READ_S;
+
+					//only used in antDev v2
+					if (pkt_cycle_cnt == 11'd4) begin
+						// only needed in antDev v2
+						out_rd_data <= {ram2rd_rdata[133:128], sent_pkt_cnt, sent_time_stamp, 32'hffffffff};
+						out_rd_data_wr <= 1'b1;
+						out_rd_valid <= 1'b0;
+						out_rd_phv <= 1024'b0;
+						out_rd_phv_wr <= 1'b1;
+						out_rd_valid_wr <= 1'b0;
+					end
+					else begin
+						out_rd_data <= ram2rd_rdata[133:0];
+						out_rd_data_wr <= 1'b1;
+						out_rd_valid <= 1'b0;
+						out_rd_phv <= 1024'b0;
+						out_rd_phv_wr <= 1'b1;
+						out_rd_valid_wr <= 1'b0;
+					end
 				end
 
 				else if(ram2rd_rdata[133:132] == 2'b10) begin
@@ -331,6 +362,9 @@ always @(posedge clk or negedge rst_n) begin
 
 					sent_bit_cnt <= sent_bit_cnt + 64'd16;
 
+					//only used in andDev v2
+					pkt_cycle_cnt <= 11'b0;
+
 				end
 
 			end
@@ -355,6 +389,10 @@ always @(posedge clk or negedge rst_n) begin
 				
 				sent_time_cnt <= sent_time_cnt + 1'b1;
 
+
+				//only needed in antDev v2
+				sent_time_stamp <= sent_time_stamp + 32'b1;
+
 				if(sent_rate_cnt==sent_rate_reg) begin
 					rd2ram_rd <= 1'b1;
 					rd2ram_addr <= 7'b0000000;
@@ -368,8 +406,6 @@ always @(posedge clk or negedge rst_n) begin
 					sent_rate_cnt <= 32'b0;
 					pgm_rd_state <= HAUNT1_S;
 				end
-
-				
 
 				else begin
 					out_rd_data <= 134'b0;
