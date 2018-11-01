@@ -43,11 +43,11 @@
  */
 int ant_collect_counters(struct ant_cnt *outc)
 {
-	u64 test_time = (u64)fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_CNT, MASK_1)<<32 + (u64)fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_CNT-1, MASK_1);
-	u64 sent_bits = (u64)fast_ua_hw_rd(PGM_RD_MID, SENT_BIT_CNT, MASK_1)<<32 + (u64)fast_ua_hw_rd(PGM_RD_MID, SENT_BIT_CNT-1, MASK_1);
-	u64 sent_pkts = (u64)fast_ua_hw_rd(PGM_RD_MID, SENT_PKT_CNT, MASK_1)<<32 + (u64)fast_ua_hw_rd(PGM_RD_MID, SENT_PKT_CNT-1, MASK_1);
-	u64 recv_bits = (u64)fast_ua_hw_rd(SCM_MID, SCM_BIT_CNT, MASK_1)<<32 + (u64)fast_ua_hw_rd(SCM_MID, SCM_BIT_CNT-1, MASK_1);
-	u64 recv_pkts = (u64)fast_ua_hw_rd(SCM_MID, SCM_PKT_CNT, MASK_1)<<32 + (u64)fast_ua_hw_rd(SCM_MID, SCM_PKT_CNT-1, MASK_1);
+	u64 test_time = ((u64)fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_CNT, MASK_1))<<32 + (u64)fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_CNT-1, MASK_1);
+	u64 sent_bits = ((u64)fast_ua_hw_rd(PGM_RD_MID, SENT_BIT_CNT, MASK_1))<<32 + (u64)fast_ua_hw_rd(PGM_RD_MID, SENT_BIT_CNT-1, MASK_1);
+	u64 sent_pkts = ((u64)fast_ua_hw_rd(PGM_RD_MID, SENT_PKT_CNT, MASK_1))<<32 + (u64)fast_ua_hw_rd(PGM_RD_MID, SENT_PKT_CNT-1, MASK_1);
+	u64 recv_bits = ((u64)fast_ua_hw_rd(SCM_MID, SCM_BIT_CNT, MASK_1))<<32 + (u64)fast_ua_hw_rd(SCM_MID, SCM_BIT_CNT-1, MASK_1);
+	u64 recv_pkts = ((u64)fast_ua_hw_rd(SCM_MID, SCM_PKT_CNT, MASK_1))<<32 + (u64)fast_ua_hw_rd(SCM_MID, SCM_PKT_CNT-1, MASK_1);
 	
 	outc->test_time = test_time;
 	outc->sent_bits = sent_bits;
@@ -61,16 +61,15 @@ int ant_collect_counters(struct ant_cnt *outc)
 
 /**
  * check the hw module of ANT to see if all the modules are waiting for software reset
- * @return     [1 if waiting for software reset, otherwise return 0]
+ * @return     [0 if true, otherwise return 1]
  */
 int ant_check_finish()
 {
-	if(fast_ua_hw_rd(PGM_RD_MID, ANT_HW_STATE, MASK_1) == PGM_RD_FIN_S 
-		&& fast_ua_hw_rd(PGM_RD_MID, ANT_HW_STATE, MASK_1) == PGM_RD_FIN_S){
-		return 1;
+	if(fast_ua_hw_rd(PGM_RD_MID, ANT_HW_STATE, MASK_1) == PGM_RD_FIN_S){
+		return 0;
 	}
 	else 
-		return 0;
+		return 1;
 }
 
 /**
@@ -157,17 +156,6 @@ u32 ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnt, u32 
 }
 
 
-/**
- * conduct latency test, obtain packets with timestamp on the packet
- * @param  fast_pkt [description]
- * @param  pkt_len  [description]
- * @return          [description]
-
-u32 ant_latency_test(struct fast_pkt, int pkt_len)
-{
-
-}
- */
 
 /**
  * print the final counter values of the test
@@ -198,19 +186,33 @@ int ant_rst(){
 		if(ant_set_rd_soft_rst(0) != 0)
 			return -1;
 	}
-	//reset SCM module
-	u32 scm_state = fast_ua_hw_rd(SCM_MID, SCM_STATE, MASK_1);
-	if (scm_state == SCM_FETCH_S) {
-		if (ant_set_scm_soft_rst(1) != 0){
-			return -1;
-		}
-		if (ant_set_scm_soft_rst(0) != 0){
-			return -1;
-		}
+	else {
+		return -1;
 	}
 	return 0;
 }
 
+/**
+ * Read latency into latency test file, in a readable format
+ * @return [0 if success, else return -1]
+ */
+int import_latency_to_txt(){
+
+	FILE * fid = fopen("../../app/ant/latency_out.txt", 'w');
+	if (fid == NULL){
+		printf("write latency_out.txt error!\n");
+		return -1;
+	}
+	int i;
+	u32 in_file_latency = 0;
+	for (i = 0; i < 1023; i++){
+		in_file_latency = fast_ua_hw_rd(SCM_MID, SCM_RAM_ADDR + i, MASK_1);
+		fprintf(fid, "the %d latency: %u\n", i, in_file_latency);
+	}
+	fclose(fid);
+	printf("latency_out.txt generated!\n");
+	return 0;
+}
 
 /*---------------------------------ANT CORE FUNCTION ----------------------------*/
 

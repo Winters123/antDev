@@ -70,6 +70,7 @@ typedef unsigned long long u64;
 #define SCM_BIT_CNT   0x70000009		  // 64b, total received bits of SCM 
 #define SCM_PKT_CNT   0x7000000b		  // 64b, total received packets of SCM
 //#define SCM_TIME_CNT  0x7000000d		  // 64b, total monitoring time of SCM
+#define SCM_RAM_ADDR  0x80000000 		  // 32b, the base addr of latency in SCM_RAM
 
 
 
@@ -111,14 +112,16 @@ int  ant_check_finish(); /**检查ANT hw是否已经运行结束*/
 
 int  ant_pkt_send(struct fast_packet *pkt, int pkt_len); /**发送ant报文，并触发ANT开始进行测试*/
 
-//u32  ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnd, u32 sent_rate, u64 test_time); /**通过二分法测量吞吐率*/
+u32  ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnd, u32 sent_rate, u64 test_time); /**通过二分法测量吞吐率*/
 
 int  ant_set_test_para(struct ant_parameter antp); /**设置ANT测试参数*/
 
 //@TODO support latency test in the future
-int  ant_latency_test(struct fast_packet *pkt, int pkt_len); /**测量平均时延*/
+//int  ant_latency_test(struct fast_packet *pkt, int pkt_len); /**测量平均时延*/
 
 void ant_print_counters(struct ant_cnt a_cnt);
+
+int import_latency_to_txt();
 
 /*-------------------ANT CORE FUNCTION ------------------*/
 
