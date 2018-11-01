@@ -51,18 +51,24 @@ void ua_init(u8 mid)
 int main(int argc, char* argv[])
 {
 	u8 dmid = ANT_MID; 
+
+	/**ant_parameter is used in pgm*/
 	struct ant_parameter demo_parameter;
 	struct ant_cnt *demo_cnt = (struct ant_cnt *)malloc(sizeof(struct ant_cnt));
 
 	ua_init(ANT_MID);
 
-	//set the test parameters
+	/**set test parameters*/
 	demo_parameter.sent_time = 0x10001000; //0x100010000 is about 3 seconds
 	demo_parameter.sent_rate = 0x00001000; //about 6.5ms send a pkt
-	demo_parameter.lat_pkt = 0;
+	demo_parameter.proto_type = 0x07; //ipv4_udp
+
+	/*************no need for these 3 parameters****************/
+	demo_parameter.lat_pkt = 0; 
 	demo_parameter.lat_flag = 0; //disable latency test
 	demo_parameter.n_rtt = 0x00010000; //wait about 6.5ms after sending the last pkt.
-
+	/*************no need for these 3 parameters****************/
+	
 	if(ant_set_test_para(demo_parameter)){
 		printf("set ant parameter error!\n");
 		return -1;
@@ -72,6 +78,7 @@ struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata
 	pkt->um.flowID = 3;
 	pkt->um.seq = 4;
 	pkt->um.outport = 1;
+	/**set priority as 3'b111 to enable ANT hw pipeline*/
 	pkt->um.priority = 7;
 	pkt->um.dstmid = 1;
 	pkt->um.len = sizeof(struct um_metadata)+66;
@@ -122,10 +129,13 @@ struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata
 	for(i=34; i<66; i++ ){
 		pkt->data[i] = 0xff;
 	}
-	//init packet
+	//send packet to trigger ANT pipeline
 	ant_pkt_send(pkt, pkt->um.len); //trigger ANT to start/
+
 	usleep(demo_parameter.sent_time/100);
-	printf("debug2\n");
+	//printf("debug2\n");
+	
+	/**only jump out of while if test is finished*/
 	while(ant_check_finish()!=0){
 		printf("the final is %d\n", ant_check_finish());
 		sleep(1);
@@ -141,9 +151,10 @@ struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata
 	
 	free(demo_cnt);
 
-	/**wirte letancy into file*/
+	/**write letancy into file*/
 	import_latency_to_txt();
 	
+	/**reset ant to enble next test round*/
 	ant_rst();
 	
 	return 0;
