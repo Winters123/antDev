@@ -45,7 +45,7 @@ typedef long long s64;
 typedef unsigned long long u64;
 
 /*
-//declaration of vaddr on ANT
+//declaration of vaddr on ANT-PGM
  */
 #define SENT_TIME_CNT 0x00000002         // 64b, test time counter                  
 #define SENT_TIME_REG 0x00010002         // 64b, test time reg
@@ -58,7 +58,7 @@ typedef unsigned long long u64;
 #define SENT_PKT_CNT  0x00000006         // 64b, total sent packets
 #define LAT_FLAG      0x00010010         //  1b, latency test flag  
 #define RD_SOFT_RST   0x00000000		 //  1b, software rst for pgm_rd
-
+#define RD_STATE	  0x11111111		 //  6b, pgm_rd state machine
 
 /*
 //declaration of vaddr on ANT (SCM part)
@@ -130,7 +130,6 @@ void ant_print_counters(struct ant_cnt a_cnt);
 
 int ant_set_sent_time_cnt(u64 regvalue);
 int ant_set_sent_time_reg(u64 regvalue);
-int ant_set_wr_soft_rst(u64 regvalue);
 int ant_set_sent_rate_cnt(u64 regvalue);
 int ant_set_sent_rate_reg(u64 regvalue);
 int ant_set_lat_pkt_cnt(u64 regvalue);
@@ -146,7 +145,6 @@ int ant_set_scm_soft_rst(u64 regvalue);
 int ant_set_n_rtt(u64 regvalue);
 int ant_set_scm_bit_cnt(u64 regvalue);
 int ant_set_scm_pkt_cnt(u64 regvalue);
-int ant_set_scm_time_cnt(u64 regvalue);
 
 /*-------------------COUNTER & REG------------------*/
 
@@ -155,7 +153,6 @@ int ant_set_scm_time_cnt(u64 regvalue);
 
 int ant_get_sent_time_cnt(u64 *regvalue);
 int ant_get_sent_time_reg(u64 *regvalue);
-int ant_get_wr_soft_rst(u64 *regvalue);
 int ant_get_sent_rate_cnt(u64 *regvalue);
 int ant_get_sent_rate_reg(u64 *regvalue);
 int ant_get_lat_pkt_cnt(u64 *regvalue);

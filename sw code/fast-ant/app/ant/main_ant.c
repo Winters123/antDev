@@ -138,8 +138,10 @@ struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata
 	}
 
 	ant_print_counters(*demo_cnt);
+	printf("test finished\n");
 	
 	free(demo_cnt);
+	ant_rst();
 	
 	return 0;
 }

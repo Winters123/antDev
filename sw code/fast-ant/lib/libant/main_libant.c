@@ -58,18 +58,6 @@ int ant_collect_counters(struct ant_cnt *outc)
 	return 0;
 }
 
-/**
- * using softwre reset to rst PGM and SCM module of ANT
- * @return 0 if success
- */
-int ant_rst()
-{
-	fast_ua_hw_wr(PGM_WR_MID, WR_SOFT_RST, 1, MASK_1);
-	fast_ua_hw_wr(PGM_RD_MID, RD_SOFT_RST, 1, MASK_1);
-	fast_ua_hw_wr(SCM_MID, SCM_SOFT_RST, 1, MASK_1);
-
-	return 0;
-}
 
 /**
  * check the hw module of ANT to see if all the modules are waiting for software reset
@@ -123,7 +111,7 @@ int ant_pkt_send(struct fast_packet *pkt, int pkt_len)
  * @param  pkt_len [the length of model packet]
  * @return         [final throughput of the tested port]
  */
-/*u32 ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnt, u32 sent_rate, u64 test_time)
+u32 ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnt, u32 sent_rate, u64 test_time)
 {
 	int rnt_cnt;
 	u32 sent_rate_low = 0, sent_rate_high = sent_rate;
@@ -167,7 +155,7 @@ int ant_pkt_send(struct fast_packet *pkt, int pkt_len)
 	return antp.sent_rate;
 
 }
-*/
+
 
 /**
  * conduct latency test, obtain packets with timestamp on the packet
@@ -196,6 +184,33 @@ void ant_print_counters(struct ant_cnt a_cnt){
 
 	printf("-----------------------***ANT COUNTERS***-----------------------\n");
 }
+
+/**
+ * reset the hw pipeline in order to enable next text round
+ * @return [0 if success, else failure]
+ */
+int ant_rst(){
+	//reset PGM module
+	u32 rd_state = fast_ua_hw_rd(PGM_RD_MID, RD_STATE, MASK_1);
+	if (rd_state == 16){
+		if(ant_set_rd_soft_rst(1) != 0)
+			return -1;
+		if(ant_set_rd_soft_rst(0) != 0)
+			return -1;
+	}
+	//reset SCM module
+	u32 scm_state = fast_ua_hw_rd(SCM_MID, SCM_STATE, MASK_1);
+	if (scm_state == SCM_FETCH_S) {
+		if (ant_set_scm_soft_rst(1) != 0){
+			return -1;
+		}
+		if (ant_set_scm_soft_rst(0) != 0){
+			return -1;
+		}
+	}
+	return 0;
+}
+
 
 /*---------------------------------ANT CORE FUNCTION ----------------------------*/
 
@@ -230,13 +245,6 @@ int ant_set_sent_time_reg(u64 regvalue)
 	fast_ua_hw_wr(PGM_WR_MID, SENT_TIME_REG, regvalue_tmp_high, MASK_1);
 	fast_ua_hw_wr(PGM_WR_MID, SENT_TIME_REG - 1, regvalue_tmp_low, MASK_1);
 
-	return 0;
-}
-
-int ant_set_wr_soft_rst(u64 regvalue)
-{
-	u32 regvalue_tmp = (u32) regvalue;
-	fast_ua_hw_wr(PGM_WR_MID, WR_SOFT_RST, regvalue_tmp, MASK_1);
 	return 0;
 }
 
@@ -358,16 +366,7 @@ int ant_set_scm_pkt_cnt(u64 regvalue)
 }
 
 
-int ant_set_scm_time_cnt(u64 regvalue)
-{
-	u32 regvalue_tmp_high = ((u32) regvalue>>32);
-	u32 regvalue_tmp_low =  ((u32) regvalue);
 
-	fast_ua_hw_wr(SCM_MID, SCM_TIME_CNT, regvalue_tmp_high, MASK_1);
-	fast_ua_hw_wr(SCM_MID, SCM_TIME_CNT - 1, regvalue_tmp_low, MASK_1);
-
-	return 0;
-}
 /*---------------------------------SET REG & COUNTERS----------------------------*/
 
 
@@ -397,14 +396,6 @@ int ant_get_sent_time_reg(u64 *regvalue)
 
 	*regvalue = (u64)(regvalue_tmp_high<<32) + (u64)regvalue_tmp_low;
 
-	return 0;
-}
-
-
-int ant_get_wr_soft_rst(u64 *regvalue)
-{
-	u32 regvalue_tmp = fast_ua_hw_rd(PGM_WR_MID, WR_SOFT_RST, MASK_1);
-	*regvalue = regvalue_tmp;
 	return 0;
 }
 
