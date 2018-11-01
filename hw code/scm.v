@@ -23,6 +23,7 @@ module scm #(
     input in_scm_md_wr,
     output wire out_scm_md_alf,
 
+
     input [1023:0] in_scm_phv,
     input in_scm_phv_wr,
     output wire out_scm_phv_alf,
