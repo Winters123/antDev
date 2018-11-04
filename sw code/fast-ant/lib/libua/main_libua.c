@@ -270,6 +270,7 @@ u32 fast_ua_hw_rd(u8 dmid,u32 addr,u32 mask)
 	{
 		printf("fast_um_rd send pkt Err!\n");
 	}
+	//print_pkt(pkt, sizeof(struct ctl_metadata));
 	while(pkt->cm.reserve == 1)
 	{
 		usleep(20);

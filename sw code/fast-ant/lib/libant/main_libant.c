@@ -32,7 +32,7 @@
 #define PGM_WR_MID  61
 #define PGM_RD_MID  62
 
-#define MASK_1      0xFFFFFFFF
+#define MASK_1      0x0
 
 
 /*---------------------------------ANT CORE FUNCTION ----------------------------*/
@@ -43,11 +43,17 @@
  */
 int ant_collect_counters(struct ant_cnt *outc)
 {
-	u64 test_time = ((u64)fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_CNT, MASK_1))<<32 + (u64)fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_CNT-1, MASK_1);
-	u64 sent_bits = ((u64)fast_ua_hw_rd(PGM_RD_MID, SENT_BIT_CNT, MASK_1))<<32 + (u64)fast_ua_hw_rd(PGM_RD_MID, SENT_BIT_CNT-1, MASK_1);
-	u64 sent_pkts = ((u64)fast_ua_hw_rd(PGM_RD_MID, SENT_PKT_CNT, MASK_1))<<32 + (u64)fast_ua_hw_rd(PGM_RD_MID, SENT_PKT_CNT-1, MASK_1);
-	u64 recv_bits = ((u64)fast_ua_hw_rd(SCM_MID, SCM_BIT_CNT, MASK_1))<<32 + (u64)fast_ua_hw_rd(SCM_MID, SCM_BIT_CNT-1, MASK_1);
-	u64 recv_pkts = ((u64)fast_ua_hw_rd(SCM_MID, SCM_PKT_CNT, MASK_1))<<32 + (u64)fast_ua_hw_rd(SCM_MID, SCM_PKT_CNT-1, MASK_1);
+	u64 test_time = ((u64)fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_REG, MASK_1)<<32) + fast_ua_hw_rd(PGM_WR_MID, SENT_TIME_REG-1, MASK_1);
+
+	//printf("test_time = %llx\n", test_time);
+	u64 sent_bits = ((u64)fast_ua_hw_rd(PGM_RD_MID, SENT_BIT_CNT, MASK_1)<<32) + fast_ua_hw_rd(PGM_RD_MID, SENT_BIT_CNT-1, MASK_1);
+	//printf("test_time = %llx\n", sent_bits);
+	u64 sent_pkts = ((u64)fast_ua_hw_rd(PGM_RD_MID, SENT_PKT_CNT, MASK_1)<<32) + fast_ua_hw_rd(PGM_RD_MID, SENT_PKT_CNT-1, MASK_1);
+	//printf("test_time = %llx\n", sent_pkts);
+	u64 recv_bits = ((u64)fast_ua_hw_rd(SCM_MID, SCM_BIT_CNT, MASK_1)<<32) + fast_ua_hw_rd(SCM_MID, SCM_BIT_CNT-1, MASK_1);
+	//printf("test_time = %llx\n", recv_bits);
+	u64 recv_pkts = ((u64)fast_ua_hw_rd(SCM_MID, SCM_PKT_CNT, MASK_1)<<32) + fast_ua_hw_rd(SCM_MID, SCM_PKT_CNT-1, MASK_1);
+	//printf("test_time = %llx\n", recv_pkts);
 	
 	outc->test_time = test_time;
 	outc->sent_bits = sent_bits;
@@ -65,7 +71,7 @@ int ant_collect_counters(struct ant_cnt *outc)
  */
 int ant_check_finish()
 {
-	if(fast_ua_hw_rd(PGM_RD_MID, ANT_HW_STATE, MASK_1) == PGM_RD_FIN_S){
+	if(fast_ua_hw_rd(PGM_RD_MID, ANT_HW_STATE, MASK_1) == 0x910){
 		return 0;
 	}
 	else 
@@ -166,11 +172,11 @@ u32 ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnt, u32 
 void ant_print_counters(struct ant_cnt a_cnt){
 	printf("-----------------------***ANT COUNTERS***-----------------------\n");
 
-	printf("Test Time:\t%lu\n", a_cnt.test_time);
-	printf("Sent Pkt Bits:\t%lu\t\n", a_cnt.sent_bits);
-	printf("Sent Pkt Num:\t%lu\t\n", a_cnt.sent_pkts);
-	printf("Recv Pkt Bits:\t%lu\t\n", a_cnt.recv_bits);
-	printf("Recv Pkt Num:\t%lu\n", a_cnt.recv_pkts);
+	printf("Test Time:\t%llu *10ns\n", a_cnt.test_time);
+	printf("Sent Pkt Bytes:\t%llu\t Bytes\n", a_cnt.sent_bits);
+	printf("Sent Pkt Num:\t%llu\t\n", a_cnt.sent_pkts);
+	printf("Recv Pkt Bytes:\t%llu\t Bytes\n", a_cnt.recv_pkts*66);
+	printf("Recv Pkt Num:\t%llu\n", a_cnt.recv_pkts);
 
 	printf("-----------------------***ANT COUNTERS***-----------------------\n");
 }
@@ -182,11 +188,14 @@ void ant_print_counters(struct ant_cnt a_cnt){
 int ant_rst(){
 	//reset PGM module
 	u32 rd_state = fast_ua_hw_rd(PGM_RD_MID, RD_STATE, MASK_1);
-	if (rd_state == 16){
+	if (rd_state == 0x910){
 		if(ant_set_rd_soft_rst(1) != 0)
 			return -1;
 		if(ant_set_rd_soft_rst(0) != 0)
 			return -1;
+		fast_ua_hw_wr(SCM_MID, 0x70000001, 1, MASK_1);
+		fast_ua_hw_wr(SCM_MID, 0x70000001, 0, MASK_1);
+
 	}
 	else {
 		return -1;
@@ -200,17 +209,26 @@ int ant_rst(){
  */
 int import_latency_to_txt(){
 
-	FILE * fid = fopen("../../app/ant/latency_out.txt", 'w');
+	FILE * fid = fopen("latency_out", "w");
 	if (fid == NULL){
 		printf("write latency_out.txt error!\n");
 		return -1;
 	}
-	int i;
+	fprintf(fid, "/*****************latency test result****************/\n");
+	fprintf(fid, "                                           Unit *10ns \n");
+	int i, j=0;
 	u32 in_file_latency = 0;
 	for (i = 0; i < 1023; i++){
 		in_file_latency = fast_ua_hw_rd(SCM_MID, SCM_RAM_ADDR + i, MASK_1);
-		fprintf(fid, "the %d latency: %u\n", i, in_file_latency);
+		fprintf(fid, "%d round: %u\t", i, in_file_latency);
+		j++;
+		if(j == 5){
+			fprintf(fid, "\n");
+			j = 0;
+		}
 	}
+
+	fprintf(fid, "/*****************latency test result****************/\n");
 	fclose(fid);
 	printf("latency_out.txt generated!\n");
 	return 0;
@@ -243,8 +261,10 @@ int ant_set_sent_time_cnt(u64 regvalue)
  */
 int ant_set_sent_time_reg(u64 regvalue)
 {
-	u32 regvalue_tmp_high = ((u32) regvalue>>32);
+	u32 regvalue_tmp_high = regvalue>>32;
+	printf("regvalue tmp high = %lx\n", regvalue_tmp_high);
 	u32 regvalue_tmp_low  = ((u32) regvalue);
+	printf("regvalue tmp low = %lx\n", regvalue_tmp_low);
 
 	fast_ua_hw_wr(PGM_WR_MID, SENT_TIME_REG, regvalue_tmp_high, MASK_1);
 	fast_ua_hw_wr(PGM_WR_MID, SENT_TIME_REG - 1, regvalue_tmp_low, MASK_1);
@@ -328,6 +348,7 @@ int ant_set_proto_type(u64 regvalue)
 {
 	u32 regvalue_tmp = (u32) regvalue;
 	fast_ua_hw_wr(SCM_MID, PROTO_TYPE, regvalue_tmp, MASK_1);
+	return 0;
 }
 
 
@@ -335,6 +356,7 @@ int ant_set_scm_soft_rst(u64 regvalue)
 {
 	u32 regvalue_tmp = (u32) regvalue;
 	fast_ua_hw_wr(SCM_MID, SCM_SOFT_RST, regvalue_tmp, MASK_1);
+	return 0;
 }
 
 
