@@ -28,14 +28,15 @@
 #include "../../include/fast.h"
 
 
-#define ANT_MID 130
+#define ANT_MID 140
 
 int callback(struct fast_packet *pkt,int pkt_len)
 {
+	printf("/****************************debug1*****************/\n");
 	print_pkt(pkt, pkt_len);
+	printf("/****************************debug1*****************/\n");
 	return 0;
 }
-
 void ua_init(u8 mid)
 {
 	int ret = 0;
@@ -54,19 +55,23 @@ int main(int argc, char* argv[])
 
 	/**ant_parameter is used in pgm*/
 	struct ant_parameter demo_parameter;
-	struct ant_cnt *demo_cnt = (struct ant_cnt *)malloc(sizeof(struct ant_cnt));
+	struct ant_cnt demo_cnt;
+	struct ant_cnt *demo_cnt_p = &demo_cnt;
+	//struct ant_cnt *demo_cnt = (struct ant_cnt *)malloc(sizeof(struct ant_cnt));
 
 	ua_init(ANT_MID);
+
+	fast_ua_recv();
 
 	/**set test parameters*/
 	demo_parameter.sent_time = 0x10001000; //0x100010000 is about 3 seconds
 	demo_parameter.sent_rate = 0x00001000; //about 6.5ms send a pkt
-	demo_parameter.proto_type = 0x07; //ipv4_udp
+	demo_parameter.proto_type = 0x2; //ipv4_udp
 
 	/*************no need for these 3 parameters****************/
 	demo_parameter.lat_pkt = 0; 
 	demo_parameter.lat_flag = 0; //disable latency test
-	demo_parameter.n_rtt = 0x00010000; //wait about 6.5ms after sending the last pkt.
+	demo_parameter.n_rtt = 0x0001000; //wait about 6.5ms after sending the last pkt.
 	/*************no need for these 3 parameters****************/
 	
 	if(ant_set_test_para(demo_parameter)){
@@ -83,12 +88,7 @@ struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata
 	pkt->um.dstmid = 1;
 	pkt->um.len = sizeof(struct um_metadata)+66;
 	int i;
-	/*
-	for(i=0;i<1400;i++){
-		pkt->data[i] = 'c';
-	}
-	*/
-	
+
 	//construct a packet
 	pkt->data[0] = 0xf0;
 	pkt->data[1] = 0xde;
@@ -133,29 +133,23 @@ struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata
 	ant_pkt_send(pkt, pkt->um.len); //trigger ANT to start/
 
 	usleep(demo_parameter.sent_time/100);
-	//printf("debug2\n");
-	
+
 	/**only jump out of while if test is finished*/
 	while(ant_check_finish()!=0){
-		printf("the final is %d\n", ant_check_finish());
+		printf("the final is %d\n", 1);
 		sleep(1);
 	}
-
-	if(ant_collect_counters(demo_cnt)){
+	if(ant_collect_counters(demo_cnt_p)){
 		printf("test result obtaining error!\n");
 		return -1;
 	}
 	/**obtain all the counter values in hw*/
-	ant_print_counters(*demo_cnt);
+	ant_print_counters(demo_cnt);
 	printf("test finished\n");
-	
-	free(demo_cnt);
-
-	/**write letancy into file*/
-	import_latency_to_txt();
 	
 	/**reset ant to enble next test round*/
 	ant_rst();
-	
+	/**write letancy into file*/
+	import_latency_to_txt();
 	return 0;
 }
