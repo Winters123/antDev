@@ -220,7 +220,8 @@ int import_latency_to_txt(){
 	u32 in_file_latency = 0;
 	for (i = 0; i < 1023; i++){
 		in_file_latency = fast_ua_hw_rd(SCM_MID, SCM_RAM_ADDR + i, MASK_1);
-		fprintf(fid, "%d round: %u\t", i, in_file_latency);
+		usleep(1);
+		fprintf(fid, "%04d round: %uns\t", i, (in_file_latency*10-2680));
 		j++;
 		if(j == 5){
 			fprintf(fid, "\n");
@@ -228,7 +229,7 @@ int import_latency_to_txt(){
 		}
 	}
 
-	fprintf(fid, "/*****************latency test result****************/\n");
+	fprintf(fid, "\n/*****************latency test result****************/\n");
 	fclose(fid);
 	printf("latency_out.txt generated!\n");
 	return 0;
