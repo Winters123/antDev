@@ -64,14 +64,15 @@ int main(int argc, char* argv[])
 	fast_ua_recv();
 
 	/**set test parameters*/
-	demo_parameter.sent_time = 0x10001000; //0x100010000 is about 3 seconds
+	demo_parameter.sent_time = 0x165a0bc00; //about 100 seconds
 	demo_parameter.sent_rate = 0x00001000; //about 6.5ms send a pkt
+	//demo_parameter.sent_rate = 0x59c1f1; //about sending 1000 pkts per min
 	demo_parameter.proto_type = 0x2; //ipv4_udp
 
 	/*************no need for these 3 parameters****************/
 	demo_parameter.lat_pkt = 0; 
 	demo_parameter.lat_flag = 0; //disable latency test
-	demo_parameter.n_rtt = 0x0001000; //wait about 6.5ms after sending the last pkt.
+	demo_parameter.n_rtt = 0x0004000; //wait about 6.5ms after sending the last pkt.
 	/*************no need for these 3 parameters****************/
 	
 	if(ant_set_test_para(demo_parameter)){
@@ -79,29 +80,29 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata)+66);
+struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata)+140);
 	pkt->um.flowID = 3;
 	pkt->um.seq = 4;
 	pkt->um.outport = 1;
 	/**set priority as 3'b111 to enable ANT hw pipeline*/
 	pkt->um.priority = 7;
 	pkt->um.dstmid = 1;
-	pkt->um.len = sizeof(struct um_metadata)+66;
+	pkt->um.len = sizeof(struct um_metadata)+140;
 	int i;
 
 	//construct a packet
-	pkt->data[0] = 0xf0;
-	pkt->data[1] = 0xde;
-	pkt->data[2] = 0xf1;
-	pkt->data[3] = 0x31;
-	pkt->data[4] = 0x7b;
-	pkt->data[5] = 0xc5;
+	pkt->data[0] = 0x11;
+	pkt->data[1] = 0x22;
+	pkt->data[2] = 0x33;
+	pkt->data[3] = 0x44;
+	pkt->data[4] = 0x55;
+	pkt->data[5] = 0x66;
 	pkt->data[6] = 0x00;
 	pkt->data[7] = 0x21;
 	pkt->data[8] = 0x85;
 	pkt->data[9] = 0xc5;
 	pkt->data[10] = 0x2b;
-	pkt->data[11] = 0x8f;
+	pkt->data[11] = 0x08;
 	pkt->data[12] = 0x08;
 	pkt->data[13] = 0x00;
 	pkt->data[14] = 0x45;
@@ -126,7 +127,7 @@ struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata
 	pkt->data[33] = 0x15;
 	
 	//i;
-	for(i=34; i<66; i++ ){
+	for(i=34; i<140; i++ ){
 		pkt->data[i] = 0xff;
 	}
 	//send packet to trigger ANT pipeline
