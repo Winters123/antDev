@@ -60,7 +60,7 @@ module gme #(
 	 
 //transport key to lookup
     output reg out_gme_key_wr,
-    (*mark_debug = "true"*)output reg [511:0] out_gme_key,
+    output reg [511:0] out_gme_key,
     input in_gme_key_alf,
 //localbus to gme
     input cfg2gme_cs_n, //low active
@@ -161,68 +161,61 @@ always @(posedge clk or negedge rst_n) begin
 		index_fifo_rd<=1'b0;
 		md_flag<=1'b0;
     end 
-    else begin 
-		case(md_phv_state)
-		    md_phv_idle:begin
-			 MD_fifo_rd<=1'b0;
-             out_gme_md <= 256'b0;
-             out_gme_md_wr <= 1'b0;
-			 md_flag<=1'b0;
-			 PHV_fifo_rd <= 1'b0;
-             out_gme_phv <= 1024'b0;	
-		     out_gme_phv_wr<=1'b0;
-			 out_gme_md_reg<=256'b0;
 
-			 index_fifo_rd<=1'b0;
-			if((MD_fifo_empty == 1'b0)&&(PHV_fifo_empty == 1'b0))begin			   
-                if(MD_fifo_rdata[87:80] == LMID) begin 
-					if(index_fifo_empty==1'b0)begin
-					    MD_fifo_rd<=1'b1;
-						index_fifo_rd<=1'b1;
-			            PHV_fifo_rd <= 1'b1;	
-                        out_gme_md_reg <= {MD_fifo_rdata[255:88],NMID,MD_fifo_rdata[79:0]};	
-                        md_flag<=1'b1;	
-						md_phv_state<=md_phv_data;
-                    end
-                    else begin
-					    md_phv_state<=md_phv_idle;
+    else begin
+    	case(md_phv_state)
+    		md_phv_idle: begin
+				if((MD_fifo_empty == 1'b0) && (PHV_fifo_empty == 1'b0)) begin
+
+					out_gme_phv <= 1024'b0;	
+					out_gme_phv_wr<=1'b0;
+		        	out_gme_md <= 256'b0;
+		        	out_gme_md_wr <= 1'b0;
+
+					if(index_fifo_empty == 1'b0)begin
+						MD_fifo_rd <= 1'b1;
+						index_fifo_rd <= 1'b1;
+						PHV_fifo_rd <= 1'b1;
+						md_phv_state <= md_phv_data;
 					end
-			    end
-				else begin
-					MD_fifo_rd<=1'b1;
-			        PHV_fifo_rd <= 1'b1;
-				    out_gme_md_reg <= 256'b0;
-					md_flag<=1'b0;
-					md_phv_state<=md_phv_data;					
+
+					else begin
+						md_phv_state <= md_phv_idle;
+					end
 				end
+				else begin
+					MD_fifo_rd<=1'b0;
+		        	out_gme_md <= 256'b0;
+		        	out_gme_md_wr <= 1'b0;
+					md_flag<=1'b0;
+					PHV_fifo_rd <= 1'b0;
+		        	out_gme_phv <= 1024'b0;	
+					out_gme_phv_wr<=1'b0;
+					out_gme_md_reg<=256'b0;
+					index_fifo_rd <= 1'b0;
+					md_phv_state <= md_phv_idle;
+				end
+			end
+
+			md_phv_data: begin
+				MD_fifo_rd<=1'b0;
+				PHV_fifo_rd <= 1'b0;
+				index_fifo_rd<=1'b0;
 				
-			end
-			else begin
-			   md_phv_state<=md_phv_idle;
-			end
-		end
-		md_phv_data:begin
-		    MD_fifo_rd<=1'b0;
-			PHV_fifo_rd <= 1'b0;
-			index_fifo_rd<=1'b0;
-		    if(md_flag==1'b0)begin  //just trans
-                out_gme_md <= MD_fifo_rdata;
-                out_gme_md_wr <= 1'b1;
 				out_gme_phv <= PHV_fifo_rdata;
-		        out_gme_phv_wr<=1'b1; 
-				md_phv_state<=md_phv_idle;
+				out_gme_phv_wr <= 1'b1;
+				out_gme_md <= {MD_fifo_rdata[255:88],NMID,MD_fifo_rdata[79:64],index_fifo_rdata[12:0],1'b1,MD_fifo_rdata[49:0]};
+				out_gme_md_wr <= 1'b1;
+
+				md_phv_state <= md_phv_idle;
+
 			end
-			else begin			  
-                    out_gme_md <= {out_gme_md_reg[255:64],index_fifo_rdata[12:0],1'b1,out_gme_md_reg[49:0]}; //use MD[63:50] to store index
-                    out_gme_md_wr <= 1'b1;
-					out_gme_phv <= PHV_fifo_rdata;
-		            out_gme_phv_wr<=1'b1; 
-					md_phv_state<=md_phv_idle;			
-			end
-		end
-		default:md_phv_state<=md_phv_idle;
-		endcase
-	end							      
+
+			default: md_phv_state <= md_phv_idle;
+
+			endcase
+	end
+			    							      
 end 
 
 //***************************************************

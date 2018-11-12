@@ -69,7 +69,8 @@ module um #(
     input ctrl_cmd,//ctrl2um_rd_wr,//0 write 1:read
     input [31:0] ctrl_datain,//ctrl2um_data_in,
     input [31:0] ctrl_addr,//ctrl2um_addr,
-    output reg [31:0] ctrl_dataout//um2ctrl_data_out
+    output reg [31:0] ctrl_dataout, //um2ctrl_data_out
+    output reg [31:0] um_timer
  
 );
     
@@ -480,7 +481,17 @@ always @(posedge clk or negedge rst_n) begin
     end
 end
 
-
+//***************************************************
+//                  UM Timer
+//***************************************************
+always @(posedge clk or negedge rst_n) begin
+    if (rst_n == 1'b0) begin
+        um_timer <= 32'b0;
+    end
+    else begin
+        um_timer <= um_timer + 32'b1;
+    end
+end
 
 //***************************************************
 //                  Module Instance
@@ -608,7 +619,7 @@ gke #(
 gme #(
     .PLATFORM(PLATFORM),
     .LMID(3),
-    .NMID(4)
+    .NMID(7)
     )gme (
     .clk(clk),
     .rst_n(rst_n),
@@ -661,7 +672,7 @@ gme #(
 scm #(
     .PLATFORM(PLATFORM),
     .LMID(7),
-    .NMID(5)
+    .NMID(4)
 )scm (
     .clk(clk),
     .rst_n(rst_n),
@@ -696,14 +707,16 @@ scm #(
     //output configure pkt to next module
     .cout_scm_data(cout_scm_data),
     .cout_scm_data_wr(cout_scm_data_wr),
-    .cin_scm_ready(cin_scm_ready)
+    .cin_scm_ready(cin_scm_ready),
 
+    //UM to SCM timestamp
+    .um2scm_timestamp(um_timer)
 );
     
 gac #(
     .PLATFORM(PLATFORM),
     .LMID(4),
-    .NMID(5)
+    .NMID(6)
 )gac (
     .clk(clk),
     .rst_n(rst_n),
@@ -807,7 +820,10 @@ pgm #(
 //output configure pkt to next module
     .cout_pgm_data(cout_pgm_data),
     .cout_pgm_data_wr(cout_pgm_data_wr),
-    .cin_pgm_ready(cin_pgm_ready)
+    .cin_pgm_ready(cin_pgm_ready),
+
+    //UM to PGM timestamp
+    .um2pgm_timestamp(um_timer)
 );
 
 

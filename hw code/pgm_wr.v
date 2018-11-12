@@ -26,8 +26,8 @@
 
 module pgm_wr #(
 	parameter PLATFORM = "Xilinx",
-	LMID = 8'd62, //set MID
-	DMID = 8'd6  //next MID
+	LMID = 8'd61, //set MID
+	DMID = 8'd62  //next MID
 )(
 	input clk,
 	input rst_n,
@@ -103,7 +103,7 @@ assign cout_wr_ready = cin_wr_ready;
 assign out_wr_sent_time_reg = sent_time_reg;
 
 
-(*mark_debug="true"*)reg [4:0] pgm_wr_state;
+reg [4:0] pgm_wr_state;
 
 //***************************************************
 //             Pkt Store & Transmit
@@ -261,7 +261,7 @@ always @(posedge clk or negedge rst_n) begin
 					sent_time_cnt <= sent_time_cnt + 1'b1;
 				end
 				else begin
-					wr2ram_wdata <= {10'b0, in_wr_data};
+					//wr2ram_wdata <= {10'b0, in_wr_data};
 					pgm_sent_finish_flag <= 1'b1;
 					pgm_wr_state <= IDLE_S;
 				end
