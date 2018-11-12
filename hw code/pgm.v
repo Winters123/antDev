@@ -65,14 +65,17 @@ module pgm #(
 
 
 //input configuree pkt from DMA
-	(*mark_debug = "true"*)input [133:0] cin_pgm_data,
-	(*mark_debug = "true"*)input cin_pgm_data_wr,
+	input [133:0] cin_pgm_data,
+	input cin_pgm_data_wr,
 	output cout_pgm_ready,
 
 //output configure pkt to next module
-	(*mark_debug = "true"*)output [133:0] cout_pgm_data,
-	(*mark_debug = "true"*)output cout_pgm_data_wr,
-	input cin_pgm_ready
+	output [133:0] cout_pgm_data,
+	output cout_pgm_data_wr,
+	input cin_pgm_ready,
+
+	//timestamp from UM
+	input [31:0] um2pgm_timestamp
 
 );
 
@@ -242,7 +245,10 @@ pgm_rd #(
     .cout_rd_data(cout_pgm_data),
 	.cout_rd_data_wr(cout_pgm_data_wr),
 	.cin_rd_ready(cin_pgm_ready),
-	.in_rd_sent_time_reg(wr2rd_sent_time_reg)
+	.in_rd_sent_time_reg(wr2rd_sent_time_reg),
+
+	//timestamp to rd
+	.timestamp2rd(um2pgm_timestamp)
 );
 
 endmodule 

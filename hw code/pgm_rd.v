@@ -74,7 +74,10 @@ module pgm_rd #(
 	output reg cout_rd_data_wr,
 	input cin_rd_ready,
 //input sent_time_reg from pgm_wr
-	input [63:0] in_rd_sent_time_reg
+	input [63:0] in_rd_sent_time_reg,
+
+	//timestamp
+	input [31:0] timestamp2rd
 
 );
 
@@ -101,15 +104,14 @@ assign out_rd_alf = in_rd_alf;
 assign out_rd_phv_alf = in_rd_phv_alf;
 assign cout_rd_ready = cin_rd_ready;
 
-(*mark_debug="true"*)reg [5:0] pgm_rd_state;
+reg [5:0] pgm_rd_state;
 
 reg ctl_write_flag;  //if its a write signal that the destination is it self, we set it as 1, otherwise we set it as 0
 
 
 /**add cycle counters for test pkts*/
 reg [10:0] pkt_cycle_cnt;
-reg [31:0] sent_time_stamp;
-
+//reg [31:0] sent_time_stamp;
 
 
 //***************************************************
@@ -153,7 +155,7 @@ always @(posedge clk or negedge rst_n) begin
 
 		//this is only used for antDev v2
 		pkt_cycle_cnt <= 11'b0;
-		sent_time_stamp <= 32'b0;
+		//sent_time_stamp <= 32'b0;
 
 		pgm_rd_state <= IDLE_S;
 		
@@ -212,7 +214,7 @@ always @(posedge clk or negedge rst_n) begin
 
 					//only used in antDev v2
 					pkt_cycle_cnt <= 11'b0;
-					sent_time_stamp <= 32'b0;
+					//sent_time_stamp <= 32'b0;
 
 					pgm_rd_state <= IDLE_S;
 				end
@@ -255,7 +257,7 @@ always @(posedge clk or negedge rst_n) begin
 				rd2ram_addr <= 7'b1;
 				pgm_rd_state <= HAUNT2_S;	
 
-				sent_time_stamp <= sent_time_stamp + 32'b1;
+				//sent_time_stamp <= sent_time_stamp + 32'b1;
 			end
 
 			HAUNT2_S: begin
@@ -279,7 +281,7 @@ always @(posedge clk or negedge rst_n) begin
 					sent_time_cnt <= sent_time_cnt + 1'b1;
 
 					//only needed in antDev v2
-					sent_time_stamp <= sent_time_stamp + 32'b1;
+					//sent_time_stamp <= sent_time_stamp + 32'b1;
 				end
 				
 
@@ -291,7 +293,7 @@ always @(posedge clk or negedge rst_n) begin
 				sent_time_cnt <= sent_time_cnt + 1'b1;
 
 				//only needed in antDev v2
-				sent_time_stamp <= sent_time_stamp + 32'b1;
+				//sent_time_stamp <= sent_time_stamp + 32'b1;
 
 				if(ram2rd_rdata[133:132] == 2'b11) begin
 
@@ -305,9 +307,9 @@ always @(posedge clk or negedge rst_n) begin
 					pgm_rd_state <= READ_S;
 
 					//only used in antDev v2
-					if (pkt_cycle_cnt == 11'd4) begin
+					if (pkt_cycle_cnt == 11'd3) begin
 						// only needed in antDev v2
-						out_rd_data <= {ram2rd_rdata[133:128], sent_pkt_cnt, sent_time_stamp, 32'hffffffff};
+						out_rd_data <= {ram2rd_rdata[133:128], sent_pkt_cnt, timestamp2rd, 32'hffffffff};
 						out_rd_data_wr <= 1'b1;
 						out_rd_valid <= 1'b0;
 						out_rd_phv <= 1024'b0;
@@ -391,7 +393,7 @@ always @(posedge clk or negedge rst_n) begin
 
 
 				//only needed in antDev v2
-				sent_time_stamp <= sent_time_stamp + 32'b1;
+				//sent_time_stamp <= sent_time_stamp + 32'b1;
 
 				if(sent_rate_cnt==sent_rate_reg) begin
 					rd2ram_rd <= 1'b1;
@@ -480,7 +482,7 @@ end
 always @(posedge clk) begin
 	//1st cycle of control packet 
 	if(cin_rd_data[133:132] == 2'b01 && cin_rd_data_wr == 1'b1) begin
-		if ((cin_rd_data[103:96]== 8'd62) && (cin_rd_data[126:124] == 3'b010) && (rst_n==1'b1) && (soft_rst==1'b0)) begin
+		if ((cin_rd_data[103:96]== 8'd62) && (cin_rd_data[126:124] == 3'b010) && (rst_n==1'b1)) begin
 			//write signal from SW
 			
 			case(cin_rd_data[95:64])

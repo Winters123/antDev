@@ -35,8 +35,8 @@ module gpp #(
     input rst_n,
 	
 //receive pkt from cpu or port
-    input pktin_data_wr,
-    input [133:0] pktin_data,
+    (*mark_debug = "true"*)input pktin_data_wr,
+    (*mark_debug = "true"*)input [133:0] pktin_data,
     input pktin_valid_wr,
     input pktin_data_valid,
     output pktin_ready,  	
@@ -106,7 +106,7 @@ wire is_ipv6_udp;
 wire is_ipv6_lisp;
 wire is_arp;
 
-(*mark_debug = "true"*)reg [1:0] gpp_state;
+reg [1:0] gpp_state;
 reg flag;       
 //***************************************************
 //             Retransmit Pkt To Data_Cache
