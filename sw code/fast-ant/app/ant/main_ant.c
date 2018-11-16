@@ -51,21 +51,42 @@ void ua_init(u8 mid)
 
 int main(int argc, char* argv[])
 {
+	
+	/*obtain sent parameters*/
+	int arg_sent_time, arg_sent_rate, arg_pkt_length, arg_sent_port;
+	if(argc != 5){
+		printf("Usage:\n\t:sent_time(s) sent_rate(10ns), pkt_length(64,1500), sent_port(0,3)\n");
+		return -1;
+	}
+	else{
+		sscanf(argv[1], "%d", &arg_sent_time);
+		sscanf(argv[2], "%d", &arg_sent_rate);
+		sscanf(argv[3], "%d", &arg_pkt_length);
+		sscanf(argv[4], "%d", &arg_sent_port);
+	}
+
+	if(arg_sent_time<0 || arg_sent_port>3 || arg_sent_port<0 || arg_pkt_length<60){
+		printf("invalid input!\n");
+		return -1;
+	}
+	/*obtain sent parameters*/
 	u8 dmid = ANT_MID; 
 
 	/**ant_parameter is used in pgm*/
 	struct ant_parameter demo_parameter;
 	struct ant_cnt demo_cnt;
 	struct ant_cnt *demo_cnt_p = &demo_cnt;
-	//struct ant_cnt *demo_cnt = (struct ant_cnt *)malloc(sizeof(struct ant_cnt));
+
 
 	ua_init(ANT_MID);
 
 	fast_ua_recv();
 
 	/**set test parameters*/
-	demo_parameter.sent_time = 0x165a0bc00; //about 100 seconds
-	demo_parameter.sent_rate = 0x00001000; //about 6.5ms send a pkt
+	//demo_parameter.sent_time = 0x165a0bc00; //about 100 seconds
+	demo_parameter.sent_time = arg_sent_time*(100000000);
+	//demo_parameter.sent_rate = 0x00001000; //about 6.5ms send a pkt
+	demo_parameter.sent_rate = (arg_sent_rate>0x10000)?arg_sent_rate:0x10000;
 	//demo_parameter.sent_rate = 0x59c1f1; //about sending 1000 pkts per min
 	demo_parameter.proto_type = 0x2; //ipv4_udp
 
@@ -80,14 +101,15 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata)+140);
+	struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata)+arg_pkt_length);
 	pkt->um.flowID = 3;
 	pkt->um.seq = 4;
-	pkt->um.outport = 1;
+	//pkt->um.outport = 1;
+	pkt->um.outport = arg_sent_port;
 	/**set priority as 3'b111 to enable ANT hw pipeline*/
 	pkt->um.priority = 7;
 	pkt->um.dstmid = 1;
-	pkt->um.len = sizeof(struct um_metadata)+140;
+	pkt->um.len = sizeof(struct um_metadata)+arg_pkt_length;
 	int i;
 
 	//construct a packet
@@ -127,7 +149,7 @@ struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata
 	pkt->data[33] = 0x15;
 	
 	//i;
-	for(i=34; i<140; i++ ){
+	for(i=34; i<arg_pkt_length; i++ ){
 		pkt->data[i] = 0xff;
 	}
 	//send packet to trigger ANT pipeline
@@ -145,7 +167,7 @@ struct fast_packet *pkt = (struct fast_packet *)malloc(sizeof(struct um_metadata
 		return -1;
 	}
 	/**obtain all the counter values in hw*/
-	ant_print_counters(demo_cnt);
+	ant_print_counters(demo_cnt, arg_pkt_length);
 	printf("test finished\n");
 	
 	/**reset ant to enble next test round*/

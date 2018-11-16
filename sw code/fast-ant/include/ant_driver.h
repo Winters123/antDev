@@ -120,7 +120,7 @@ int  ant_set_test_para(struct ant_parameter antp); /**设置ANT测试参数*/
 //@TODO support latency test in the future
 //int  ant_latency_test(struct fast_packet *pkt, int pkt_len); /**测量平均时延*/
 
-void ant_print_counters(struct ant_cnt a_cnt);
+void ant_print_counters(struct ant_cnt a_cnt, int len);
 
 int import_latency_to_txt();
 
@@ -172,6 +172,6 @@ int ant_get_scm_soft_rst(u64 *regvalue);
 int ant_get_n_rtt(u64 *regvalue);
 int ant_get_scm_bit_cnt(u64 *regvalue);
 int ant_get_scm_pkt_cnt(u64 *regvalue);
-/*-------------------COUNTER & REG------------------*/
+/*-------------------COUNTER & REG-------------------*/
 
 #endif
