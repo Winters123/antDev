@@ -169,14 +169,18 @@ u32 ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnt, u32 
  * print the final counter values of the test
  * @param ant_cnt [description]
  */
-void ant_print_counters(struct ant_cnt a_cnt){
+void ant_print_counters(struct ant_cnt a_cnt, int len){
 	printf("-----------------------***ANT COUNTERS***-----------------------\n");
 
 	printf("Test Time:\t%llu *10ns\n", a_cnt.test_time);
 	printf("Sent Pkt Bytes:\t%llu\t Bytes\n", a_cnt.sent_bits);
 	printf("Sent Pkt Num:\t%llu\t\n", a_cnt.sent_pkts);
-	printf("Recv Pkt Bytes:\t%llu\t Bytes\n", a_cnt.recv_pkts*66);
-	printf("Recv Pkt Num:\t%llu\n", a_cnt.recv_pkts);
+	printf("Sent Pkt Rate:\t%llf\tKpps\n", (double)(a_cnt.sent_pkts*100000)/a_cnt.test_time);
+	printf("Sent Bit Rate:\t%llf\tMbps\n", (double)(a_cnt.sent_bits*100*8)/a_cnt.test_time);
+	printf("Recv Pkt Bytes:\t%llu\t Bytes\n", a_cnt.recv_pkts*len);
+	printf("Recv Pkt Num:\t%llu\n", a_cnt.recv_pkts+16);
+	printf("Recv Pkt Rate:\t%llf\tKpps\n",(double)(((a_cnt.recv_pkts+16)*100000)/a_cnt.test_time));
+	printf("Recv Bit Rate:\t%llf\tMbps\n",(double)((a_cnt.recv_pkts*len*8*100)/a_cnt.test_time));
 
 	printf("-----------------------***ANT COUNTERS***-----------------------\n");
 }
