@@ -1,4 +1,4 @@
-# ANT
+# ANT (Agile Network Tester)
 Agile Network Tester is a FPGA-CPUs based Network Tester based on [FAST](www.fastswitch.org). We write this to help people test the performance of network prototypes,
 when they don't have commercial testers at hand.
 
