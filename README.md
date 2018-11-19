@@ -7,7 +7,7 @@ the ANT v1 has been up online since 2018.11.7, welcome to use!
 Tips: ANT is aimming to be deployed on both Xilinx and Altera FPGAs, but we set Xilinx Zynq 7000 as the platform in ANT v1.  
 
 ### How to use
-Firstly, you need to clone `/App/BOOT.bin` and `/App/ant` into the directory of `/mnt` of the ARM core on Zynq. Then, insmod `openbox-s4.ko`, turn on the network port with `ifconfig xxx up`, reboot the OS and run `./ant` for hint. Then you may know how to use ANT (quite simple). 
+Firstly, you need to clone `/App/BOOT.bin` and `/App/ant` into the directory of `/mnt` of the ARM core on Zynq. Then, reboot the OS, insmod `openbox-s4.ko`, turn on the network port with `ifconfig xxx up` and run `./ant` for hint. Then you may know how to use ANT (quite simple). 
 
 After finish the test, the testing report will be seen on both the `terminal` and the file named `latency_out`. 
 
