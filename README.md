@@ -14,3 +14,5 @@ After finish the test, the testing report will be seen on both the `terminal` an
 Remember that ANT now is only used for **throughput/jitter/latency/drop-rate** test, We are working on **compiler back-end design to enable complex network function evaluation**. What's more, if you and your company have some interesting demands, please leave a comment in the `issues` and we are willing to support them in the next version of ANT to help as many people as we can.
 
 Let's see what ANT can do :)
+
+Tip: If you have any problem, please contact me nudtyxr@hotmail.com
