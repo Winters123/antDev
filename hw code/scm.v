@@ -1,10 +1,9 @@
 /** *************************************************************************
- *  @file          scm.v
- *  @brief      硬件统计模块
+ *  @file       scm.v
+ *  @brief      recording statistics of received pkts.
  * 
- *   此文件包括对测试报文信息的统计和
- * 
- *  @date       2018/10/24 10:53:51 星期�???
+ *  
+ *  @date       2018/10/24 10:53:51 
  *  @author     Jiang(Copyright  2018  Jiang Yue)
  *  @modified   Yang XR
  *  @email      <lang_jy@outlook.com>
@@ -119,7 +118,7 @@ always @(posedge clk or negedge rst_n) begin
                 NORMAL_S: begin
 
                     gac2scm_sent_start_dly <= gac2scm_sent_start;
-                    in_scm_phv_dly <= in_scm_phv;
+                    //in_scm_phv_dly <= in_scm_phv;
 
                     if (statistic_reset == 1'b1) begin
                         scm_bit_num_cnt <= 64'b0;
@@ -138,7 +137,7 @@ always @(posedge clk or negedge rst_n) begin
                             out_scm_md_wr <= 1'b1;
                             out_scm_phv_wr <= 1'b1;
                             out_scm_md <= {in_scm_md[255:88], NMID, in_scm_md[79:0]};
-                            out_scm_phv <= in_scm_phv_dly;
+
 
                             if (gac2scm_sent_start == 1'b1 && protocol_type == in_scm_md[79:72]) begin  //start to count
                                 scm_bit_num_cnt <= scm_bit_num_cnt + {52'b0, in_scm_md[107:96]};
@@ -155,7 +154,8 @@ always @(posedge clk or negedge rst_n) begin
                             out_scm_md_wr <= 1'b1;
                             out_scm_phv_wr <= 1'b1;
                             out_scm_md <= in_scm_md;
-                            out_scm_phv <= in_scm_phv_dly;
+                            out_scm_phv <= in_scm_phv;
+
                         end
                     end
 
@@ -185,7 +185,7 @@ localparam IDLE_CTL_S = 3'd0,
            WAIT_CTL_S = 3'd1,
            WAIT_CTL_S2 = 3'd4,
            RESP1_CTL_S = 3'd2,
-           RESP2_CTL_S = 3'd3;
+
 
 always @(posedge clk or negedge rst_n) begin
 
@@ -343,7 +343,7 @@ blk_mem_gen_0 scm_ram(
   .dina(time_latency),
   .douta(),
   .clkb(clk),
-  .enb(ram_latency_rd_en),
+  .enb(1'b1),
   .web(1'b0),
   .addrb(cin_scm_data[73:64]),
   .dinb(32'b0),

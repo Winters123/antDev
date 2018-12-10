@@ -16,7 +16,7 @@ ACTION_SET_QUEUE_RTP	.\include\fast_struct.h	/^		ACTION_SET_QUEUE_RTP = 5,\/**< 
 AMS_CLK	.\lib\libams\main_libams.c	39;"	d	file:
 AMS_MAX_PKTS	.\lib\libams\main_libams.c	38;"	d	file:
 AMS_VERSION	.\include\fast_version.h	68;"	d
-ANT_HW_STATE	.\include\ant_driver.h	74;"	d
+ANT_HW_STATE	.\include\ant_driver.h	77;"	d
 ANT_MID	.\app\ant\main_ant.c	31;"	d	file:
 BASE_ADDR	.\include\netmagic08.h	53;"	d
 BASE_ADDR	.\include\openboxS28.h	55;"	d
@@ -32,8 +32,8 @@ DARY_GRAY	.\lib\libofp\main_libofp.h	64;"	d
 DEBUG_VERSION	.\include\fast_version.h	84;"	d
 DESC_STR_LEN	.\lib\libofp\ofp_v4.h	819;"	d
 DIV_ROUND_UP	.\lib\libofp\main_libofp.h	131;"	d
-EPFX	.\include\fast.h	100;"	d
-EPFX	.\include\fast.h	105;"	d
+EPFX	.\include\fast.h	101;"	d
+EPFX	.\include\fast.h	106;"	d
 ETH_ALEN	.\lib\libofp\ofp_v4.h	80;"	d
 ETH_P_LLDP	.\lib\libofp\ofp_v4.h	/^	ETH_P_LLDP = 0x88CC,$/;"	e	enum:eth_packet_type
 ETH_P_XX	.\lib\libofp\ofp_v4.h	/^	ETH_P_XX = 0x8942,$/;"	e	enum:eth_packet_type
@@ -97,8 +97,8 @@ FAST_COUNTS_SNDBPKT	.\include\openboxS28.h	91;"	d
 FAST_COUNTS_SNDFERR	.\include\openboxS28.h	85;"	d
 FAST_COUNTS_SNDMPKT	.\include\openboxS28.h	90;"	d
 FAST_COUNTS_SNDSPKT	.\include\openboxS28.h	89;"	d
-FAST_DBG	.\include\fast.h	101;"	d
-FAST_DBG	.\include\fast.h	106;"	d
+FAST_DBG	.\include\fast.h	102;"	d
+FAST_DBG	.\include\fast.h	107;"	d
 FAST_DEBUG_DC_DATA_CACHE_STATUS	.\include\openboxS4.h	123;"	d
 FAST_DEBUG_DC_IN_DATA_CACHE_COUNT	.\include\openboxS4.h	124;"	d
 FAST_DEBUG_DC_OUT_DATA_CACHE_COUNT	.\include\openboxS4.h	125;"	d
@@ -142,8 +142,8 @@ FAST_DEFAULT_RULE_ADDR	.\include\openboxS28.h	36;"	d
 FAST_DEFAULT_RULE_ADDR	.\include\openboxS4.h	27;"	d
 FAST_DEFAULT_RULE_ADDR	.\include\xdl_debug.h	37;"	d
 FAST_DMID_PROTO_STACK	.\include\fast_vaddr.h	48;"	d
-FAST_ERR	.\include\fast.h	102;"	d
-FAST_ERR	.\include\fast.h	107;"	d
+FAST_ERR	.\include\fast.h	103;"	d
+FAST_ERR	.\include\fast.h	108;"	d
 FAST_HW_LOOKUP	.\include\openboxS4.h	51;"	d
 FAST_HW_REG_VERSION	.\include\netmagic08.h	30;"	d
 FAST_HW_REG_VERSION	.\include\openboxS28.h	32;"	d
@@ -511,10 +511,10 @@ PACKAGE_TARNAME	.\config.h	51;"	d
 PACKAGE_URL	.\config.h	54;"	d
 PACKAGE_VERSION	.\config.h	57;"	d
 PADDING	.\lib\libofp\md5.c	/^unsigned char PADDING[]={0x80,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  $/;"	v
-PFX	.\include\fast.h	104;"	d
-PFX	.\include\fast.h	99;"	d
+PFX	.\include\fast.h	100;"	d
+PFX	.\include\fast.h	105;"	d
 PGM_MID	.\lib\libant\main_libant.c	31;"	d	file:
-PGM_RD_FIN_S	.\include\ant_driver.h	80;"	d
+PGM_RD_FIN_S	.\include\ant_driver.h	83;"	d
 PGM_RD_MID	.\lib\libant\main_libant.c	33;"	d	file:
 PGM_WR_MID	.\lib\libant\main_libant.c	32;"	d	file:
 PORT_COUNTS_VERSION	.\include\fast_version.h	74;"	d
@@ -522,10 +522,11 @@ PORT_REG	.\tools\port_counts\main_port_counts.c	/^u64 PORT_REG(u8 port,u64 regad
 PORT_REG	.\tools\port_status\main_port_status.c	/^u64 PORT_REG(int port,u64 regaddr)$/;"	f
 PORT_STATUS_VERSION	.\include\fast_version.h	82;"	d
 PRINT	.\lib\libofp\main_libofp.h	90;"	d
-PROTO_TYPE	.\include\ant_driver.h	66;"	d
+PROTO_TYPE	.\include\ant_driver.h	69;"	d
 PURPLE	.\lib\libofp\main_libofp.h	67;"	d
 P_COLOR	.\lib\libofp\main_libofp.h	/^static char P_COLOR[MAX_IF_CNT][24]  = $/;"	v
 RD_SOFT_RST	.\include\ant_driver.h	60;"	d
+RD_STATE	.\include\ant_driver.h	61;"	d
 RED	.\lib\libofp\main_libofp.h	58;"	d
 REG	.\lib\libreg\main_libreg.c	35;"	d	file:
 REG32	.\lib\libreg\main_libreg.c	36;"	d	file:
@@ -539,12 +540,13 @@ ROUND_UP	.\lib\libofp\main_libofp.h	132;"	d
 RULE_LEN	.\lib\librule\main_librule.c	35;"	d	file:
 RULE_RW_VERSION	.\include\fast_version.h	80;"	d
 S	.\lib\libams\main_libams.c	/^		S:1,$/;"	m	struct:fast_ams_head	file:
-SCM_BIT_CNT	.\include\ant_driver.h	69;"	d
-SCM_FETCH_S	.\include\ant_driver.h	79;"	d
+SCM_BIT_CNT	.\include\ant_driver.h	70;"	d
+SCM_FETCH_S	.\include\ant_driver.h	82;"	d
 SCM_MID	.\lib\libant\main_libant.c	30;"	d	file:
-SCM_PKT_CNT	.\include\ant_driver.h	70;"	d
+SCM_PKT_CNT	.\include\ant_driver.h	71;"	d
+SCM_RAM_ADDR	.\include\ant_driver.h	73;"	d
 SCM_SOFT_RST	.\include\ant_driver.h	67;"	d
-SCM_TIME_CNT	.\include\ant_driver.h	71;"	d
+SCM_STATE	.\include\ant_driver.h	66;"	d
 SENT_BIT_CNT	.\include\ant_driver.h	57;"	d
 SENT_PKT_CNT	.\include\ant_driver.h	58;"	d
 SENT_RATE_CNT	.\include\ant_driver.h	53;"	d
@@ -637,18 +639,16 @@ ant_get_rd_soft_rst	.\lib\libant\main_libant.c	/^int ant_get_rd_soft_rst(u64 *re
 ant_get_scm_bit_cnt	.\lib\libant\main_libant.c	/^int ant_get_scm_bit_cnt(u64 *regvalue)$/;"	f
 ant_get_scm_pkt_cnt	.\lib\libant\main_libant.c	/^int ant_get_scm_pkt_cnt(u64 *regvalue)$/;"	f
 ant_get_scm_soft_rst	.\lib\libant\main_libant.c	/^int ant_get_scm_soft_rst(u64 *regvalue)$/;"	f
-ant_get_scm_time_cnt	.\lib\libant\main_libant.c	/^int ant_get_scm_time_cnt(u64 *regvalue)$/;"	f
 ant_get_sent_bit_cnt	.\lib\libant\main_libant.c	/^int ant_get_sent_bit_cnt(u64 *regvalue)$/;"	f
 ant_get_sent_pkt_cnt	.\lib\libant\main_libant.c	/^int ant_get_sent_pkt_cnt(u64 *regvalue)$/;"	f
 ant_get_sent_rate_cnt	.\lib\libant\main_libant.c	/^int ant_get_sent_rate_cnt(u64 *regvalue)$/;"	f
 ant_get_sent_rate_reg	.\lib\libant\main_libant.c	/^int ant_get_sent_rate_reg(u64 *regvalue)$/;"	f
 ant_get_sent_time_cnt	.\lib\libant\main_libant.c	/^int ant_get_sent_time_cnt(u64 *regvalue)$/;"	f
 ant_get_sent_time_reg	.\lib\libant\main_libant.c	/^int ant_get_sent_time_reg(u64 *regvalue)$/;"	f
-ant_get_wr_soft_rst	.\lib\libant\main_libant.c	/^int ant_get_wr_soft_rst(u64 *regvalue)$/;"	f
 ant_parameter	.\include\ant_driver.h	/^struct ant_parameter$/;"	s
 ant_pkt_send	.\lib\libant\main_libant.c	/^int ant_pkt_send(struct fast_packet *pkt, int pkt_len)$/;"	f
-ant_print_counters	.\lib\libant\main_libant.c	/^void ant_print_counters(struct ant_cnt a_cnt){$/;"	f
-ant_rst	.\lib\libant\main_libant.c	/^int ant_rst()$/;"	f
+ant_print_counters	.\lib\libant\main_libant.c	/^void ant_print_counters(struct ant_cnt a_cnt, int len){$/;"	f
+ant_rst	.\lib\libant\main_libant.c	/^int ant_rst(){$/;"	f
 ant_set_lat_flag	.\lib\libant\main_libant.c	/^int ant_set_lat_flag(u64 regvalue)$/;"	f
 ant_set_lat_pkt_cnt	.\lib\libant\main_libant.c	/^int ant_set_lat_pkt_cnt(u64 regvalue)$/;"	f
 ant_set_lat_pkt_reg	.\lib\libant\main_libant.c	/^int ant_set_lat_pkt_reg(u64 regvalue)$/;"	f
@@ -658,7 +658,6 @@ ant_set_rd_soft_rst	.\lib\libant\main_libant.c	/^int ant_set_rd_soft_rst(u64 reg
 ant_set_scm_bit_cnt	.\lib\libant\main_libant.c	/^int ant_set_scm_bit_cnt(u64 regvalue)$/;"	f
 ant_set_scm_pkt_cnt	.\lib\libant\main_libant.c	/^int ant_set_scm_pkt_cnt(u64 regvalue)$/;"	f
 ant_set_scm_soft_rst	.\lib\libant\main_libant.c	/^int ant_set_scm_soft_rst(u64 regvalue)$/;"	f
-ant_set_scm_time_cnt	.\lib\libant\main_libant.c	/^int ant_set_scm_time_cnt(u64 regvalue)$/;"	f
 ant_set_sent_bit_cnt	.\lib\libant\main_libant.c	/^int ant_set_sent_bit_cnt(u64 regvalue)$/;"	f
 ant_set_sent_pkt_cnt	.\lib\libant\main_libant.c	/^int ant_set_sent_pkt_cnt(u64 regvalue)$/;"	f
 ant_set_sent_rate_cnt	.\lib\libant\main_libant.c	/^int ant_set_sent_rate_cnt(u64 regvalue)$/;"	f
@@ -666,7 +665,6 @@ ant_set_sent_rate_reg	.\lib\libant\main_libant.c	/^int ant_set_sent_rate_reg(u64
 ant_set_sent_time_cnt	.\lib\libant\main_libant.c	/^int ant_set_sent_time_cnt(u64 regvalue)$/;"	f
 ant_set_sent_time_reg	.\lib\libant\main_libant.c	/^int ant_set_sent_time_reg(u64 regvalue)$/;"	f
 ant_set_test_para	.\lib\libant\main_libant.c	/^int ant_set_test_para(struct ant_parameter antp)$/;"	f
-ant_set_wr_soft_rst	.\lib\libant\main_libant.c	/^int ant_set_wr_soft_rst(u64 regvalue)$/;"	f
 arp	.\include\fast_struct.h	/^				} arp;					\/**< @brief ARP的MAC地址信息*\/$/;"	m	union:flow::__anon4::__anon5::__anon6	typeref:struct:flow::__anon4::__anon5::__anon6::__anon8
 auxiliary_id	.\lib\libofp\ofp_v4.h	/^	uint8_t auxiliary_id; 		 \/* Identify auxiliary connections *\/$/;"	m	struct:ofp_switch_features
 b	.\include\fast_struct.h	/^	u64 b:32,$/;"	m	struct:common_metadata
@@ -684,6 +682,7 @@ byte_count	.\lib\libofp\ofp_v4.h	/^	uint64_t byte_count; 		\/* Number of bytes i
 byte_count	.\lib\libofp\ofp_v4.h	/^	uint64_t byte_count;$/;"	m	struct:ofp_flow_removed
 c	.\include\fast_struct.h	/^		c:31,$/;"	m	struct:common_metadata
 callback	.\app\ams\main_delay_ams.c	/^int callback(struct fast_packet *pkt,int pkt_len)$/;"	f
+callback	.\app\ant\main_ant.c	/^int callback(struct fast_packet *pkt,int pkt_len)$/;"	f
 callback	.\app\l2switch\main_l2switch.c	/^int callback(struct fast_packet *pkt,int pkt_len)$/;"	f
 callback	.\tools\ctl_rw\main_ctl_rw.c	/^int callback(struct fast_packet *pkt,int pkt_len)$/;"	f
 callback	.\tools\ua_fwd\main_ua_fwd.c	/^int callback(struct fast_packet *pkt,int pkt_len)$/;"	f
@@ -969,6 +968,7 @@ idle_timeout	.\lib\libofp\ofp_v4.h	/^	uint16_t idle_timeout;			\/* Idle time bef
 idle_timeout	.\lib\libofp\ofp_v4.h	/^	uint16_t idle_timeout; 			\/* Idle timeout from original flow mod. *\/$/;"	m	struct:ofp_flow_removed
 idle_timeout	.\lib\libofp\ofp_v4.h	/^	uint16_t idle_timeout; 		\/* Number of seconds idle before expiration. *\/$/;"	m	struct:ofp_flow_stats
 idx	.\include\fast_struct.h	/^	u32 idx:5,		\/**< 规则索引*\/$/;"	m	struct:row_bv
+import_latency_to_txt	.\lib\libant\main_libant.c	/^int import_latency_to_txt(){$/;"	f
 in6_xaddr	.\include\fast_struct.h	/^struct in6_xaddr$/;"	s
 in_port	.\lib\libofp\main_libofp.h	/^	u8 in_port;$/;"	m	struct:meter_buffer
 in_port	.\lib\libofp\ofp_v4.h	/^	uint32_t in_port;$/;"	m	struct:ofp_packet_out
@@ -1249,6 +1249,7 @@ priority	.\lib\libofp\ofp_v4.h	/^	uint16_t priority; 			\/* Priority of the entr
 properties	.\lib\libofp\ofp_v4.h	/^	struct ofp_table_feature_prop_header properties[0]; \/* List of properties *\/$/;"	m	struct:ofp_table_features	typeref:struct:ofp_table_features::ofp_table_feature_prop_header
 proto	.\include\fast_struct.h	/^	u8  proto;			\/**< @brief IP protocol or lower 8 bits of ARP opcode. *\/$/;"	m	struct:flow
 proto	.\include\fast_struct.h	/^	u8 proto;$/;"	m	struct:tuple5
+proto_type	.\include\ant_driver.h	/^	u8  proto_type;  \/** Protocol type used in SCM*\/$/;"	m	struct:ant_parameter
 read_hw_rule	.\lib\librule\main_librule.c	/^int read_hw_rule(struct fast_rule *rule,int index)$/;"	f
 read_pcie_base	.\lib\libreg\main_libreg.c	/^int read_pcie_base(int vendor_id,int device_id)$/;"	f
 read_port_stats	.\lib\libofp\main_libofp.c	/^void read_port_stats(char ifname[6],u8 port,u8 flag,struct ofp_port_stats *of_stats)$/;"	f
@@ -1437,6 +1438,7 @@ u8	.\include\ant_driver.h	/^typedef unsigned char u8;$/;"	t
 u8	.\include\fast_type.h	/^typedef unsigned char u8;		\/**< 无符号的8位（1字节）数据定义*\/$/;"	t
 ua_improper_quit	.\lib\libua\main_libua.c	/^void ua_improper_quit(int argc)$/;"	f
 ua_init	.\app\ams\main_delay_ams.c	/^void ua_init(void)$/;"	f
+ua_init	.\app\ant\main_ant.c	/^void ua_init(u8 mid)$/;"	f
 ua_init	.\app\l2switch\main_l2switch.c	/^void ua_init(u8 mid)$/;"	f
 ua_init	.\tools\ctl_rw\main_ctl_rw.c	/^void ua_init(u8 mid)$/;"	f
 ua_init	.\tools\ua_fwd\main_ua_fwd.c	/^void ua_init(u8 mid)$/;"	f

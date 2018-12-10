@@ -10,7 +10,9 @@ rule_config_test	app\ams\main_delay_ams.c	/^void rule_config_test(void)$/;"	f
 start_ams_func	app\ams\main_delay_ams.c	/^void start_ams_func(void)$/;"	f
 ua_init	app\ams\main_delay_ams.c	/^void ua_init(void)$/;"	f
 ANT_MID	app\ant\main_ant.c	31;"	d	file:
+callback	app\ant\main_ant.c	/^int callback(struct fast_packet *pkt,int pkt_len)$/;"	f
 main	app\ant\main_ant.c	/^int main(int argc, char* argv[])$/;"	f
+ua_init	app\ant\main_ant.c	/^void ua_init(u8 mid)$/;"	f
 MAC_LEN	app\l2switch\main_l2switch.c	36;"	d	file:
 MAC_LIFE_TIME	app\l2switch\main_l2switch.c	37;"	d	file:
 NM08_NEIGH_MAX	app\l2switch\main_l2switch.c	35;"	d	file:
@@ -64,19 +66,21 @@ PACKAGE_URL	config.h	54;"	d
 PACKAGE_VERSION	config.h	57;"	d
 STDC_HEADERS	config.h	60;"	d
 VERSION	config.h	63;"	d
-ANT_HW_STATE	include\ant_driver.h	74;"	d
+ANT_HW_STATE	include\ant_driver.h	77;"	d
 LAT_FLAG	include\ant_driver.h	59;"	d
 LAT_PKT_CNT	include\ant_driver.h	55;"	d
 LAT_PKT_REG	include\ant_driver.h	56;"	d
 N_RTT	include\ant_driver.h	68;"	d
-PGM_RD_FIN_S	include\ant_driver.h	80;"	d
-PROTO_TYPE	include\ant_driver.h	66;"	d
+PGM_RD_FIN_S	include\ant_driver.h	83;"	d
+PROTO_TYPE	include\ant_driver.h	69;"	d
 RD_SOFT_RST	include\ant_driver.h	60;"	d
-SCM_BIT_CNT	include\ant_driver.h	69;"	d
-SCM_FETCH_S	include\ant_driver.h	79;"	d
-SCM_PKT_CNT	include\ant_driver.h	70;"	d
+RD_STATE	include\ant_driver.h	61;"	d
+SCM_BIT_CNT	include\ant_driver.h	70;"	d
+SCM_FETCH_S	include\ant_driver.h	82;"	d
+SCM_PKT_CNT	include\ant_driver.h	71;"	d
+SCM_RAM_ADDR	include\ant_driver.h	73;"	d
 SCM_SOFT_RST	include\ant_driver.h	67;"	d
-SCM_TIME_CNT	include\ant_driver.h	71;"	d
+SCM_STATE	include\ant_driver.h	66;"	d
 SENT_BIT_CNT	include\ant_driver.h	57;"	d
 SENT_PKT_CNT	include\ant_driver.h	58;"	d
 SENT_RATE_CNT	include\ant_driver.h	53;"	d
@@ -90,6 +94,7 @@ ant_parameter	include\ant_driver.h	/^struct ant_parameter$/;"	s
 lat_flag	include\ant_driver.h	/^	u8  lat_flag;   \/** Flag for enabling latency test*\/$/;"	m	struct:ant_parameter
 lat_pkt	include\ant_driver.h	/^	u32 lat_pkt;    \/** blocking num pof packet between two latency flag packets*\/$/;"	m	struct:ant_parameter
 n_rtt	include\ant_driver.h	/^	u32 n_rtt;      \/** Controlling the waiting time after sending last packet*\/$/;"	m	struct:ant_parameter
+proto_type	include\ant_driver.h	/^	u8  proto_type;  \/** Protocol type used in SCM*\/$/;"	m	struct:ant_parameter
 recv_bits	include\ant_driver.h	/^	u64 recv_bits; \/** total received bytes of sending packets*\/$/;"	m	struct:ant_cnt
 recv_pkts	include\ant_driver.h	/^	u64 recv_pkts; \/** total received number of sending packets*\/$/;"	m	struct:ant_cnt
 s16	include\ant_driver.h	/^typedef short s16;$/;"	t
@@ -105,22 +110,22 @@ u16	include\ant_driver.h	/^typedef unsigned short u16;$/;"	t
 u32	include\ant_driver.h	/^typedef unsigned int u32;$/;"	t
 u64	include\ant_driver.h	/^typedef unsigned long long u64;$/;"	t
 u8	include\ant_driver.h	/^typedef unsigned char u8;$/;"	t
-EPFX	include\fast.h	100;"	d
-EPFX	include\fast.h	105;"	d
+EPFX	include\fast.h	101;"	d
+EPFX	include\fast.h	106;"	d
 FAST_10	include\fast.h	67;"	d
 FAST_10	include\fast.h	68;"	d
 FAST_20	include\fast.h	70;"	d
-FAST_DBG	include\fast.h	101;"	d
-FAST_DBG	include\fast.h	106;"	d
-FAST_ERR	include\fast.h	102;"	d
-FAST_ERR	include\fast.h	107;"	d
+FAST_DBG	include\fast.h	102;"	d
+FAST_DBG	include\fast.h	107;"	d
+FAST_ERR	include\fast.h	103;"	d
+FAST_ERR	include\fast.h	108;"	d
 LOOKUP_BV	include\fast.h	74;"	d
 LOOKUP_BV	include\fast.h	75;"	d
 OPENBOX_S28	include\fast.h	62;"	d
 OPENBOX_S28	include\fast.h	63;"	d
 OPENBOX_S4	include\fast.h	58;"	d
-PFX	include\fast.h	104;"	d
-PFX	include\fast.h	99;"	d
+PFX	include\fast.h	100;"	d
+PFX	include\fast.h	105;"	d
 XDL_DEBUG	include\fast.h	54;"	d
 XDL_DEBUG	include\fast.h	55;"	d
 __FAST_H__	include\fast.h	32;"	d
@@ -499,17 +504,15 @@ ant_get_rd_soft_rst	lib\libant\main_libant.c	/^int ant_get_rd_soft_rst(u64 *regv
 ant_get_scm_bit_cnt	lib\libant\main_libant.c	/^int ant_get_scm_bit_cnt(u64 *regvalue)$/;"	f
 ant_get_scm_pkt_cnt	lib\libant\main_libant.c	/^int ant_get_scm_pkt_cnt(u64 *regvalue)$/;"	f
 ant_get_scm_soft_rst	lib\libant\main_libant.c	/^int ant_get_scm_soft_rst(u64 *regvalue)$/;"	f
-ant_get_scm_time_cnt	lib\libant\main_libant.c	/^int ant_get_scm_time_cnt(u64 *regvalue)$/;"	f
 ant_get_sent_bit_cnt	lib\libant\main_libant.c	/^int ant_get_sent_bit_cnt(u64 *regvalue)$/;"	f
 ant_get_sent_pkt_cnt	lib\libant\main_libant.c	/^int ant_get_sent_pkt_cnt(u64 *regvalue)$/;"	f
 ant_get_sent_rate_cnt	lib\libant\main_libant.c	/^int ant_get_sent_rate_cnt(u64 *regvalue)$/;"	f
 ant_get_sent_rate_reg	lib\libant\main_libant.c	/^int ant_get_sent_rate_reg(u64 *regvalue)$/;"	f
 ant_get_sent_time_cnt	lib\libant\main_libant.c	/^int ant_get_sent_time_cnt(u64 *regvalue)$/;"	f
 ant_get_sent_time_reg	lib\libant\main_libant.c	/^int ant_get_sent_time_reg(u64 *regvalue)$/;"	f
-ant_get_wr_soft_rst	lib\libant\main_libant.c	/^int ant_get_wr_soft_rst(u64 *regvalue)$/;"	f
 ant_pkt_send	lib\libant\main_libant.c	/^int ant_pkt_send(struct fast_packet *pkt, int pkt_len)$/;"	f
-ant_print_counters	lib\libant\main_libant.c	/^void ant_print_counters(struct ant_cnt a_cnt){$/;"	f
-ant_rst	lib\libant\main_libant.c	/^int ant_rst()$/;"	f
+ant_print_counters	lib\libant\main_libant.c	/^void ant_print_counters(struct ant_cnt a_cnt, int len){$/;"	f
+ant_rst	lib\libant\main_libant.c	/^int ant_rst(){$/;"	f
 ant_set_lat_flag	lib\libant\main_libant.c	/^int ant_set_lat_flag(u64 regvalue)$/;"	f
 ant_set_lat_pkt_cnt	lib\libant\main_libant.c	/^int ant_set_lat_pkt_cnt(u64 regvalue)$/;"	f
 ant_set_lat_pkt_reg	lib\libant\main_libant.c	/^int ant_set_lat_pkt_reg(u64 regvalue)$/;"	f
@@ -519,7 +522,6 @@ ant_set_rd_soft_rst	lib\libant\main_libant.c	/^int ant_set_rd_soft_rst(u64 regva
 ant_set_scm_bit_cnt	lib\libant\main_libant.c	/^int ant_set_scm_bit_cnt(u64 regvalue)$/;"	f
 ant_set_scm_pkt_cnt	lib\libant\main_libant.c	/^int ant_set_scm_pkt_cnt(u64 regvalue)$/;"	f
 ant_set_scm_soft_rst	lib\libant\main_libant.c	/^int ant_set_scm_soft_rst(u64 regvalue)$/;"	f
-ant_set_scm_time_cnt	lib\libant\main_libant.c	/^int ant_set_scm_time_cnt(u64 regvalue)$/;"	f
 ant_set_sent_bit_cnt	lib\libant\main_libant.c	/^int ant_set_sent_bit_cnt(u64 regvalue)$/;"	f
 ant_set_sent_pkt_cnt	lib\libant\main_libant.c	/^int ant_set_sent_pkt_cnt(u64 regvalue)$/;"	f
 ant_set_sent_rate_cnt	lib\libant\main_libant.c	/^int ant_set_sent_rate_cnt(u64 regvalue)$/;"	f
@@ -527,7 +529,7 @@ ant_set_sent_rate_reg	lib\libant\main_libant.c	/^int ant_set_sent_rate_reg(u64 r
 ant_set_sent_time_cnt	lib\libant\main_libant.c	/^int ant_set_sent_time_cnt(u64 regvalue)$/;"	f
 ant_set_sent_time_reg	lib\libant\main_libant.c	/^int ant_set_sent_time_reg(u64 regvalue)$/;"	f
 ant_set_test_para	lib\libant\main_libant.c	/^int ant_set_test_para(struct ant_parameter antp)$/;"	f
-ant_set_wr_soft_rst	lib\libant\main_libant.c	/^int ant_set_wr_soft_rst(u64 regvalue)$/;"	f
+import_latency_to_txt	lib\libant\main_libant.c	/^int import_latency_to_txt(){$/;"	f
 OFP_MAX_RULE_CNT	lib\libofp\main_libofp.c	39;"	d	file:
 __ofp_exit	lib\libofp\main_libofp.c	/^void __ofp_exit(int argc)$/;"	f
 aging_rule_sw	lib\libofp\main_libofp.c	/^void *aging_rule_sw(void *argv)$/;"	f
