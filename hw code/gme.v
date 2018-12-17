@@ -254,7 +254,6 @@ fifo_256_256  MD_fifo(
 	.data_count(MD_fifo_usedw),
 	.empty(MD_fifo_empty),
 	.full()
-
 	);
 fifo_1024_256  PHV_fifo(
     .srst(!rst_n),

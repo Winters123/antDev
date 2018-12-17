@@ -1,9 +1,10 @@
 /** *************************************************************************
- *  @file       scm.v
- *  @brief      recording statistics of received pkts.
+ *  @file          scm.v
+ *  @brief      çĄŹäťśçťčŽĄć¨Ąĺ
  * 
- *  
- *  @date       2018/10/24 10:53:51 
+ *   ć­¤ćäťśĺćŹĺŻšćľčŻćĽćäżĄćŻççťčŽĄĺ
+ * 
+ *  @date       2018/10/24 10:53:51 ććďż???
  *  @author     Jiang(Copyright  2018  Jiang Yue)
  *  @modified   Yang XR
  *  @email      <lang_jy@outlook.com>
@@ -185,6 +186,7 @@ localparam IDLE_CTL_S = 3'd0,
            WAIT_CTL_S = 3'd1,
            WAIT_CTL_S2 = 3'd4,
            RESP1_CTL_S = 3'd2,
+           RESP2_CTL_S = 3'd3;
 
 
 always @(posedge clk or negedge rst_n) begin

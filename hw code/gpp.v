@@ -35,8 +35,8 @@ module gpp #(
     input rst_n,
 	
 //receive pkt from cpu or port
-    (*mark_debug = "true"*)input pktin_data_wr,
-    (*mark_debug = "true"*)input [133:0] pktin_data,
+    input pktin_data_wr,
+    input [133:0] pktin_data,
     input pktin_valid_wr,
     input pktin_data_valid,
     output pktin_ready,  	

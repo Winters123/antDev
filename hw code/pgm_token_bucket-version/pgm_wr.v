@@ -95,6 +95,17 @@ reg [63:0] sent_time_reg;
 //used for recording 2nd part of control data
 reg ctl_write_flag; //if its a read cin or a wirte cin that the destination is not it self, then we should send the second part of the packet; else, we should delete it.
 
+//fifo control regs
+wire data_full_flag;
+wire data_almost_full_flag;
+wire data_empty_flag;
+
+
+//read data from fifo
+wire [133:0] fifo_out_data;
+reg fifo_out_data_rd;
+
+wire fifo_out_data_wr;
 
 
 assign out_wr_phv_alf = in_wr_phv_alf;
@@ -109,72 +120,69 @@ reg [4:0] pgm_wr_state;
 //             Pkt Store & Transmit
 //***************************************************
 
-localparam  IDLE_S = 4'd0,
-			WAIT_S = 4'd1,
-			STORE_S = 4'd2,
-			SENT_S = 4'd4,
-			DISCARD_S = 4'd8;
+localparam IDLE_S = 4'd0,
+		   SENT_S = 4'd1,
+		   STORE_S = 4'd2,
+		   WAIT_S = 4'd3,
+		   DISCARD_S = 4'd5;
 
 always @(posedge clk or negedge rst_n) begin
 
-		if(rst_n == 1'b0) begin
+	if(rst_n == 1'b0) begin
+		out_wr_phv <= 1024'b0;
+		out_wr_phv_wr <= 1'b0;
+
+		out_wr_data_wr <= 1'b0;
+		out_wr_data <= 134'b0;
+		out_wr_valid <= 1'b0;
+		out_wr_data <= 1'b1;
+
 
 		wr2ram_wr_en <= 1'b0;
 		wr2ram_wdata <= 144'b0;
 		wr2ram_addr <= 7'b0;
 
-		//outputs set to 0
-		out_wr_data <= 134'b0;
-		out_wr_data_wr <= 1'b0;
-		out_wr_valid <= 1'b0;
-		out_wr_valid_wr <= 1'b0;
-
-		out_wr_phv <= 1024'b0;
-		out_wr_phv_wr <= 1'b0;
-
-		//intermediate set to 0
 		sent_time_cnt <= 64'b0;
-		//sent_time_reg <= 64'd100000000000;
-
 		pgm_bypass_flag <= 1'b0;
-
 		pgm_sent_start_flag <= 1'b0;
 		pgm_sent_finish_flag <= 1'b0;
 
-		//ctl_write_flag <= 1'b0;
-
 		pgm_wr_state <= IDLE_S;
-
-
-		
-		
 	end
+
 	else begin
 		case(pgm_wr_state)
 			IDLE_S: begin
-				
 				//start bypassing
-				if(in_wr_data_wr == 1'b1 && in_wr_data[133:132]==2'b01 && in_wr_data[111:109]!=3'b111) begin
-					out_wr_data <= in_wr_data;
-					out_wr_data_wr <= 1'b1;
-					out_wr_phv <= in_wr_phv;
-					out_wr_phv_wr <= 1'b1;
-					out_wr_valid <= in_wr_valid;
+				if(data_empty_flag == 1'b0) begin
+					fifo_out_data_rd <= 1'b1;
+					if(fifo_out_data[133:132] == 2'b01 && fifo_out_data[111:109]!=3'b111) begin
+						//bypassing logic
+						out_wr_data <= 134'b0;
+						out_wr_data_wr <= 1'b0;
+						out_wr_valid <= 1'b0;
+						out_wr_valid_wr <= 1'b0;
 
-					pgm_bypass_flag <= 1'b1;
-					pgm_wr_state <= SENT_S;
-				end
+						pgm_wr_state <= SENT_S;
+					end
 
-				//PGM start to store packet.
-				else if(in_wr_data_wr == 1'b1 && in_wr_data[133:132]==2'b01 && in_wr_data[111:109]==3'b111) begin
-					wr2ram_wr_en <= 1'b1;
-					wr2ram_addr <= 7'b0;
-					wr2ram_wdata <= {10'b0,in_wr_data};
+					else if(fifo_out_data[133:132] == 2'b01 && fifo_out_data[111:109]==3'b111) begin
+						//starting of ANT
+						wr2ram_wr_en <= 1'b0;
+						wr2ram_addr <= 7'b0;
+						wr2ram_wdata <= {10'b0, fifo_out_data};
+						pgm_wr_state <= STORE_S;
+					end
 
-					//pgm_sent_start_flag <= 1'b1;
-					pgm_wr_state <= STORE_S;
+					else begin
+						//discard the packet
+						fifo_out_data_rd <= 1'b1;
+						pgm_wr_state <= DISCARD_S;
+					end
 				end
 				else begin
+					fifo_out_data_rd <= 1'b0;
+
 					wr2ram_wr_en <= 1'b0;
 					wr2ram_wdata <= 144'b0;
 					wr2ram_addr <= 7'b0;
@@ -201,24 +209,33 @@ always @(posedge clk or negedge rst_n) begin
 			end
 
 			SENT_S: begin
-				if(in_wr_data_wr == 1'b1 && in_wr_data[133:132] == 2'b11) begin
-					out_wr_data <= in_wr_data;
-					out_wr_data_wr <= 1'b1;
-					out_wr_phv <= in_wr_phv;
+				if (fifo_out_data_wr==1'b1 && fifo_out_data[133:132]==2'b01) begin
+					out_wr_data <= fifo_out_data;
+					out_wr_data_wr <= fifo_out_data_wr;
+					fifo_out_data_rd <= 1'b1;
+					out_wr_valid_wr <= 1'b0;
+					out_wr_valid <= 1'b0;
 					out_wr_phv_wr <= 1'b1;
-					out_wr_valid <= in_wr_valid;
+					out_wr_phv <= 1024'b1;
 					pgm_wr_state <= SENT_S;
 				end
 
-				else if(in_wr_data_wr == 1'b1 && in_wr_data[133:132] == 2'b10) begin
-					out_wr_data <= in_wr_data;
-					out_wr_data_wr <= 1'b1;
-					out_wr_valid <= 1'b1;
-					out_wr_valid_wr <= 1'b1;
-
+				else if(fifo_out_data_wr==1'b1 && fifo_out_data[133:132]==2'b11) begin
+					out_wr_data <= fifo_out_data;
+					out_wr_data_wr <= fifo_out_data_wr;
+					fifo_out_data_rd <= 1'b1;
+					out_wr_phv_wr <= 1'b0;
 					out_wr_phv <= 1024'b0;
-					out_wr_phv_wr <= 1'b1;
-					pgm_wr_state <= IDLE_S;
+					pgm_wr_state <= SENT_S;
+				end
+
+				else if(fifo_out_data_wr==1'b1 && fifo_out_data[133:132]==2'b10) begin
+					//set rd signal as 1'b0 after reading a pkt.
+					fifo_out_data_rd <= 1'b0;
+					
+					out_wr_data <= fifo_out_data;
+					out_wr_data_wr <= 1'b1;
+
 				end
 
 				else begin
@@ -229,46 +246,56 @@ always @(posedge clk or negedge rst_n) begin
 
 					out_wr_phv <= 1024'b0;
 					out_wr_phv_wr <= 1'b0;
+					fifo_out_data_rd <= 1'b1;
 					pgm_wr_state <= DISCARD_S;
 				end
-			end
 
-			STORE_S: begin
-				if(in_wr_data[133:132] == 2'b11 && in_wr_data_wr == 1'b1) begin
-					wr2ram_wr_en <= 1'b1;
-					wr2ram_wdata <= {10'b0, in_wr_data};
-					wr2ram_addr <= wr2ram_addr + 1'b1;
-				end
-				else if(in_wr_data[133:132] == 2'b10) begin
-					wr2ram_wr_en <= 1'b1;
-					wr2ram_addr <= wr2ram_addr + 1'b1;
-					wr2ram_wdata <= {10'b0, in_wr_data};
-					pgm_sent_start_flag <= 1'b1;
-					pgm_wr_state <= WAIT_S;
-				end
-				else begin
-					/*TODO: clear all the values in RAM*/
-					wr2ram_wr_en <= 1'b0;
-					pgm_wr_state <= DISCARD_S;
-				end
-			end
-
-			WAIT_S: begin
-				if(sent_time_cnt <= sent_time_reg) begin
-					wr2ram_addr <= 7'b0;
-					wr2ram_wdata <= 144'b0;
-					wr2ram_wr_en <= 1'b0;
-					sent_time_cnt <= sent_time_cnt + 1'b1;
-				end
-				else begin
-					//wr2ram_wdata <= {10'b0, in_wr_data};
-					pgm_sent_finish_flag <= 1'b1;
+				//when finish the trans, need to go back to idle state.
+				if (out_wr_data[133:132] == 2'b10 && out_wr_data_wr==1'b1) begin
+					out_wr_data_wr <= 1'b0;
+					out_wr_data <= 134'b0;
+					out_wr_valid <= 1'b1;
+					out_wr_valid_wr <= 1'b1;
 					pgm_wr_state <= IDLE_S;
 				end
 			end
 
+			STORE_S: begin
+
+				if(fifo_out_data_wr==1'b1 && fifo_out_data[133:132]==2'b01) begin
+					wr2ram_wr_en <= 1'b1;
+					wr2ram_wdata <= {10'b0, fifo_out_data};
+					wr2ram_addr <= 7'b0;
+				end
+
+				else if(fifo_out_data_wr==1'b1 && fifo_out_data[133:132]!=2'b10) begin
+
+					wr2ram_wr_en <= 1'b1;
+					wr2ram_addr <= wr2ram_addr+7'b1;
+					wr2ram_wdata <= {10'b0, fifo_out_data};
+
+				end
+
+				else if(fifo_out_data_wr==1'b1 && fifo_out_data[133:132]==2'b10) begin
+					//set rd signal as 1'b0 after reading a pkt.
+					fifo_out_data_rd <= 1'b0;
+
+					wr2ram_wr_en <= 1'b1;
+					wr2ram_wdata <= {10'b0, fifo_out_data};
+					wr2ram_addr <= wr2ram_addr + 1'b1;
+					pgm_sent_start_flag <= 1'b1;
+					pgm_wr_state <= WAIT_S;
+				end
+
+				else begin
+					wr2ram_wr_en <=1'b0;
+					fifo_out_data_rd <= 1'b1;
+					pgm_wr_state <= DISCARD_S;
+				end
+			end
+
 			DISCARD_S: begin
-				if(in_wr_data[133:132] != 2'b10 && in_wr_data_wr == 1'b1) begin
+				if(fifo_out_data[133:132] != 2'b10 && in_wr_data_wr == 1'b1) begin
 					wr2ram_wr_en <= 1'b0;
 
 					//outputs set to 0
@@ -282,12 +309,98 @@ always @(posedge clk or negedge rst_n) begin
 				end 
 
 				else begin
+					fifo_out_data_rd <= 1'b0;
 					pgm_wr_state <= IDLE_S;
 				end
 			end
+
+			//this state is different from the former as it will response to packet arriving.
+			WAIT_S: begin
+				sent_time_cnt <= sent_time_cnt + 1'b1;
+				wr2ram_addr <= 7'b0;
+				wr2ram_wdata <= 144'b0;
+				wr2ram_wr_en <= 1'b0;
+
+				//it indicates there is a pkt needed to be transmitted.
+				if(data_empty_flag == 1'b0) begin
+					fifo_out_data_rd <= 1'b1; //start reading fifo
+				end
+
+				else begin
+					fifo_out_data_rd <= 1'b0;
+				end
+
+				if(fifo_out_data_rd == 1'b1 && fifo_out_data[133:132] == 2'b01) begin
+					out_wr_data <= fifo_out_data;
+					out_wr_data_wr <= fifo_out_data_wr;
+					out_wr_phv <= 1024'b1;
+					out_wr_phv_wr <= 1'b1;
+				end
+
+				else if(fifo_out_data_rd == 1'b1 && fifo_out_data[133:132] == 2'b11) begin
+					out_wr_data <= fifo_out_data;
+					out_wr_data_wr <= fifo_out_data_wr;
+					out_wr_phv <= 1024'b0;
+					out_wr_phv_wr <= 1'b0;
+				end
+
+				else if(fifo_out_data_rd == 1'b1 && fifo_out_data[133:132] == 2'b10) begin
+					out_wr_data <= fifo_out_data;
+					out_wr_data_wr <= fifo_out_data_wr;
+					out_wr_phv <= 1024'b0;
+					out_wr_phv_wr <= 1'b0;
+
+					if(sent_time_cnt >= sent_time_reg) begin
+						pgm_sent_finish_flag <= 1'b1;
+						pgm_wr_state <= IDLE_S;
+					end
+				end
+
+				if(out_wr_data_wr==1'b1 && out_wr_data[133:132]==2'b10) begin
+					out_wr_valid_wr <= 1'b1;
+					out_wr_valid <= 1'b1;
+				end
+
+				else begin
+					out_wr_valid <= 1'b0;
+					out_wr_valid_wr <= 1'b0;
+				end
+
+				if(data_empty_flag == 1'b1 && sent_time_cnt >= sent_time_reg) begin
+					pgm_sent_finish_flag <= 1'b1;
+					pgm_wr_state <= IDLE_S;
+				end
+
+
+			end
 		endcase
+
 	end
 end
+
+
+//***************************************************
+//                  Other IP Instance
+//***************************************************
+//likely fifo/ram/async block.... 
+//should be instantiated below here
+
+fifo_135_512 pgm_wr_data_fifo
+(
+	.clk(clk),
+	.srst(!rst_n),
+	.din({in_wr_data_wr,in_wr_data}),
+	.wr_en(in_wr_data_wr),
+	.rd_en(fifo_out_data_rd),
+	.dout({fifo_out_data_wr,fifo_out_data}),
+	.full(data_full_flag),
+	.almost_full(),
+	.empty(data_empty_flag),
+	.data_count()
+);
+
+
+
 
 //***************************************************
 //          Operation of User Defined Regs

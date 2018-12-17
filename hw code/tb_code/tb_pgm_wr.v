@@ -120,7 +120,7 @@ initial begin
 	
 	#CYCLE in_wr_phv = 1024'b0;
 	in_wr_phv_wr = 1'b0;
-	in_wr_phv_wr = 1'b0;
+	in_wr_phv_alf = 1'b0;
 
 	in_wr_data = 133'b0;
 	in_wr_data_wr = 1'b0;
@@ -131,7 +131,7 @@ initial begin
 	cin_wr_ready = 1'b1;
 
 	cin_wr_data_wr = 1'b1;
-	cin_wr_data = {6'b010000,1'b1,3'b001,12'b0,8'd70,8'd62,32'h00010001,32'hffffffff,32'h00000000};
+	cin_wr_data = {6'b010000,1'b1,3'b010,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00004000};
 
 
 
@@ -152,13 +152,49 @@ initial begin
 	cin_wr_data_wr = 1'b1;
 	cin_wr_data = {6'b100000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010002,32'hffffffff,32'h00000000};
 
-	#(10*CYCLE);
-	$finish; 
+    
+    //2nd control pkt
+    #CYCLE in_wr_phv = 1024'b0;
+        
+    in_wr_phv_wr = 1'b0;
+    in_wr_phv_alf = 1'b0;
+
+    in_wr_data = 133'b0;
+    in_wr_data_wr = 1'b0;
+    in_wr_valid = 1'b0;
+    in_wr_valid_wr = 1'b0;
+    in_wr_alf = 1'b0;
+
+    cin_wr_ready = 1'b1;
+
+    cin_wr_data_wr = 1'b1;
+    cin_wr_data = {6'b010000,1'b1,3'b010,12'b0,8'd70,8'd61,32'h00010002,32'hffffffff,32'h00000000};
+        
+    #CYCLE in_wr_phv = 1024'b0;
+    in_wr_phv_wr = 1'b0;
+    in_wr_phv_alf = 1'b0;
+
+    in_wr_data = 133'b0;
+    in_wr_data_wr = 1'b0;
+    in_wr_valid = 1'b0;
+    in_wr_valid_wr = 1'b0;
+    in_wr_alf = 1'b0;
+
+    cin_wr_ready = 1'b1;
+
+    cin_wr_data_wr = 1'b1;
+    cin_wr_data = {6'b100000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010002,32'hffffffff,32'h00000000};
+
+
+    #CYCLE 
+   	cin_wr_data_wr <= 1'b0;
+   	cin_wr_data = 134'b0;
 
 
 	//tb for data path
-	/*
-	#CYCLE in_wr_phv = 1024'b0;
+
+	#CYCLE 
+	in_wr_phv = 1024'b0;
 	in_wr_phv_wr = 1'b1;
 	in_wr_phv_alf = 1'b0;
 
@@ -166,135 +202,80 @@ initial begin
 
 
 	in_wr_data_wr = 1'b1;
-	in_wr_valid = 1'b1;
+	in_wr_valid = 1'b0;
 	in_wr_valid_wr = 1'b0;
 	in_wr_alf = 1'b0;
 
-	cin_wr_ready = 1'b1;
 
-	cin_wr_data_wr = 1'b0;
-	cin_wr_data = {6'b010000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
-
-	//2nd
-	#CYCLE in_wr_phv = 1024'b0;
-	in_wr_phv_wr = 1'b1;
-	in_wr_phv_alf = 1'b0;
-
+	#CYCLE 
+	in_wr_phv_wr = 1'b0;
+	in_wr_phv = 1024'b0;
 	in_wr_data = {6'b110000, 16'b0, 16'b0, 32'b0, 64'd2};
-	
 
-	in_wr_data_wr = 1'b1;
-	in_wr_valid = 1'b1;
-	in_wr_valid_wr = 1'b0;
-	in_wr_alf = 1'b0;
-
-	cin_wr_ready = 1'b1;
-
-	cin_wr_data_wr = 1'b0;
-	cin_wr_data = {6'b100000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
-
-	//3rd
-	#CYCLE in_wr_phv = 1024'b0;
-	in_wr_phv_wr = 1'b1;
-	in_wr_phv_alf = 1'b0;
-
+	#CYCLE 
 	in_wr_data = {6'b110000, 16'b0, 16'b0, 32'b0, 64'd2};
-	
 
-	in_wr_data_wr = 1'b1;
+	#CYCLE
+	in_wr_data = {6'b100000, 16'b0, 16'b0, 32'b0, 64'd2};
+
+	#CYCLE
+	in_wr_data = 134'b0;
+	in_wr_data_wr = 1'b0;
 	in_wr_valid = 1'b1;
-	in_wr_valid_wr = 1'b0;
-	in_wr_alf = 1'b0;
-
-	cin_wr_ready = 1'b1;
-
-	cin_wr_data_wr = 1'b0;
-	cin_wr_data = {6'b010000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
+	in_wr_valid_wr = 1'b1;
 
 
-	//4th
-	#CYCLE in_wr_phv = 1024'b0;
+	#(2*CYCLE)
+	// the by passing pkt
+	in_wr_phv = 1024'b0;
 	in_wr_phv_wr = 1'b1;
 	in_wr_phv_alf = 1'b0;
 
-	in_wr_data = {6'b100000, 16'b0, 16'b0, 32'b0, 64'd3};
-	
+	in_wr_data = {6'b010000, 16'b0, 3'b011, 13'b0, 32'b0, 64'b0};
+
 
 	in_wr_data_wr = 1'b1;
+	in_wr_valid = 1'b0;
+	in_wr_valid_wr = 1'b0;
+	in_wr_alf = 1'b0;
+
+
+	#CYCLE 
+	in_wr_phv_wr = 1'b0;
+	in_wr_phv = 1024'b0;
+	in_wr_data = {6'b110000, 16'b0, 16'b0, 32'b0, 64'd2};
+
+	#CYCLE 
+	in_wr_data = {6'b110000, 16'b0, 16'b0, 32'b0, 64'd2};
+
+	#CYCLE
+	in_wr_data = {6'b100000, 16'b0, 16'b0, 32'b0, 64'd2};
+
+	#CYCLE
+	in_wr_data = 134'b0;
+	in_wr_data_wr = 1'b0;
 	in_wr_valid = 1'b1;
-	in_wr_valid_wr = 1'b0;
-	in_wr_alf = 1'b0;
-
-	cin_wr_ready = 1'b1;
-
-	cin_wr_data_wr = 1'b0;
-	cin_wr_data = {6'b100000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
+	in_wr_valid_wr = 1'b1;
 
 
-	//control path
-	#CYCLE in_wr_phv = 1024'b0;
-	in_wr_phv_wr = 1'b0;
-	in_wr_phv_alf = 1'b0;
-
-	in_wr_data = 133'b0;
+	#CYCLE
+	in_wr_data = 134'b0;
 	in_wr_data_wr = 1'b0;
 	in_wr_valid = 1'b0;
 	in_wr_valid_wr = 1'b0;
-	in_wr_alf = 1'b0;
 
-	cin_wr_ready = 1'b1;
 
-	cin_wr_data_wr = 1'b1;
-	cin_wr_data = {6'b010000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
 
-	#CYCLE in_wr_phv = 1024'b0;
-	in_wr_phv_wr = 1'b0;
-	in_wr_phv_alf = 1'b0;
 
-	in_wr_data = 133'b0;
-	in_wr_data_wr = 1'b0;
-	in_wr_valid = 1'b0;
-	in_wr_valid_wr = 1'b0;
-	in_wr_alf = 1'b0;
+	
 
-	cin_wr_ready = 1'b1;
 
-	cin_wr_data_wr = 1'b1;
-	cin_wr_data = {6'b100000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
 
-	#CYCLE in_wr_phv = 1024'b0;
-	in_wr_phv_wr = 1'b0;
-	in_wr_phv_wr = 1'b0;
-
-	in_wr_data = 133'b0;
-	in_wr_data_wr = 1'b0;
-	in_wr_valid = 1'b0;
-	in_wr_valid_wr = 1'b0;
-	in_wr_alf = 1'b0;
-
-	cin_wr_ready = 1'b1;
-
-	cin_wr_data_wr = 1'b1;
-	cin_wr_data = {6'b010000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010002,32'hffffffff,32'h00000000};
-
-	#CYCLE in_wr_phv = 1024'b0;
-	in_wr_phv_wr = 1'b0;
-	in_wr_phv_wr = 1'b0;
-
-	in_wr_data = 133'b0;
-	in_wr_data_wr = 1'b0;
-	in_wr_valid = 1'b0;
-	in_wr_valid_wr = 1'b0;
-	in_wr_alf = 1'b0;
-
-	cin_wr_ready = 1'b1;
-
-	cin_wr_data_wr = 1'b1;
-	cin_wr_data = {6'b100000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010002,32'hffffffff,32'h00000000};
 
 	#(10*CYCLE);
 	$finish; 
-	*/
+
+
 end
 
 always begin
