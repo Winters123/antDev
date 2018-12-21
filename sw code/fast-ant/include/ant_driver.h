@@ -95,8 +95,8 @@ struct ant_cnt
 
 struct ant_parameter
 {
-	u64 sent_time;
-	u32 sent_rate;
+	u64 sent_time;  /**total testing time period*/
+	u32 sent_rate;  /** sending rate, num of cycles between two packets*/
 	u32 lat_pkt;    /** blocking num pof packet between two latency flag packets*/
 	u8  lat_flag;   /** Flag for enabling latency test*/
 	u32 n_rtt;      /** Controlling the waiting time after sending last packet*/
@@ -122,7 +122,7 @@ int  ant_set_test_para(struct ant_parameter antp); /**设置ANT测试参数*/
 
 void ant_print_counters(struct ant_cnt a_cnt, int len);
 
-int import_latency_to_txt();
+int import_latency_to_txt(); /**测量时延，并将时延信息写入latency.txt文件*/
 
 /*-------------------ANT CORE FUNCTION ------------------*/
 
