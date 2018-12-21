@@ -208,8 +208,18 @@ always @(posedge clk or negedge rst_n) begin
 				end
 			end
 
+
 			SENT_S: begin
-				if (fifo_out_data_wr==1'b1 && fifo_out_data[133:132]==2'b01) begin
+
+				if (out_wr_data[133:132] == 2'b10 && out_wr_data_wr==1'b1) begin
+					out_wr_data_wr <= 1'b0;
+					out_wr_data <= 134'b0;
+					out_wr_valid <= 1'b1;
+					out_wr_valid_wr <= 1'b1;
+					pgm_wr_state <= IDLE_S;
+				end
+
+				else if (fifo_out_data_wr==1'b1 && fifo_out_data[133:132]==2'b01) begin
 					out_wr_data <= fifo_out_data;
 					out_wr_data_wr <= fifo_out_data_wr;
 					fifo_out_data_rd <= 1'b1;
@@ -234,10 +244,14 @@ always @(posedge clk or negedge rst_n) begin
 					fifo_out_data_rd <= 1'b0;
 					
 					out_wr_data <= fifo_out_data;
-					out_wr_data_wr <= 1'b1;
+					out_wr_data_wr <= fifo_out_data_wr;
+
+					//pgm_wr_state <= IDLE_S;
 
 				end
 
+				//when finish the trans, need to go back to idle state.
+				
 				else begin
 					out_wr_data <= 134'b0;
 					out_wr_data_wr <= 1'b0;
@@ -249,15 +263,7 @@ always @(posedge clk or negedge rst_n) begin
 					fifo_out_data_rd <= 1'b1;
 					pgm_wr_state <= DISCARD_S;
 				end
-
-				//when finish the trans, need to go back to idle state.
-				if (out_wr_data[133:132] == 2'b10 && out_wr_data_wr==1'b1) begin
-					out_wr_data_wr <= 1'b0;
-					out_wr_data <= 134'b0;
-					out_wr_valid <= 1'b1;
-					out_wr_valid_wr <= 1'b1;
-					pgm_wr_state <= IDLE_S;
-				end
+				
 			end
 
 			STORE_S: begin
@@ -295,7 +301,7 @@ always @(posedge clk or negedge rst_n) begin
 			end
 
 			DISCARD_S: begin
-				if(fifo_out_data[133:132] != 2'b10 && in_wr_data_wr == 1'b1) begin
+				if(fifo_out_data[133:132] != 2'b10 && fifo_out_data_wr == 1'b1) begin
 					wr2ram_wr_en <= 1'b0;
 
 					//outputs set to 0
@@ -347,13 +353,22 @@ always @(posedge clk or negedge rst_n) begin
 				else if(fifo_out_data_rd == 1'b1 && fifo_out_data[133:132] == 2'b10) begin
 					out_wr_data <= fifo_out_data;
 					out_wr_data_wr <= fifo_out_data_wr;
-					out_wr_phv <= 1024'b0;
-					out_wr_phv_wr <= 1'b0;
+					
+					fifo_out_data_rd <= 1'b0;
+
+
 
 					if(sent_time_cnt >= sent_time_reg) begin
 						pgm_sent_finish_flag <= 1'b1;
 						pgm_wr_state <= IDLE_S;
 					end
+				end
+
+				else if(fifo_out_data_rd == 1'b0) begin
+					out_wr_data <= 134'b0;
+					out_wr_data_wr <= 1'b0;
+					out_wr_phv <= 1024'b0;
+					out_wr_phv_wr <= 1'b0;
 				end
 
 				if(out_wr_data_wr==1'b1 && out_wr_data[133:132]==2'b10) begin
