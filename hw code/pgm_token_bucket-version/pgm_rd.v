@@ -114,11 +114,11 @@ reg [10:0] pkt_cycle_cnt;
 //reg [31:0] sent_time_stamp;
 
 /**regs and wires related to fifo*/
-reg data_empty_flag; 
+wire data_empty_flag; 
 reg fifo_out_data_rd;
-reg fifo_out_data_wr;
-reg [133:0] fifo_out_data;
-reg data_full_flag;
+wire fifo_out_data_wr;
+wire [133:0] fifo_out_data;
+wire data_full_flag;
 
 //***************************************************
 //             Pkt Rd & Transmit
@@ -286,6 +286,7 @@ always @(posedge clk or negedge rst_n) begin
 				end
 			end
 
+
 			HAUNT1_S: begin
 				rd2ram_rd <= 1'b1;
 				rd2ram_addr <= 7'b1;
@@ -314,7 +315,7 @@ always @(posedge clk or negedge rst_n) begin
 					rd2ram_addr <= rd2ram_addr + 1'b1;
 					sent_bit_cnt <= sent_bit_cnt + 64'd16;
 
-					//only used in antDev v2
+					//to record pkt 
 					pkt_cycle_cnt <= pkt_cycle_cnt + 11'b1;
 
 					pgm_rd_state <= READ_S;

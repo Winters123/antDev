@@ -203,7 +203,6 @@ initial begin
 	in_wr_valid_wr = 1'b0;
 	in_wr_alf = 1'b0;
 
-
 	#CYCLE 
 	in_wr_phv_wr = 1'b0;
 	in_wr_phv = 1024'b0;
