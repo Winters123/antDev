@@ -113,6 +113,12 @@ reg ctl_write_flag;  //if its a write signal that the destination is it self, we
 reg [10:0] pkt_cycle_cnt;
 //reg [31:0] sent_time_stamp;
 
+/**regs and wires related to fifo*/
+wire data_empty_flag; 
+reg fifo_out_data_rd;
+wire fifo_out_data_wr;
+wire [133:0] fifo_out_data;
+wire data_full_flag;
 
 //***************************************************
 //             Pkt Rd & Transmit
@@ -125,11 +131,12 @@ localparam  IDLE_S = 6'd0,
 			READ_S = 6'd2,
 			WAIT_S = 6'd4,
 			PROBE_S = 6'd8,
+			INSERT_S = 6'd9,
+			DISCARD_S = 6'd11,
 			FIN_S = 6'd16;
 
 always @(posedge clk or negedge rst_n) begin
-
-	if (rst_n == 1'b0) begin
+	if(rst_n == 1'b0) begin
 		// reset
 		rd2ram_rd <= 1'b0;
 		rd2ram_addr <= 7'b0;
@@ -158,37 +165,46 @@ always @(posedge clk or negedge rst_n) begin
 		//sent_time_stamp <= 32'b0;
 
 		pgm_rd_state <= IDLE_S;
-		
+
+		fifo_out_data_rd <= 1'b0;
 	end
+
 	else begin
 		case(pgm_rd_state)
 			IDLE_S: begin
-				if(pgm_bypass_flag == 1'b1 && in_rd_data[133:132] == 2'b01 && in_rd_data_wr == 1'b1) begin
-					
-					out_rd_data <= in_rd_data;
-					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= in_rd_valid;
-					out_rd_phv <= in_rd_phv;
-					out_rd_phv_wr <= 1'b1;
-					out_rd_valid_wr <= in_rd_valid_wr;
-
-					pgm_rd_state <= SENT_S;
-				end
-
-				else if(pgm_sent_start_flag == 1'b1) begin
+				if(pgm_sent_start_flag == 1'b1) begin
 					
 					out_rd_data <= 134'b0;
 					rd2ram_addr <= 7'b0;
 					rd2ram_rd <= 1'b1;
 
-					out_rd_data_wr <= 1'b0;
+					out_rd_data_wr <= 134'b0;
 					out_rd_valid <= 1'b0;
 					out_rd_phv <= 1024'b0;
 					out_rd_phv_wr <= 1'b0;
-					//need jump to HAUNT1_S to wait for RAM output
+					out_rd_valid_wr <= 1'b0;
+
 					pgm_rd_state <= HAUNT1_S;
-					//obtain sent_time_reg from input
 					sent_time_reg <= in_rd_sent_time_reg;
+
+				end
+
+
+				else if(data_empty_flag == 1'b0) begin
+					fifo_out_data_rd<=1'b1;
+					if(fifo_out_data[133:132] == 2'b01) begin
+						out_rd_data <= 134'b0;
+						out_rd_data_wr <= 1'b0;
+						out_rd_valid <= 1'b0;
+						out_rd_valid_wr <= 1'b0;
+
+						pgm_rd_state <= SENT_S;
+					end
+
+					else begin
+						fifo_out_data_rd <= 1'b1;
+						pgm_rd_state <= DISCARD_S;
+					end
 				end
 
 				else begin
@@ -212,6 +228,7 @@ always @(posedge clk or negedge rst_n) begin
 
 					sent_time_cnt <= 64'b0;
 
+					fifo_out_data_rd <= 1'b0;
 					//only used in antDev v2
 					pkt_cycle_cnt <= 11'b0;
 					//sent_time_stamp <= 32'b0;
@@ -221,71 +238,68 @@ always @(posedge clk or negedge rst_n) begin
 			end
 
 			SENT_S: begin
-				if(in_rd_data[133:132] == 2'b11 && in_rd_data_wr == 1'b1) begin
-					out_rd_data <= in_rd_data;
-					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= in_rd_valid;
-					out_rd_phv <= in_rd_phv;
-					out_rd_phv_wr <= 1'b1;
-					out_rd_valid_wr <= in_rd_valid_wr;
-				end
-				else if(in_rd_data[133:132] == 2'b10 && in_rd_data_wr == 1'b1) begin
-					out_rd_data <= in_rd_data;
-					out_rd_data_wr <= 1'b1;
+
+				if(out_rd_data[133:132]==2'b10 && out_rd_data_wr == 1'b1)begin
+					out_rd_data_wr <= 1'b0;
+					out_rd_data <= 134'b0;
 					out_rd_valid <= 1'b1;
 					out_rd_valid_wr <= 1'b1;
-					out_rd_phv <= in_rd_phv;
-					out_rd_phv_wr <= 1'b1;
-
 					pgm_rd_state <= IDLE_S;
+				end
+
+				else if(fifo_out_data_wr==1'b1 && fifo_out_data[133:132]==2'b01) begin
+					out_rd_data <= fifo_out_data;
+					out_rd_data <= fifo_out_data_wr;
+					fifo_out_data_rd <= 1'b1;
+					out_rd_phv <= 1024'b1;
+					out_rd_phv_wr <= 1'b1;
+					pgm_rd_state <= SENT_S;
+				end
+
+				else if(fifo_out_data_wr==1'b1 && fifo_out_data[133:132]==2'b11) begin
+					out_rd_data <= fifo_out_data;
+					out_rd_data <= fifo_out_data_wr;
+					fifo_out_data_rd <= 1'b1;
+					out_rd_phv <= 1024'b0;
+					out_rd_phv_wr <= 1'b0;
+					pgm_rd_state <= SENT_S;
+				end
+
+				else if(fifo_out_data_wr==1'b1 && fifo_out_data[133:132]==2'b10) begin
+					out_rd_data <= fifo_out_data;
+					out_rd_data_wr <= fifo_out_data_wr;
+
+					fifo_out_data_rd <= 1'b0;
 				end
 
 				else begin
+					
+					out_rd_data <= 134'b0;
 					out_rd_data_wr <= 1'b0;
-					out_rd_valid <= 1'b0;
 					out_rd_phv <= 1024'b0;
 					out_rd_phv_wr <= 1'b0;
+					out_rd_valid <= 1'b0;
+					out_rd_valid_wr <=1'b0;
+					fifo_out_data_rd <= 1'b1;
 					
-					out_rd_valid_wr <= in_rd_valid_wr;
-
-					pgm_rd_state <= IDLE_S;
+					pgm_rd_state <= DISCARD_S;
 				end
 			end
+
 
 			HAUNT1_S: begin
 				rd2ram_rd <= 1'b1;
 				rd2ram_addr <= 7'b1;
-				pgm_rd_state <= HAUNT2_S;	
-
-				//sent_time_stamp <= sent_time_stamp + 32'b1;
+				sent_time_cnt <= sent_time_cnt + 1'b1;
+				pgm_rd_state <= HAUNT2_S;
 			end
 
 			HAUNT2_S: begin
-				//out_rd_data <= ram2rd_rdata[133:0];
-				//rd2ram_addr <= 7'd2;
-				//rd2ram_rd <= 1'b1;
-				//out_rd_data_wr <= 1'b1;
-				//out_rd_valid <= 1'b1;
-				//out_rd_phv <= 1024'b0;
-				//out_rd_phv_wr <= 1'b1;
-				if(lat_flag == 1'b1) begin
-					rd2ram_addr <= 7'd2;
-					pgm_rd_state <= PROBE_S;
-					//need to increment sent_rate_cnt as needed
-					sent_time_cnt <= sent_time_cnt + 1'b1;
-				end
-				else begin
-					rd2ram_addr <= 7'd2;
-					pgm_rd_state <= READ_S;
-					//need to increment sent_rate_cnt as needed
-					sent_time_cnt <= sent_time_cnt + 1'b1;
+				rd2ram_rd <= 1'b1;
+				rd2ram_addr <= 7'd2;
+				sent_time_cnt <= sent_time_cnt + 1'b1;
 
-					//only needed in antDev v2
-					//sent_time_stamp <= sent_time_stamp + 32'b1;
-				end
-				
-
-				//sent_bit_cnt <= sent_bit_cnt + 64'd16;
+				pgm_rd_state <= READ_S;
 			end
 
 			READ_S: begin
@@ -301,13 +315,13 @@ always @(posedge clk or negedge rst_n) begin
 					rd2ram_addr <= rd2ram_addr + 1'b1;
 					sent_bit_cnt <= sent_bit_cnt + 64'd16;
 
-					//only used in antDev v2
+					//to record pkt 
 					pkt_cycle_cnt <= pkt_cycle_cnt + 11'b1;
 
 					pgm_rd_state <= READ_S;
 
 					//only used in antDev v2
-					if (pkt_cycle_cnt == 11'd3) begin
+					if (pkt_cycle_cnt == 11'd4) begin
 						// only needed in antDev v2
 						out_rd_data <= {ram2rd_rdata[133:128], sent_pkt_cnt, timestamp2rd, 32'hffffffff};
 						out_rd_data_wr <= 1'b1;
@@ -332,10 +346,13 @@ always @(posedge clk or negedge rst_n) begin
 
 					out_rd_data <= ram2rd_rdata[133:0];
 					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= 1'b1;
+					
 					out_rd_phv <= 1024'b0;
 					out_rd_phv_wr <= 1'b1;
+
+					/**How we use valid signal is wrong here*/
 					out_rd_valid_wr <= 1'b1;
+					out_rd_valid <= 1'b1;
 
 					sent_bit_cnt <= sent_bit_cnt + ram2rd_rdata[131:128];
 					sent_pkt_cnt <= sent_pkt_cnt + 1'b1;
@@ -368,7 +385,111 @@ always @(posedge clk or negedge rst_n) begin
 					pkt_cycle_cnt <= 11'b0;
 
 				end
+            
+            end
 
+			WAIT_S: begin
+
+				sent_time_cnt <= sent_time_cnt + 1'b1;
+
+				//the priority of data in the fifo is higher than generating pkt.
+				if(data_empty_flag == 1'b0) begin
+					//send pkt from fifo
+					sent_rate_cnt <= sent_rate_cnt + 1'b1;
+
+					out_rd_data <= 134'b0;
+					out_rd_data_wr <= 1'b0;
+					out_rd_valid <= 1'b0;
+					out_rd_phv <= 1024'b0;
+					out_rd_phv_wr <= 1'b0;
+					out_rd_valid_wr <= 1'b0;
+
+					fifo_out_data_rd <= 1'b1;
+					pgm_rd_state <= INSERT_S;
+				end
+
+				else begin
+
+					fifo_out_data_rd <= 1'b0;
+
+					if(sent_rate_cnt >= sent_rate_reg) begin
+						rd2ram_rd <= 1'b1;
+						rd2ram_addr <= 7'b0000000;
+						out_rd_data <= 134'b0;
+						out_rd_data_wr <= 1'b0;
+						out_rd_valid <= 1'b0;
+						out_rd_phv_wr <= 1'b0;
+						out_rd_phv <= 1024'b0;
+						out_rd_valid_wr <= 1'b0;
+
+						sent_rate_cnt <= 32'b0;
+						pgm_rd_state <= HAUNT1_S;
+					end
+
+					else begin
+						sent_rate_cnt <= sent_rate_cnt + 1'b1;
+
+						out_rd_data <= 134'b0;
+						out_rd_data_wr <= 1'b0;
+						out_rd_valid <= 1'b0;
+						out_rd_phv <= 1024'b0;
+						out_rd_phv_wr <= 1'b0;
+						out_rd_valid_wr <= 1'b0;
+
+						if(sent_time_cnt >= sent_time_reg) begin
+							pgm_rd_state <= FIN_S;
+						end
+					end
+				end
+
+
+
+			end
+
+			INSERT_S: begin
+				sent_time_cnt <= sent_time_cnt + 1'b1;
+				sent_rate_cnt <= sent_rate_cnt + 1'b1;
+
+				if (out_rd_data[133:132] == 2'b10 && out_rd_data_wr==1'b1) begin
+					out_rd_data_wr <= 1'b0;
+					out_rd_data <= 134'b0;
+					out_rd_valid <= 1'b1;
+					out_rd_valid_wr <= 1'b1;
+					pgm_rd_state <= WAIT_S;
+				end
+				
+				else if(fifo_out_data[133:132]==2'b01 && fifo_out_data_rd==1'b1) begin
+					out_rd_data <= fifo_out_data;
+					out_rd_data_wr <= fifo_out_data_wr;
+					out_rd_phv <= 1024'b1;
+					out_rd_phv_wr <= 1'b1;
+				end
+
+				else if(fifo_out_data[133:132]==2'b11 && fifo_out_data_rd==1'b1) begin
+					out_rd_data <= fifo_out_data;
+					out_rd_data_wr <= fifo_out_data_wr;
+					out_rd_phv <= 1024'b0;
+					out_rd_phv_wr <= 1'b0;
+				end
+
+				else if(fifo_out_data[133:132]==2'b10 && fifo_out_data_rd==1'b1) begin
+					out_rd_data <= fifo_out_data;
+					out_rd_data_wr <= fifo_out_data_wr;
+					fifo_out_data_rd <= 1'b0;
+				end
+
+
+				else begin
+					out_rd_data <= 134'b0;
+					out_rd_data_wr <= 1'b0;
+					out_rd_valid <= 1'b0;
+					out_rd_valid_wr <= 1'b0;
+
+					out_rd_phv <= 1024'b0;
+					out_rd_phv_wr <= 1'b0;
+					fifo_out_data_rd <= 1'b1;
+					pgm_rd_state <= DISCARD_S;
+				end
 			end
 
 			FIN_S: begin
@@ -387,91 +508,55 @@ always @(posedge clk or negedge rst_n) begin
 				end
 			end
 
-			WAIT_S: begin
-				
-				sent_time_cnt <= sent_time_cnt + 1'b1;
+			DISCARD_S: begin
+				if(fifo_out_data[133:132] != 2'b10 && fifo_out_data_wr == 1'b1) begin
 
-
-				//only needed in antDev v2
-				//sent_time_stamp <= sent_time_stamp + 32'b1;
-
-				if(sent_rate_cnt==sent_rate_reg) begin
-					rd2ram_rd <= 1'b1;
-					rd2ram_addr <= 7'b0000000;
+					fifo_out_data_rd <= 1'b1;
+					//outputs set to 0
 					out_rd_data <= 134'b0;
 					out_rd_data_wr <= 1'b0;
 					out_rd_valid <= 1'b0;
-					out_rd_phv_wr <= 1'b0;
-					out_rd_phv <= 1024'b0;
 					out_rd_valid_wr <= 1'b0;
 
-					sent_rate_cnt <= 32'b0;
-					pgm_rd_state <= HAUNT1_S;
-				end
+					out_rd_phv <= 1024'b0;
+					out_rd_phv_wr <= 1'b0;
+				end 
 
 				else begin
-					out_rd_data <= 134'b0;
-					out_rd_data_wr <= 1'b0;
-					out_rd_valid <= 1'b0;
-					out_rd_phv <= 1024'b0;
-					out_rd_phv_wr <= 1'b0;
-					out_rd_valid_wr <= 1'b0;
-
-					lat_pkt_cnt <= lat_pkt_cnt + 1'b1;
-					sent_rate_cnt <= sent_rate_cnt + 1'b1;
-					pgm_rd_state <= WAIT_S;
+					fifo_out_data_rd <= 1'b0;
+					pgm_rd_state <= IDLE_S;
 				end
 			end
 
-
-			//NEED TO BE RE-WRITE FOR 2 CYCLES DELAY
-			PROBE_S: begin
-				//TODO: add timestamp in this part
-				//but I still think that the timestamp should be added in UDO
-				
-				sent_time_cnt <= sent_time_cnt + 1'b1;
-
-
-				if(out_rd_data[133:132] != 2'b10) begin
-					out_rd_data <= ram2rd_rdata[133:0];
-					rd2ram_rd <= 1'b1;
-					rd2ram_addr <= rd2ram_addr + 7'b1;
-					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= 1'b0;
-					out_rd_phv_wr <= 1'b1;
-					out_rd_phv <= 1024'b0;
-					out_rd_valid_wr <= 1'b0;
-					
-					pgm_rd_state <= PROBE_S;
-				end
-
-				else begin
-					lat_pkt_cnt <= 32'b0;
-					sent_rate_cnt <= 32'b0;
-
-					rd2ram_rd <= 1'b0;
-					rd2ram_addr <= 7'b0;
-
-					out_rd_data <= ram2rd_rdata[133:0];
-					out_rd_data_wr <= 1'b1;
-					out_rd_valid <= 1'b1;
-					out_rd_phv_wr <= 1'b1;
-					out_rd_phv <= 1024'b0;
-					out_rd_valid_wr <= 1'b1;
-
-					if(sent_time_cnt >= sent_time_reg) begin
-						pgm_rd_state <= FIN_S;
-					end
-
-					else begin
-						pgm_rd_state <= WAIT_S;
-					end
-
-				end
-			end
 		endcase
 	end
 end
+
+
+
+
+
+
+
+//***************************************************
+//                  Other IP Instance
+//***************************************************
+//likely fifo/ram/async block.... 
+//should be instantiated below here
+
+fifo_135_512 pgm_rd_data_fifo
+(
+	.clk(clk),
+	.srst(!rst_n),
+	.din({in_rd_data_wr,in_rd_data}),
+	.wr_en(in_rd_data_wr),
+	.rd_en(fifo_out_data_rd),
+	.dout({fifo_out_data_wr,fifo_out_data}),
+	.full(data_full_flag),
+	.almost_full(),
+	.empty(data_empty_flag),
+	.data_count()
+);
 
 
 //***************************************************

@@ -134,9 +134,6 @@ initial begin
 	cin_wr_data = {6'b010000,1'b1,3'b010,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00004000};
 
 
-
-	
-
 	#CYCLE in_wr_phv = 1024'b0;
 	in_wr_phv_wr = 1'b0;
 	in_wr_phv_wr = 1'b0;
@@ -206,11 +203,10 @@ initial begin
 	in_wr_valid_wr = 1'b0;
 	in_wr_alf = 1'b0;
 
-
 	#CYCLE 
 	in_wr_phv_wr = 1'b0;
 	in_wr_phv = 1024'b0;
-	in_wr_data = {6'b110000, 16'b0, 16'b0, 32'b0, 64'd2};
+	in_wr_data = {6'b110000, 16'b1, 16'b0, 32'b0, 64'd2};
 
 	#CYCLE 
 	in_wr_data = {6'b110000, 16'b0, 16'b0, 32'b0, 64'd2};
@@ -246,7 +242,7 @@ initial begin
 	in_wr_data = {6'b110000, 16'b0, 16'b0, 32'b0, 64'd2};
 
 	#CYCLE 
-	in_wr_data = {6'b110000, 16'b0, 16'b0, 32'b0, 64'd2};
+	in_wr_data = {6'b110000, 16'b1, 16'b0, 32'b0, 64'd2};
 
 	#CYCLE
 	in_wr_data = {6'b100000, 16'b0, 16'b0, 32'b0, 64'd2};

@@ -663,7 +663,6 @@ always @(posedge clk) begin
 		end
 
 		else begin
-			
 			cout_rd_data_wr <= cin_rd_data_wr;
 			cout_rd_data <= cin_rd_data;
 			

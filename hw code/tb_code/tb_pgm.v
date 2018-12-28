@@ -107,8 +107,10 @@ end
 
 //start user code
 initial begin
-	/*
+
 	//tb for control path
+	//
+	/**the 1st control packet*/
 	#CYCLE in_pgm_phv = 1024'b0;
 	in_pgm_phv_wr = 1'b0;
 	in_pgm_phv_wr = 1'b0;
@@ -121,11 +123,41 @@ initial begin
 	cin_pgm_ready = 1'b1;
 
 	cin_pgm_data_wr = 1'b1;
-	cin_pgm_data = {6'b010000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
+	cin_pgm_data = {6'b010000,1'b1,3'b010,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00004000};
 
+
+#CYCLE in_pgm_phv = 1024'b0;
+	in_pgm_phv_wr = 1'b0;
+	in_pgm_phv_wr = 1'b0;
+	in_pgm_data = 133'b0;
+	in_pgm_data_wr = 1'b0;
+	in_pgm_valid = 1'b0;
+	in_pgm_valid_wr = 1'b0;
+	in_pgm_alf = 1'b0;
+
+	cin_pgm_ready = 1'b1;
+
+	cin_pgm_data_wr = 1'b1;
+	cin_pgm_data = {6'b100000,1'b1,3'b010,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
 
 
 	
+// 2nd control packet
+	#CYCLE in_pgm_phv = 1024'b0;
+	in_pgm_phv_wr = 1'b0;
+	in_pgm_phv_wr = 1'b0;
+
+	in_pgm_data = 133'b0;
+	in_pgm_data_wr = 1'b0;
+	in_pgm_valid = 1'b0;
+	in_pgm_valid_wr = 1'b0;
+	in_pgm_alf = 1'b0;
+
+	cin_pgm_ready = 1'b1;
+
+	cin_pgm_data_wr = 1'b1;
+	cin_pgm_data = {6'b010000,1'b1,3'b010,12'b0,8'd70,8'd61,32'h00010002,32'hffffffff,32'h000000000};
+
 
 	#CYCLE in_pgm_phv = 1024'b0;
 	in_pgm_phv_wr = 1'b0;
@@ -140,7 +172,10 @@ initial begin
 	cin_pgm_ready = 1'b1;
 
 	cin_pgm_data_wr = 1'b1;
-	cin_pgm_data = {6'b100000,1'b1,3'b001,12'b0,8'd70,8'd62,32'h00010002,32'hffffffff,32'h00000000};
+	cin_pgm_data = {6'b100000,1'b1,3'b010,12'b0,8'd70,8'd61,32'h00010002,32'hffffffff,32'h00000000};
+
+
+//3rd control packet
 
 	#CYCLE in_pgm_phv = 1024'b0;
 	in_pgm_phv_wr = 1'b0;
@@ -152,91 +187,141 @@ initial begin
 	in_pgm_valid_wr = 1'b0;
 	in_pgm_alf = 1'b0;
 
-	cin_pgm_ready = 1'b0;
+	cin_pgm_ready = 1'b1;
 
-	cin_pgm_data_wr = 1'b0;
-	cin_pgm_data = {6'b111111,1'b1,3'b001,12'b0,8'd70,8'd62,32'h00010001,32'hffffffff,32'h00000000};
+	cin_pgm_data_wr = 1'b1;
+	cin_pgm_data = {6'b010000,1'b1,3'b010,12'b0,8'd70,8'd62,32'h00010001,32'hffffffff,32'h0000000a};
 
-	#(10*CYCLE);
-	$finish; 
 
-	*/
-	//tb for data path
-	
 	#CYCLE in_pgm_phv = 1024'b0;
+	in_pgm_phv_wr = 1'b0;
+	in_pgm_phv_wr = 1'b0;
+
+	in_pgm_data = 133'b0;
+	in_pgm_data_wr = 1'b0;
+	in_pgm_valid = 1'b0;
+	in_pgm_valid_wr = 1'b0;
+	in_pgm_alf = 1'b0;
+
+	cin_pgm_ready = 1'b1;
+
+	cin_pgm_data_wr = 1'b1;
+	cin_pgm_data = {6'b100000,1'b1,3'b010,12'b0,8'd70,8'd62,32'h00010001,32'hffffffff,32'h00000000};
+//4th control packet
+
+	#CYCLE in_pgm_phv = 1024'b0;
+	in_pgm_phv_wr = 1'b0;
+	in_pgm_phv_wr = 1'b0;
+
+	in_pgm_data = 133'b0;
+	in_pgm_data_wr = 1'b0;
+	in_pgm_valid = 1'b0;
+	in_pgm_valid_wr = 1'b0;
+	in_pgm_alf = 1'b0;
+
+	cin_pgm_ready = 1'b1;
+
+	cin_pgm_data_wr = 1'b1;
+	cin_pgm_data = {6'b010000,1'b1,3'b010,12'b0,8'd70,8'd62,32'h00010002,32'hffffffff,32'h00000000};
+
+
+	#CYCLE in_pgm_phv = 1024'b0;
+	in_pgm_phv_wr = 1'b0;
+	in_pgm_phv_wr = 1'b0;
+
+	in_pgm_data = 133'b0;
+	in_pgm_data_wr = 1'b0;
+	in_pgm_valid = 1'b0;
+	in_pgm_valid_wr = 1'b0;
+	in_pgm_alf = 1'b0;
+
+	cin_pgm_ready = 1'b1;
+
+	cin_pgm_data_wr = 1'b1;
+	cin_pgm_data = {6'b100000,1'b1,3'b010,12'b0,8'd70,8'd62,32'h00010002,32'hffffffff,32'h00000000};
+	
+
+//finish the trans
+	#CYCLE 
+   	cin_pgm_data_wr <= 1'b0;
+   	cin_pgm_data = 134'b0;
+
+
+
+/**start data plane trans*/
+
+/**1st packet*/
+	#CYCLE
+	in_pgm_phv = 1024'b1;
 	in_pgm_phv_wr = 1'b1;
 	in_pgm_phv_alf = 1'b0;
 
 	in_pgm_data = {6'b010000, 16'b0, 3'b111, 13'b0, 32'b0, 64'b0};
 
-
 	in_pgm_data_wr = 1'b1;
-	in_pgm_valid = 1'b1;
+	in_pgm_valid = 1'b0;
 	in_pgm_valid_wr = 1'b0;
 	in_pgm_alf = 1'b0;
 
-	cin_pgm_ready = 1'b1;
+	#CYCLE 
+	in_pgm_phv_wr = 1'b0;
+	in_pgm_phv = 1024'b0;
+	in_pgm_data = {6'b110000, 16'b1, 16'b0, 32'b0, 64'd2};
 
-	cin_pgm_data_wr = 1'b0;
-	cin_pgm_data = {6'b010000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
-
-	//2nd
-	#CYCLE in_pgm_phv = 1024'b0;
-	in_pgm_phv_wr = 1'b1;
-	in_pgm_phv_alf = 1'b0;
-
+	#CYCLE 
 	in_pgm_data = {6'b110000, 16'b0, 16'b0, 32'b0, 64'd2};
-	
 
-	in_pgm_data_wr = 1'b1;
+	#CYCLE
+	in_pgm_data = {6'b100000, 16'b0, 16'b0, 32'b0, 64'd2};
+
+	#CYCLE
+	in_pgm_data = 134'b0;
+	in_pgm_data_wr = 1'b0;
 	in_pgm_valid = 1'b1;
-	in_pgm_valid_wr = 1'b0;
-	in_pgm_alf = 1'b0;
+	in_pgm_valid_wr = 1'b1;
 
-	cin_pgm_ready = 1'b1;
 
-	cin_pgm_data_wr = 1'b0;
-	cin_pgm_data = {6'b100000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
+	#(2*CYCLE)
 
-	//3rd
-	#CYCLE in_pgm_phv = 1024'b0;
+/**2nd packet*/
+	in_pgm_phv = 1024'b1;
 	in_pgm_phv_wr = 1'b1;
 	in_pgm_phv_alf = 1'b0;
 
-	in_pgm_data = {6'b110000, 16'b0, 16'b0, 32'b0, 64'd3};
-	
+	in_pgm_data = {6'b010000, 16'b0, 3'b111, 13'b0, 32'b0, 64'b0};
 
 	in_pgm_data_wr = 1'b1;
-	in_pgm_valid = 1'b1;
+	in_pgm_valid = 1'b0;
 	in_pgm_valid_wr = 1'b0;
 	in_pgm_alf = 1'b0;
 
-	cin_pgm_ready = 1'b1;
+	#CYCLE 
+	in_pgm_phv_wr = 1'b0;
+	in_pgm_phv = 1024'b0;
+	in_pgm_data = {6'b110000, 16'b1, 16'b0, 32'b0, 64'd2};
 
-	cin_pgm_data_wr = 1'b0;
-	cin_pgm_data = {6'b010000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
+	#CYCLE 
+	in_pgm_data = {6'b110000, 16'b0, 16'b0, 32'b0, 64'd2};
 
+	#CYCLE
+	in_pgm_data = {6'b100000, 16'b0, 16'b0, 32'b0, 64'd2};
 
-	//4th
-	#CYCLE in_pgm_phv = 1024'b0;
-	in_pgm_phv_wr = 1'b1;
-	in_pgm_phv_alf = 1'b0;
-
-	in_pgm_data = {6'b100000, 16'b0, 16'b0, 32'b0, 64'd4};
-	
-
-	in_pgm_data_wr = 1'b1;
+	#CYCLE
+	in_pgm_data = 134'b0;
+	in_pgm_data_wr = 1'b0;
 	in_pgm_valid = 1'b1;
+	in_pgm_valid_wr = 1'b1;
+
+/**finish trans*/
+
+	#CYCLE
+	in_pgm_data = 134'b0;
+	in_pgm_data_wr = 1'b0;
+	in_pgm_valid = 1'b0;
 	in_pgm_valid_wr = 1'b0;
-	in_pgm_alf = 1'b0;
-
-	cin_pgm_ready = 1'b1;
-
-	cin_pgm_data_wr = 1'b0;
-	cin_pgm_data = {6'b100000,1'b1,3'b001,12'b0,8'd70,8'd61,32'h00010001,32'hffffffff,32'h00000000};
 
 
-	#(20*CYCLE);
+	#(10*CYCLE);
 	$finish; 
 	
 end
