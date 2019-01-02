@@ -108,6 +108,7 @@ int main(int argc, char* argv[])
 	pkt->um.outport = arg_sent_port;
 	/**set priority as 3'b111 to enable ANT hw pipeline*/
 	pkt->um.priority = 7;
+	pkt->um.inport = 63;
 	pkt->um.dstmid = 1;
 	pkt->um.len = sizeof(struct um_metadata)+arg_pkt_length;
 	int i;
