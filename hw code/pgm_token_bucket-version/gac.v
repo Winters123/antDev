@@ -331,10 +331,10 @@ always @(posedge clk or negedge rst_n) begin
 				out_gac_data_wr <= 1'b0;				 
 				  if((gac_vfifo_empty == 1'b0) && (MD_fifo_empty == 1'b0) && (in_gac_alf == 1'b0)&& (in_gac_phv_alf==1'b0)) begin //wait pkt and md(index)
 				     if(MD_fifo_rdata[87:80] == LMID) begin //DMID = 4
-					  MD_fifo_rd <= 1'b0;					 
-                   //   gac_ram_rd <= 1'b1;  
-                      gac_address <= MD_fifo_rdata[57:50];  //index
-                      gac_state <= LOOKUP_S;
+						  MD_fifo_rd <= 1'b0;					 
+	                      //gac_ram_rd <= 1'b1;  
+	                      gac_address <= MD_fifo_rdata[57:50];  //index
+	                      gac_state <= LOOKUP_S;
 					  end
 					  else begin //DMID != 4
                           gac_vfifo_rd <= 1'b1;
@@ -345,7 +345,7 @@ always @(posedge clk or negedge rst_n) begin
 						  out_gac_phv <= PHV_fifo_rdata;
 					      gac_state <= TRANS_S;
 					  end
-			     end       
+			      end       
 				  else begin
 			           gac_vfifo_rd <= 1'b0;
                        gac_dfifo_rd <= 1'b0;
@@ -354,7 +354,7 @@ always @(posedge clk or negedge rst_n) begin
                        out_gac_data_wr <= 1'b0;			  
 					   out_gac_phv <= 1024'b0;
 					   out_gac_phv_wr <= 1'b0;							  
-                    gac_state <= IDLE_S;			  
+                       gac_state <= IDLE_S;			  
 				  end		  
 			  end
 			  
@@ -439,7 +439,7 @@ always @(posedge clk or negedge rst_n) begin
                    4'd4: begin//4 assign Mid
                         out_gac_data_wr <= 1'b1;
 					  	out_gac_data[133:128] <= gac_dfifo_rdata[133:128];
-						out_gac_data[127]     <= MD_fifo_rdata[127];      //pktsrc
+						out_gac_data[127]     <= MD_fifo_rdata[127];      //pktsrc: control or data path
 						out_gac_data[126]     <= 1'b1;                    //pktdes
 						out_gac_data[125:120] <= MD_fifo_rdata[125:120];  //inport
 						out_gac_data[119:118] <= 2'b0;        //outtype
@@ -458,16 +458,16 @@ always @(posedge clk or negedge rst_n) begin
                     * in order to allow ant_pkt sent arrive pgm, we need to judge if the pkt comes from CPU or
                     *  phy, if the pkt from CPU, we need to allow it to pass, else, we discard the pkt.
                     */
-                   		if(gac_dfifo_rdata[127]==1'b1) begin
+                   		if(gac_dfifo_rdata[50]==1'b1) begin
                    			gac_state <= TRANS_S;
                         	out_gac_phv_wr <= 1'b1;
                         	out_gac_phv <= 1024'b0;
                         	out_gac_data_wr <= 1'b1;
-                        	out_gac_data <= {gac_dfifo_rdata[133:88], 8'd5, gac_dfifo_rdata[79:0]};
+                        	out_gac_data <= {gac_dfifo_rdata[133:88], 8'd6, gac_dfifo_rdata[79:0]};
                    		end
                    		
                    		else begin
-                            gac_state <= DISCARD_S;
+                            gac_state <= DISCARD_S; 
 							out_gac_phv_wr <= 1'b0;	
 							out_gac_phv <=1024'b0;
 						end
@@ -517,7 +517,7 @@ always @(posedge clk or negedge rst_n) begin
                  gac_dfifo_rd <= 1'b0;
 		         PHV_fifo_rd  <= 1'b0;
 		         MD_fifo_rd   <= 1'b0;  
-		   //      gac_ram_rd <= 1'b0;	  
+		   //    gac_ram_rd <= 1'b0;	  
 		         out_gac_data <= 134'b0;
                  out_gac_data_wr <= 1'b0;		    	  
                  out_gac_phv <= 1024'b0;
