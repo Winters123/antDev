@@ -307,7 +307,7 @@ always @(posedge clk or negedge rst_n) begin
 					pgm_rd_state <= READ_S;
 
 					//only used in antDev v2
-					if (pkt_cycle_cnt == 11'd3) begin
+					if (pkt_cycle_cnt == 11'd4) begin
 						// only needed in antDev v2
 						out_rd_data <= {ram2rd_rdata[133:128], sent_pkt_cnt, timestamp2rd, 32'hffffffff};
 						out_rd_data_wr <= 1'b1;
@@ -329,8 +329,13 @@ always @(posedge clk or negedge rst_n) begin
 				else if(ram2rd_rdata[133:132] == 2'b10) begin
 					rd2ram_rd <= 1'b0;
 					rd2ram_addr <= 7'b0;
-
-					out_rd_data <= ram2rd_rdata[133:0];
+					
+                    if (pkt_cycle_cnt == 11'd4) begin
+                        out_rd_data <= {ram2rd_rdata[133:128], sent_pkt_cnt, timestamp2rd, 32'hffffffff};
+                    end
+                    else begin
+                        out_rd_data <= ram2rd_rdata[133:0];
+                    end	
 					out_rd_data_wr <= 1'b1;
 					out_rd_valid <= 1'b1;
 					out_rd_phv <= 1024'b0;

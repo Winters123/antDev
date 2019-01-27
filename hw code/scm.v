@@ -1,10 +1,10 @@
 /** *************************************************************************
  *  @file          scm.v
- *  @brief      çĄŹäťśçťčŽĄć¨Ąĺ
+ *  @brief      ?????????????¨????
  * 
- *   ć­¤ćäťśĺćŹĺŻšćľčŻćĽćäżĄćŻççťčŽĄĺ
+ *   ??¤?????????????????????????????????????????????
  * 
- *  @date       2018/10/24 10:53:51 ććďż???
+ *  @date       2018/10/24 10:53:51 ???????????
  *  @author     Jiang(Copyright  2018  Jiang Yue)
  *  @modified   Yang XR
  *  @email      <lang_jy@outlook.com>
@@ -72,13 +72,13 @@ reg statistic_reset;
 //reg [31:0] n_RTT_cnt;
 
 /*used for obatain the output of RAM*/
-(*mark_debug = "true"*)wire [31:0] ram_latency_out;
+wire [31:0] ram_latency_out;
 /*used for restore the 2nd cycle of control read signal*/
 reg [133:0] cin_scm_data_2_cycle;
-(*mark_debug = "true"*)reg ram_latency_rd_en;
+reg ram_latency_rd_en;
 reg ctl_write_flag; //if its a read signal or write signal that the destination isn't self, we set the flag as 0, else we set it as 1
 //Debug
-(*mark_debug = "true"*)wire [9:0] ram_wr_addr;
+wire [9:0] ram_wr_addr;
 
 
 assign out_scm_md_alf = in_scm_md_alf;
@@ -184,7 +184,6 @@ reg [2:0] scm_ctl_state;
 //State Declaration
 localparam IDLE_CTL_S = 3'd0,
            WAIT_CTL_S = 3'd1,
-           WAIT_CTL_S2 = 3'd4,
            RESP1_CTL_S = 3'd2,
            RESP2_CTL_S = 3'd3;
 
@@ -304,16 +303,10 @@ always @(posedge clk or negedge rst_n) begin
                 cin_scm_data_2_cycle <= cin_scm_data;
                 cout_scm_data_wr <= 1'b0;
                 ram_latency_rd_en <= 1'b0;
-                scm_ctl_state <= WAIT_CTL_S2;
-            end
-
-            WAIT_CTL_S2: begin
-                cout_scm_data <= cout_scm_data;
-                cin_scm_data_2_cycle <= cin_scm_data_2_cycle;
-                cout_scm_data_wr <= 1'b0;
-                ram_latency_rd_en <= 1'b0;
                 scm_ctl_state <= RESP1_CTL_S;
             end
+
+
 
             RESP1_CTL_S: begin
                 cout_scm_data <= {cout_scm_data[133:128], 4'b1011, cout_scm_data[123:112], cout_scm_data[103:96], cout_scm_data[111:104], cout_scm_data[95:32], ram_latency_out};
@@ -333,7 +326,7 @@ always @(posedge clk or negedge rst_n) begin
 end
 
 (*mark_debug = "true"*)wire [31:0] time_latency;
-assign time_latency = um2scm_timestamp-in_scm_phv[783:672];
+assign time_latency = um2scm_timestamp-in_scm_phv[575:544];
 
 
 
@@ -341,7 +334,7 @@ assign time_latency = um2scm_timestamp-in_scm_phv[783:672];
 blk_mem_gen_0 scm_ram(
   .clka(clk),
   .wea(in_scm_md_wr),
-  .addra(in_scm_phv[713:704]),
+  .addra(in_scm_phv[585:576]),
   .dina(time_latency),
   .douta(),
   .clkb(clk),
