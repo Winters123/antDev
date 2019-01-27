@@ -172,15 +172,18 @@ u32 ant_dich_throughput_test(struct fast_packet *pkt, int pkt_len, int rnt, u32 
 void ant_print_counters(struct ant_cnt a_cnt, int len){
 	printf("-----------------------***ANT COUNTERS***-----------------------\n");
 
+	a_cnt.sent_bits = a_cnt.sent_bits-a_cnt.sent_pkts*16;
+	
+	a_cnt.recv_bits = a_cnt.recv_bits-a_cnt.recv_pkts*32;
 	printf("Test Time:\t%llu *10ns\n", a_cnt.test_time);
 	printf("Sent Pkt Bytes:\t%llu\t Bytes\n", a_cnt.sent_bits);
 	printf("Sent Pkt Num:\t%llu\t\n", a_cnt.sent_pkts);
-	printf("Sent Pkt Rate:\t%llf\tKpps\n", (double)(a_cnt.sent_pkts*100000)/a_cnt.test_time);
-	printf("Sent Bit Rate:\t%llf\tMbps\n", (double)(a_cnt.sent_bits*100*8)/a_cnt.test_time);
-	printf("Recv Pkt Bytes:\t%llu\t Bytes\n", a_cnt.recv_pkts*len);
-	printf("Recv Pkt Num:\t%llu\n", a_cnt.recv_pkts+16);
-	printf("Recv Pkt Rate:\t%llf\tKpps\n",(double)(((a_cnt.recv_pkts+16)*100000)/a_cnt.test_time));
-	printf("Recv Bit Rate:\t%llf\tMbps\n",(double)((a_cnt.recv_pkts*len*8*100)/a_cnt.test_time));
+	printf("Sent Pkt Rate:\t%llf\tKpps\n", (double)(a_cnt.sent_pkts*100000.0/a_cnt.test_time));
+	printf("Sent Bit Rate:\t%llf\tMbps\n", (double)(a_cnt.sent_bits*100*8.0/a_cnt.test_time));
+	printf("Recv Pkt Bytes:\t%llu\t Bytes\n", a_cnt.recv_bits);
+	printf("Recv Pkt Num:\t%llu\n", a_cnt.recv_pkts);
+	printf("Recv Pkt Rate:\t%llf\tKpps\n",(double)(a_cnt.recv_pkts*100000.0/a_cnt.test_time));
+	printf("Recv Bit Rate:\t%llf\tMbps\n",(double)((a_cnt.recv_bits*8*100.0)/a_cnt.test_time));
 
 	printf("-----------------------***ANT COUNTERS***-----------------------\n");
 }
@@ -211,7 +214,7 @@ int ant_rst(){
  * Read latency into latency test file, in a readable format
  * @return [0 if success, else return -1]
  */
-int import_latency_to_txt(){
+int import_latency_to_txt(int size){
 
 	FILE * fid = fopen("latency_out", "w");
 	if (fid == NULL){
@@ -225,7 +228,30 @@ int import_latency_to_txt(){
 	for (i = 0; i < 1023; i++){
 		in_file_latency = fast_ua_hw_rd(SCM_MID, SCM_RAM_ADDR + i, MASK_1);
 		usleep(1);
-		fprintf(fid, "%04d round: %uns\t", i, (in_file_latency*10-2680));
+		if(size>0 && size<=64){
+			fprintf(fid, "%04d round: %uns\t", i, (in_file_latency*10-260));
+		}
+
+		else if(size >64 && size <=128){
+			fprintf(fid, "%04d round: %uns\t", i, (in_file_latency*10-730));
+		}
+		else if(size>128 && size <=256){
+			
+			fprintf(fid, "%04d round: %uns\t", i, (in_file_latency*10-2400));
+		}
+		else if(size>256 && size <= 512){
+			
+			fprintf(fid, "%04d round: %uns\t", i, (in_file_latency*10-5710));
+		}
+		else if(size>512 && size <= 1024){
+			
+			fprintf(fid, "%04d round: %uns\t", i, (in_file_latency*10-12370));
+		}
+		else if(size>1024 && size <= 1500){
+			fprintf(fid, "%04d round: %uns\t", i, (in_file_latency*10-19370));
+		}
+		else 
+			fprintf(fid, "%04d round: invalid value.\t", i);
 		j++;
 		if(j == 5){
 			fprintf(fid, "\n");

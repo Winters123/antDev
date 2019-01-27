@@ -53,18 +53,23 @@ int main(int argc, char* argv[])
 {
 	
 	/*obtain sent parameters*/
-	int arg_sent_time, arg_sent_rate, arg_pkt_length, arg_sent_port;
+	long long arg_sent_time, arg_sent_rate, arg_pkt_length, arg_sent_port;
 	if(argc != 5){
-		printf("Usage:\n\t:sent_time(s) sent_rate(10ns), pkt_length(64,1500), sent_port(0,3)\n");
+		printf("Usage:\n\t:sent_time(s) sent_rate(Mbps), pkt_length(64,1500), sent_port(0,3)\n");
 		return -1;
 	}
 	else{
-		sscanf(argv[1], "%d", &arg_sent_time);
-		sscanf(argv[2], "%d", &arg_sent_rate);
-		sscanf(argv[3], "%d", &arg_pkt_length);
-		sscanf(argv[4], "%d", &arg_sent_port);
+		sscanf(argv[1], "%lld", &arg_sent_time);
+		sscanf(argv[2], "%lld", &arg_sent_rate); //this stands for Mbps
+		sscanf(argv[3], "%lld", &arg_pkt_length);
+		sscanf(argv[4], "%lld", &arg_sent_port);
 	}
 
+	//arg_sent_rate = 800*arg_pkt_length/arg_sent_rate - arg_pkt_length/16;
+	
+	//so the users could enter the speed rate from 1% to 100%
+	arg_sent_rate = (arg_pkt_length+20)*80/arg_sent_rate-arg_pkt_length/16-2-2;
+	
 	if(arg_sent_time<0 || arg_sent_port>3 || arg_sent_port<0 || arg_pkt_length<60){
 		printf("invalid input!\n");
 		return -1;
@@ -85,8 +90,10 @@ int main(int argc, char* argv[])
 	/**set test parameters*/
 	//demo_parameter.sent_time = 0x165a0bc00; //about 100 seconds
 	demo_parameter.sent_time = arg_sent_time*(100000000);
+	//printf("the sending time is %lld", demo_parameter.sent_time);
 	//demo_parameter.sent_rate = 0x00001000; //about 6.5ms send a pkt
-	demo_parameter.sent_rate = (arg_sent_rate>0x10000)?arg_sent_rate:0x10000;
+	//demo_parameter.sent_rate = (arg_sent_rate>30)?arg_sent_rate:62;
+	demo_parameter.sent_rate = arg_sent_rate;
 	//demo_parameter.sent_rate = 0x59c1f1; //about sending 1000 pkts per min
 	demo_parameter.proto_type = 0x2; //ipv4_udp
 
@@ -108,8 +115,9 @@ int main(int argc, char* argv[])
 	pkt->um.outport = arg_sent_port;
 	/**set priority as 3'b111 to enable ANT hw pipeline*/
 	pkt->um.priority = 7;
-	pkt->um.inport = 63;
 	pkt->um.dstmid = 1;
+	pkt->um.pktsrc = 1;
+	pkt->um.inport = 63;
 	pkt->um.len = sizeof(struct um_metadata)+arg_pkt_length;
 	int i;
 
@@ -174,6 +182,6 @@ int main(int argc, char* argv[])
 	/**reset ant to enble next test round*/
 	ant_rst();
 	/**write letancy into file*/
-	import_latency_to_txt();
+	import_latency_to_txt(arg_pkt_length);
 	return 0;
 }
