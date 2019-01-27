@@ -147,7 +147,6 @@ always @(posedge clk or negedge rst_n) begin
 
 
 		
-		
 	end
 	else begin
 		case(pgm_wr_state)

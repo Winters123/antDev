@@ -452,7 +452,13 @@ always @(posedge clk or negedge rst_n) begin
                         gac_state <= TRANS_S;
                     end									
                     
-                   default: begin //discard
+                   default: begin 
+
+                   /**
+                    * in order to allow ant_pkt sent arrive pgm, we need to judge if the pkt comes from CPU or
+                    *  phy, if the pkt from CPU, we need to allow it to pass, else, we discard the pkt.
+                    */
+                   		//discard
                         gac_state <= TRANS_S;
                         out_gac_phv_wr <= 1'b1;
                         out_gac_phv <= 1024'b0;

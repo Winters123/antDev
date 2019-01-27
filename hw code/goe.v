@@ -552,8 +552,7 @@ fifo_134_128 ctrl_fifo(
 );
 
 	
-ram_32_256 goe_ram_inst
-(      
+ram_32_256 goe_ram_inst(
     .clka(clk),
     .dina(data_a),
     .wea(cnt_rw),

@@ -33,19 +33,67 @@ wire cout_scm_data_wr;
 reg cin_scm_ready;
 
 //clock signal
-initial begin
-    clk = 1'b0;
-    forever # 5 clk = ~clk;
+always begin
+    #(CYCLE/2) clk = ~ clk;
 end
+
+
+parameter CYCLE = 10;
 
 //reset signal
 initial begin
-    rst_n = 1'b0;
-    # 200;
-    rst_n = 1'b1;
+    clk = 0;
+    rst_n = 1;
+    #(5);
+    rst_n = 0;
+    #(5);
+    rst_n = 1;
 end
 
+initial begin
+    # (2*CYCLE) 
+    cin_scm_data_wr = 1'b1;
+    cin_scm_ready = 1'b1;
+    in_scm_md = 256'b0;
+    in_scm_md_wr = 1'b0;
+    in_scm_phv_alf = 1'b0;
+    gac2scm_sent_start = 1'b0;
+    gac2scm_sent_end = 1'b0;
+    cin_scm_data = {6'b010000,1'b1,3'b001,12'b0,8'd123,8'd7,32'h80000002,32'h00010000};
 
+    #CYCLE
+    cin_scm_data_wr = 1'b1;
+    cin_scm_ready = 1'b1;
+    in_scm_md = 256'b0;
+    in_scm_md_wr = 1'b0;
+    in_scm_phv_alf = 1'b0;
+    gac2scm_sent_start = 1'b0;
+    gac2scm_sent_end = 1'b0;
+    cin_scm_data = {6'b100000,1'b1,3'b001,12'b0,8'd123,8'd7,32'h80000000,32'h00010000};
+
+    #CYCLE
+    cin_scm_data_wr = 1'b1;
+    cin_scm_ready = 1'b1;
+    in_scm_md = 256'b0;
+    in_scm_md_wr = 1'b0;
+    in_scm_phv_alf = 1'b0;
+    gac2scm_sent_start = 1'b0;
+    gac2scm_sent_end = 1'b0;
+    cin_scm_data = {6'b010000,1'b1,3'b001,12'b0,8'd123,8'd7,32'h80000003,32'h00010000};
+
+
+    #CYCLE
+    cin_scm_data_wr = 1'b1;
+    cin_scm_ready = 1'b1;
+    in_scm_md = 256'b0;
+    in_scm_md_wr = 1'b0;
+    in_scm_phv_alf = 1'b0;
+    gac2scm_sent_start = 1'b0;
+    gac2scm_sent_end = 1'b0;
+    cin_scm_data = {6'b100000,1'b1,3'b001,12'b0,8'd123,8'd7,32'h80000003,32'h00010000};
+
+
+end
 //*************************************************************************************
 //check software signal
 
@@ -285,6 +333,7 @@ initial begin
 end
 */
 ///////////////////////////////////////////////////////////////////////
+
 
 
 
