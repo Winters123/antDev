@@ -49,8 +49,8 @@ module pgm_wr #(
 	output reg out_wr_phv_wr,
 	input in_wr_phv_alf,
 
-	output reg [133:0] out_wr_data, 
-	output reg out_wr_data_wr,
+	(*mark_debug="true"*)output reg [133:0] out_wr_data, 
+	(*mark_debug="true"*)output reg out_wr_data_wr,
 	output reg out_wr_valid,
 	output reg out_wr_valid_wr,
 	input in_wr_alf,
@@ -114,7 +114,7 @@ assign cout_wr_ready = cin_wr_ready;
 assign out_wr_sent_time_reg = sent_time_reg;
 
 
-reg [4:0] pgm_wr_state;
+(*mark_debug="true"*)reg [4:0] pgm_wr_state;
 
 //***************************************************
 //             Pkt Store & Transmit
