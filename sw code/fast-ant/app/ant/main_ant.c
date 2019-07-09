@@ -37,6 +37,7 @@ int callback(struct fast_packet *pkt,int pkt_len)
 	printf("/****************************debug1*****************/\n");
 	return 0;
 }
+
 void ua_init(u8 mid)
 {
 	int ret = 0;

@@ -329,6 +329,7 @@ assign is_ipv4_udp = ((PHV[927:912] == 16'h0800)&&(PHV[839:832] == 8'h11))? 1'b1
 assign is_ipv6 = (PHV[927:912] == 16'h86dd)?1'b1:1'b0;
 assign is_ipv6_udp = ((PHV[927:912] == 16'h86dd)&&(PHV[863:856] == 8'h11))?1'b1:1'b0;
 assign is_ipv6_tcp = ((PHV[927:912] == 16'h86dd)&&(PHV[863:856] == 8'h6))? 1'b1:1'b0;
+assign is_vlan = (PHV[927:912] == 16'h8100)? 1'b1:1'b0;
 
 always @(posedge clk) begin 
     if(rst_n == 1'b0) begin
@@ -355,6 +356,9 @@ always @(posedge clk) begin
     end
     else if (is_arp == 1'b1) begin //PST = 8'b0000 0011
         PST[7:0] <= 8'b00000011;
+    end
+    else if (is_vlan == 1'b1) begin
+    	PST[7:0] <= 8'b11100000;  //0xe0
     end
     else begin
         PST <= PST;
